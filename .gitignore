@@ -9,3 +9,6 @@ screenshots/
 next-env.d.ts
 /media/
 .vercel
+
+# Local Netlify folder
+.netlify
