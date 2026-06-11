@@ -30,6 +30,10 @@ export default async function UslugeStranica() {
         nadnaslov="Uz Vas u svakom koraku"
         naslov="Naše usluge"
         uvod="Od prve provjere sluha do dugogodišnjeg održavanja aparata — uz Vas smo u svakom koraku."
+        slika={{
+          src: '/media/site-refresh/services-page.png',
+          alt: 'Profesionalna provjera sluha u audiometrijskoj kabini Audio BM poslovnice',
+        }}
       />
 
       <div className="kontejner pb-16 md:pb-24">

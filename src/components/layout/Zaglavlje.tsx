@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { MapPin, Phone, ShieldCheck } from 'lucide-react'
+import { Headphones, MapPin, Phone } from 'lucide-react'
 import { dajNavigaciju, dajPodesavanja, dajPoslovnice } from '@/lib/podaci'
 import { stvarno } from '@/lib/tekst'
 import { TelefonLink } from '@/components/ui/TelefonLink'
@@ -22,6 +22,9 @@ export async function Zaglavlje() {
     dajPoslovnice(),
   ])
   const stavke = (navigacija.glavniMeni ?? []).map((s) => ({ oznaka: s.oznaka, putanja: s.putanja }))
+  // online test je proizvodna funkcija stranice (fiksna ruta) — u mobilnom meniju
+  // stoji uz CMS stavke, na desktopu u servisnom pojasu
+  const stavkeMobilne = [...stavke, { oznaka: 'Online test sluha', putanja: '/online-test-sluha' }]
   const telefon = stvarno(podesavanja.telefonGlavni)
 
   return (
@@ -37,10 +40,13 @@ export async function Zaglavlje() {
               <MapPin className="size-3.5 text-brand-600" aria-hidden />
               {poslovnice.length} poslovnica širom Bosne i Hercegovine
             </Link>
-            <span className="inline-flex items-center gap-1.5 text-neutral-500">
-              <ShieldCheck className="size-3.5 text-success-600" aria-hidden />
-              Provjera sluha je besplatna i bez obaveze
-            </span>
+            <Link
+              href="/online-test-sluha"
+              className="inline-flex items-center gap-1.5 font-semibold text-brand-700 transition-colors duration-150 hover:text-brand-800"
+            >
+              <Headphones className="size-3.5" aria-hidden />
+              Online test sluha — besplatno, za 5 minuta
+            </Link>
           </div>
           {telefon && (
             <span className="inline-flex items-baseline gap-2.5">
@@ -94,7 +100,7 @@ export async function Zaglavlje() {
               <Phone className="size-5" aria-hidden />
             </a>
           )}
-          <MobilniMeni stavke={stavke} telefon={telefon ?? undefined} />
+          <MobilniMeni stavke={stavkeMobilne} telefon={telefon ?? undefined} />
         </div>
       </div>
     </header>

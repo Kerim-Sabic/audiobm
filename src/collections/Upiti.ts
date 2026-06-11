@@ -9,6 +9,7 @@ export const VRSTE_UPITA = [
   { label: 'Opšta podrška', value: 'podrska' },
   { label: 'Kupovina proizvoda', value: 'kupovina' },
   { label: 'Zahtjev za povratni poziv', value: 'povratni-poziv' },
+  { label: 'Online test sluha (screening)', value: 'online-test-sluha' },
 ] as const
 
 /** CSV izvoz svih upita (samo vlasnik i urednik). */
@@ -138,6 +139,17 @@ export const Upiti: CollectionConfig = {
       label: 'Stranica sa koje je upit poslan',
       type: 'text',
       admin: { readOnly: true },
+    },
+    {
+      name: 'rezultatTesta',
+      label: 'Rezultat online testa sluha',
+      type: 'json',
+      admin: {
+        readOnly: true,
+        condition: (data) => data?.vrsta === 'online-test-sluha',
+        description:
+          'Strukturirani rezultat informativnog online screeninga (kategorija, pouzdanost, relativni pragovi po uhu i frekvenciji, upitnik). Ne predstavlja medicinsku dijagnozu.',
+      },
     },
     {
       name: 'saglasnost',

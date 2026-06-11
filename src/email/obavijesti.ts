@@ -7,6 +7,14 @@ const NAZIVI_VRSTA: Record<string, string> = {
   podrska: 'Opšta podrška',
   kupovina: 'Kupovina proizvoda',
   'povratni-poziv': 'Zahtjev za povratni poziv',
+  'online-test-sluha': 'Online test sluha (screening)',
+}
+
+const NAZIVI_KATEGORIJA: Record<string, string> = {
+  'bez-znakova': 'Nema jasnih znakova poteškoće',
+  moguca: 'Moguća poteškoća sa sluhom',
+  preporuka: 'Preporučuje se profesionalna provjera',
+  hitno: 'Potrebna brza konsultacija (crvene zastavice)',
 }
 
 const esc = (s: unknown) =>
@@ -71,6 +79,18 @@ export async function posaljiObavijestOUpitu(payload: Payload, upit: Record<stri
         ${red('E-mail', upit.email)}
         ${red('Preferirani termin', upit.preferiraniTermin)}
         ${red('Poruka', upit.poruka)}
+        ${red(
+          'Rezultat screeninga',
+          upit.rezultatTesta && typeof upit.rezultatTesta === 'object'
+            ? NAZIVI_KATEGORIJA[(upit.rezultatTesta as Record<string, unknown>).kategorija as string]
+            : undefined,
+        )}
+        ${red(
+          'Pouzdanost screeninga',
+          upit.rezultatTesta && typeof upit.rezultatTesta === 'object'
+            ? (upit.rezultatTesta as Record<string, unknown>).pouzdanostNivo
+            : undefined,
+        )}
       </table>
       <p style="margin:20px 0 0">
         <a href="${adminUrl}" style="display:inline-block;background:#ED1C24;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:8px;font-size:15px;font-weight:600">Otvorite upit u administraciji</a>

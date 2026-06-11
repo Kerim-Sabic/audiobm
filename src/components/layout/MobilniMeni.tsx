@@ -15,10 +15,12 @@ import {
   BookOpen,
   Mail,
   Home,
+  Headphones,
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { usePathname } from 'next/navigation'
 import { telHref } from '@/components/ui/TelefonLink'
 import { zabiljezi } from '@/lib/analytics'
@@ -34,6 +36,7 @@ const IKONE_RUTA: Record<string, typeof Ear> = {
   '/cijene-i-finansiranje': Wallet,
   '/savjeti': BookOpen,
   '/kontakt': Mail,
+  '/online-test-sluha': Headphones,
 }
 
 /**
@@ -49,8 +52,11 @@ export function MobilniMeni({
   telefon?: string
 }) {
   const [otvoren, setOtvoren] = useState(false)
+  // portal cilj postoji tek nakon montiranja (SSR nema document)
+  const [montiran, setMontiran] = useState(false)
   const putanja = usePathname()
 
+  useEffect(() => setMontiran(true), [])
   useEffect(() => setOtvoren(false), [putanja])
 
   useEffect(() => {
@@ -77,9 +83,13 @@ export function MobilniMeni({
         <Menu className="size-5" aria-hidden />
       </button>
 
-      <AnimatePresence>
-        {otvoren && (
-          <>
+      {/* portal na <body>: backdrop-blur na zaglavlju pravi containing block
+          za fixed elemente, pa ladica unutar zaglavlja ne bi pokrila ekran */}
+      {montiran &&
+        createPortal(
+          <AnimatePresence>
+            {otvoren && (
+              <>
             {/* zatamnjena pozadina */}
             <m.button
               type="button"
@@ -179,8 +189,10 @@ export function MobilniMeni({
               </div>
             </m.div>
           </>
+            )}
+          </AnimatePresence>,
+          document.body,
         )}
-      </AnimatePresence>
     </div>
   )
 }

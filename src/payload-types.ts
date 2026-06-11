@@ -159,7 +159,7 @@ export interface KorisniciAuthOperations {
  */
 export interface Upiti {
   id: number;
-  vrsta: 'zakazivanje' | 'doktor' | 'poslovnica' | 'podrska' | 'kupovina' | 'povratni-poziv';
+  vrsta: 'zakazivanje' | 'doktor' | 'poslovnica' | 'podrska' | 'kupovina' | 'povratni-poziv' | 'online-test-sluha';
   status: 'novo' | 'u-toku' | 'rijeseno';
   poslovnica?: (number | null) | Poslovnice;
   dodijeljeno?: (number | null) | Korisnici;
@@ -170,6 +170,18 @@ export interface Upiti {
   preferiraniTermin?: string | null;
   proizvod?: (number | null) | Proizvodi;
   izvorStranica?: string | null;
+  /**
+   * Strukturirani rezultat informativnog online screeninga (kategorija, pouzdanost, relativni pragovi po uhu i frekvenciji, upitnik). Ne predstavlja medicinsku dijagnozu.
+   */
+  rezultatTesta?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   saglasnost: boolean;
   /**
    * Vidljivo samo u administraciji.
@@ -864,6 +876,7 @@ export interface UpitiSelect<T extends boolean = true> {
   preferiraniTermin?: T;
   proizvod?: T;
   izvorStranica?: T;
+  rezultatTesta?: T;
   saglasnost?: T;
   biljeske?:
     | T

@@ -3,7 +3,8 @@
 /**
  * Analitički događaji (Plausible). Bez podešene domene pozivi su bezopasni no-op.
  * Događaji: lead_submit, call_click, whatsapp_click, viber_click,
- * booking_start, booking_complete, promo_click.
+ * booking_start, booking_complete, promo_click,
+ * hearing_test_start, hearing_test_complete.
  */
 type Dogadjaj =
   | 'lead_submit'
@@ -13,6 +14,8 @@ type Dogadjaj =
   | 'booking_start'
   | 'booking_complete'
   | 'promo_click'
+  | 'hearing_test_start'
+  | 'hearing_test_complete'
 
 declare global {
   interface Window {

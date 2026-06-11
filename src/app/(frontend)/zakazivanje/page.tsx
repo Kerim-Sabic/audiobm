@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { ShieldCheck, Clock, PhoneCall } from 'lucide-react'
 import { dajPoslovnice } from '@/lib/podaci'
 import { metaStranice } from '@/lib/seo'
@@ -55,6 +56,17 @@ export default async function ZakazivanjeStranica() {
           <div className="povrsina !rounded-[28px] p-6 !shadow-[var(--shadow-lift-lg)] md:p-10">
             <ZakazivanjeKoraci lokacije={lokacije} />
           </div>
+
+          <p className="text-small mt-6 text-center text-neutral-500">
+            Niste sigurni da li Vam je provjera potrebna?{' '}
+            <Link
+              href="/online-test-sluha"
+              className="font-semibold text-brand-700 underline decoration-brand-200 decoration-2 underline-offset-4 transition-colors duration-150 hover:text-brand-800 hover:decoration-brand-400"
+            >
+              Uradite online test sluha
+            </Link>{' '}
+            — besplatno, za 5 minuta.
+          </p>
         </div>
       </div>
     </div>

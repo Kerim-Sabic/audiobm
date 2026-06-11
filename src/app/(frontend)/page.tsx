@@ -14,8 +14,9 @@ import {
   Star,
   MapPin,
   Check,
+  Headphones,
+  Clock,
 } from 'lucide-react'
-import heroOsoba from '@/assets/hero-osoba.png'
 import {
   dajAktivneAkcije,
   dajPayload,
@@ -633,20 +634,26 @@ export default async function Pocetna() {
               <p data-hero-stavka="3" className="uvodni mt-6 max-w-xl md:text-[20px]">
                 {pocetna.hero?.podnaslov}
               </p>
-              <div data-hero-stavka="4" className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5">
-                <DugmeLink href="/zakazivanje" velicina="veliko">
-                  {pocetna.hero?.ctaTekst ?? 'Zakažite besplatnu provjeru sluha'}
-                  <ArrowRight className="size-5" aria-hidden />
-                </DugmeLink>
+              <div data-hero-stavka="4" className="mt-10">
+                <div className="flex flex-wrap items-center gap-3.5">
+                  <DugmeLink href="/zakazivanje" velicina="veliko">
+                    {pocetna.hero?.ctaTekst ?? 'Zakažite besplatnu provjeru sluha'}
+                    <ArrowRight className="size-5" aria-hidden />
+                  </DugmeLink>
+                  <DugmeLink href="/online-test-sluha" varijanta="sekundarno" velicina="veliko">
+                    <Headphones className="size-5 text-brand-600" aria-hidden />
+                    Online test sluha
+                  </DugmeLink>
+                </div>
                 {telefon && (
-                  <span className="flex flex-col">
-                    <span className="text-small font-medium text-neutral-500">Pozovite nas direktno</span>
+                  <p className="mt-5 flex flex-wrap items-baseline gap-x-3 text-neutral-600">
+                    Radije telefonom?
                     <TelefonLink
                       broj={telefon}
                       lokacija="hero"
-                      className="text-[24px] text-neutral-900 hover:text-brand-700"
+                      className="text-[22px] text-neutral-900 hover:text-brand-700"
                     />
-                  </span>
+                  </p>
                 )}
               </div>
               <ul data-hero-stavka="5" className="mt-11 flex flex-wrap items-center gap-x-7 gap-y-3.5">
@@ -661,12 +668,12 @@ export default async function Pocetna() {
               </ul>
             </div>
 
-            {/* klinička kompozicija: portret + stakleni audiogram + živi zvuk */}
-            <div data-hero-stavka="5" className="relative mx-auto w-full max-w-[330px] sm:max-w-[400px] lg:max-w-[440px]">
-              {/* koncentrični zvučni prsteni iza portreta */}
+            {/* klinička fotografija + stakleni audiogram + živi zvuk */}
+            <div data-hero-stavka="5" className="relative mx-auto w-full max-w-[480px] lg:max-w-none">
+              {/* koncentrični zvučni prsteni iza fotografije */}
               <svg
                 viewBox="0 0 200 200"
-                className="absolute -top-10 -left-14 w-48 text-brand-200/70 lg:-left-20 lg:w-60"
+                className="absolute -top-12 -left-12 hidden w-52 text-brand-200/70 sm:block lg:-left-16"
                 aria-hidden
               >
                 {[40, 62, 84].map((r, i) => (
@@ -685,25 +692,24 @@ export default async function Pocetna() {
                 ))}
               </svg>
 
-              <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-b from-brand-50 via-neutral-50 to-white shadow-[var(--shadow-lift-lg)] ring-1 ring-neutral-900/5">
-                <div className="mreza-audiogram absolute inset-0" aria-hidden />
+              <div className="relative aspect-[5/4] overflow-hidden rounded-[32px] shadow-[var(--shadow-lift-lg)] ring-1 ring-neutral-900/5">
                 <Image
-                  src={heroOsoba}
-                  alt="Nasmijana starija žena sa slušalicama"
+                  src="/media/site-refresh/homepage-hero.png"
+                  alt="Audiologinja pažljivo postavlja slušni aparat starijoj gospođi u Audio BM poslovnici"
+                  fill
                   priority
-                  placeholder="blur"
-                  sizes="(min-width: 1024px) 440px, (min-width: 640px) 400px, 330px"
-                  className="relative mt-8 h-auto w-full"
+                  sizes="(min-width: 1024px) 560px, (min-width: 640px) 480px, 92vw"
+                  className="object-cover object-[60%_center]"
                 />
               </div>
 
               {/* stakleni audiogram — medicinski UI detalj */}
-              <div className="staklo lebdi-sporije absolute -bottom-7 -left-4 w-[225px] rounded-[20px] p-4 sm:-left-10">
+              <div className="staklo lebdi-sporije absolute -bottom-7 -left-3 w-[225px] rounded-[20px] p-4 sm:-left-8">
                 <Audiogram />
               </div>
 
               {/* živi zvuk — godine iskustva */}
-              <div className="staklo lebdi absolute -top-5 -right-3 flex items-center gap-3 rounded-full py-2.5 pr-5 pl-3.5 sm:-right-6">
+              <div className="staklo lebdi absolute -top-5 -right-2 flex items-center gap-3 rounded-full py-2.5 pr-5 pl-3.5 sm:-right-5">
                 <span className="ekvilajzer flex h-5 items-end gap-[3px]" aria-hidden>
                   <span className="block h-2.5 w-[3px] rounded-full bg-brand-600" />
                   <span className="block h-4 w-[3px] rounded-full bg-brand-600" />
@@ -722,6 +728,62 @@ export default async function Pocetna() {
           </div>
         </section>
       </HeroUlaz>
+
+      {/* ——— Online test sluha — istaknuta traka odmah ispod hero sekcije ——— */}
+      <section className="sekcija !py-14 md:!py-20" aria-labelledby="online-test-naslov">
+        <div className="kontejner">
+          <Otkrij>
+            <div className="povrsina grid items-center gap-0 overflow-hidden !rounded-[28px] lg:grid-cols-[0.95fr_1.05fr]">
+              <div className="relative hidden h-full min-h-[320px] lg:block">
+                <Image
+                  src="/media/site-refresh/online-hearing-test-page.png"
+                  alt="Starija žena sa slušalicama radi online test sluha na laptopu kod kuće"
+                  fill
+                  sizes="(min-width: 1024px) 560px, 0px"
+                  className="object-cover"
+                />
+                <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white to-transparent" aria-hidden />
+              </div>
+              <div className="p-7 md:p-10 lg:p-12">
+                <p className="nadnaslov">Novo na stranici</p>
+                <h2 id="online-test-naslov" className="text-h2 mt-3.5">
+                  Provjerite sluh od kuće — online test za 5 minuta
+                </h2>
+                <p className="uvodni mt-4">
+                  Kratki tonovi za lijevo i desno uho, nekoliko jednostavnih pitanja — i odmah jasan,
+                  razumljiv rezultat. Potrebne su Vam samo slušalice i tiha prostorija.
+                </p>
+                <ul className="mt-6 flex flex-wrap gap-x-7 gap-y-2.5 text-[15px] font-semibold text-neutral-700">
+                  <li className="flex items-center gap-2">
+                    <Clock className="size-4.5 text-brand-600" aria-hidden /> 3–5 minuta
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Headphones className="size-4.5 text-brand-600" aria-hidden /> Uz slušalice
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ShieldCheck className="size-4.5 text-success-600" aria-hidden /> Ništa se ne snima
+                  </li>
+                </ul>
+                <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+                  <DugmeLink href="/online-test-sluha" velicina="veliko">
+                    <Headphones className="size-5" aria-hidden />
+                    Pokrenite online test
+                  </DugmeLink>
+                  <Link
+                    href="/zakazivanje"
+                    className="font-semibold text-brand-700 underline decoration-brand-200 decoration-2 underline-offset-4 transition-colors duration-150 hover:text-brand-800 hover:decoration-brand-400"
+                  >
+                    ili zakažite termin u poslovnici
+                  </Link>
+                </div>
+                <p className="text-small mt-5 text-neutral-500">
+                  Informativni screening — ne zamjenjuje profesionalnu provjeru sluha u poslovnici.
+                </p>
+              </div>
+            </div>
+          </Otkrij>
+        </div>
+      </section>
 
       {/* sekcije po redoslijedu iz CMS-a */}
       {redoslijed.length > 0 ? redoslijed.map((s) => sekcije[s] ?? null) : Object.values(sekcije)}

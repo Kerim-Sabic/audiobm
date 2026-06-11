@@ -42,6 +42,10 @@ export default async function SlusniAparatiStranica() {
             Vam pomoći da odaberete aparat prilagođen Vašem sluhu, navikama i budžetu.
           </>
         }
+        slika={{
+          src: '/media/site-refresh/hearing-aids-page.png',
+          alt: 'Audiologinja pokazuje savremeni slušni aparat korisniku tokom savjetovanja',
+        }}
       />
 
       <div className="kontejner">

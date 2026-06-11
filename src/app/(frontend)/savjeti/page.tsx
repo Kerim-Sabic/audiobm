@@ -44,6 +44,10 @@ export default async function SavjetiStranica({
         nadnaslov="Razumljivo o sluhu"
         naslov="Savjeti i novosti"
         uvod="Razumljivi tekstovi o sluhu, aparatima i svemu što Vas zanima — bez komplikovanih izraza."
+        slika={{
+          src: '/media/site-refresh/blog-advice-page.png',
+          alt: 'Stariji par u opuštenom razgovoru kod kuće — život sa zdravim sluhom',
+        }}
       >
         <nav aria-label="Kategorije objava" className="flex flex-wrap gap-2">
           <Link
