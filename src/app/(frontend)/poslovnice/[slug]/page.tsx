@@ -189,6 +189,7 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
               </Otkrij>
             )}
           </div>
+          )}
 
           {/* bočna kolona: kontakt + radno vrijeme + CTA */}
           <aside className="space-y-5 lg:sticky lg:top-32 lg:self-start">

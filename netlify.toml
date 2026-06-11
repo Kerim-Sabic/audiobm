@@ -1,7 +1,7 @@
 # Netlify konfiguracija — Audio BM (Next.js 16 + Payload CMS 3)
 #
-# Rutiranjem (uključujući osvježavanje i direktne linkove) upravlja zvanični
-# Next.js runtime (@netlify/plugin-nextjs) — NE dodavati "/* -> /index.html"
+# Rutiranjem (uključujući osvježavanje i direktne linkove) upravlja Netlify
+# OpenNext adapter za Next.js — NE dodavati "/* -> /index.html"
 # preusmjeravanja: ona lome serverske rute Next aplikacije.
 #
 # OBAVEZNE varijable okruženja (Site settings → Environment variables):
@@ -23,9 +23,6 @@
 
 [build.environment]
   NODE_VERSION = "22"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
 
 # Keširanje statičkih resursa (Next runtime postavlja vlastite za /_next/*)
 [[headers]]
