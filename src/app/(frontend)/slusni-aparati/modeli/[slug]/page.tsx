@@ -68,13 +68,12 @@ export default async function ModelStranica({ params }: { params: Promise<{ slug
       <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_1fr]">
         <div>
           {slike[0] && typeof slike[0] === 'object' ? (
-            <div className="relative aspect-square overflow-hidden rounded-[16px] border border-neutral-200 bg-white p-8">
+            <div className="grid aspect-square place-items-center overflow-hidden rounded-[20px] border border-neutral-200 bg-gradient-to-br from-white to-neutral-100/70 p-10 shadow-[var(--shadow-lift)]">
               <SlikaMedija
                 medij={slike[0]}
-                fill
                 sizes="(min-width: 1024px) 560px, 100vw"
                 prioritet
-                className="!relative h-full w-full object-contain"
+                className="max-h-full w-auto object-contain drop-shadow-xl"
               />
             </div>
           ) : (
@@ -87,8 +86,8 @@ export default async function ModelStranica({ params }: { params: Promise<{ slug
               {slike.slice(1, 5).map(
                 (s, i) =>
                   typeof s === 'object' && (
-                    <div key={i} className="relative aspect-square overflow-hidden rounded-[12px] border border-neutral-200 bg-white p-2">
-                      <SlikaMedija medij={s} fill sizes="140px" className="!relative h-full w-full object-contain" />
+                    <div key={i} className="grid aspect-square place-items-center overflow-hidden rounded-[12px] border border-neutral-200 bg-white p-3">
+                      <SlikaMedija medij={s} sizes="140px" className="max-h-full w-auto object-contain" />
                     </div>
                   ),
               )}

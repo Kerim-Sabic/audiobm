@@ -1,6 +1,5 @@
 'use client'
 
-import { m, useReducedMotion } from 'motion/react'
 import { useState } from 'react'
 
 type Faza = 'zvuk' | 'obrada' | 'razumijevanje'
@@ -21,90 +20,154 @@ const FAZE: Record<Faza, { naslov: string; opis: string }> = {
 }
 
 /**
- * Animirana vizualizacija: kako slušni aparat pomaže uhu da čuje.
- * Zvučni talasi → aparat → unutrašnje uho; klik mijenja fazu objašnjenja.
- * Uz prefers-reduced-motion prikazuje statičan dijagram.
+ * Animirana vizualizacija rada slušnog aparata: zvučni talasi → aparat →
+ * unutrašnje uho. Klik na fazu ističe odgovarajući dio ilustracije.
+ * Uz prefers-reduced-motion sve dekorativne animacije nestaju (CSS).
  */
 export function UhoVizualizacija() {
   const [faza, setFaza] = useState<Faza>('zvuk')
-  const smanjeno = useReducedMotion()
 
-  const talasAnim = smanjeno
-    ? {}
-    : {
-        animate: { opacity: [0, 1, 0], x: [0, 26] },
-        transition: { duration: 1.8, repeat: Infinity, ease: 'easeOut' as const },
-      }
+  const aktivnoUho = faza === 'razumijevanje'
+  const aktivanAparat = faza === 'obrada'
+  const aktivniTalasi = faza === 'zvuk'
 
   return (
-    <div className="grid items-center gap-8 rounded-[16px] border border-neutral-200 bg-white p-6 shadow-sm md:grid-cols-[1.1fr_1fr] md:p-10">
-      <figure>
-        <svg viewBox="0 0 420 320" role="img" aria-label="Prikaz kako slušni aparat obrađuje zvuk i prenosi ga u uho" className="w-full">
+    <div className="grid items-center gap-8 overflow-hidden rounded-[24px] border border-neutral-200 bg-gradient-to-br from-white via-neutral-50 to-brand-50/40 p-6 shadow-[var(--shadow-lift)] md:grid-cols-[1.15fr_1fr] md:p-10">
+      <figure className="relative">
+        <svg
+          viewBox="0 0 440 330"
+          role="img"
+          aria-label="Prikaz kako slušni aparat obrađuje zvuk i prenosi ga u uho"
+          className="w-full"
+        >
+          <defs>
+            <linearGradient id="kozaG" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#FAF6F3" />
+              <stop offset="100%" stopColor="#EFE7E1" />
+            </linearGradient>
+            <linearGradient id="aparatG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#F03C43" />
+              <stop offset="100%" stopColor="#BF181E" />
+            </linearGradient>
+            <linearGradient id="aparatSivaG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#79726C" />
+              <stop offset="100%" stopColor="#57534E" />
+            </linearGradient>
+            <filter id="sjaj" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="7" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="meka" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="6" stdDeviation="10" floodColor="#1C1917" floodOpacity="0.12" />
+            </filter>
+          </defs>
+
+          {/* pozadinski krug */}
+          <circle cx="260" cy="170" r="135" fill="white" opacity="0.7" />
+          <circle cx="260" cy="170" r="135" fill="none" stroke="#E8E5E3" strokeWidth="1.5" strokeDasharray="3 7" />
+
           {/* zvučni talasi */}
-          <g stroke="var(--color-brand-400)" strokeWidth="5" strokeLinecap="round" fill="none">
-            {[0, 1, 2].map((i) => (
-              <m.path
-                key={i}
-                d={`M${52 - i * 18} ${130 - (2 - i) * 6} a ${26 + i * 14} ${30 + i * 16} 0 0 1 0 ${(2 - i) * 12 + 60}`}
-                opacity={smanjeno ? 0.7 : undefined}
-                {...(smanjeno ? {} : { ...talasAnim, transition: { ...talasAnim.transition!, delay: i * 0.35 } })}
-              />
-            ))}
+          <g
+            stroke={aktivniTalasi ? '#ED1C24' : '#D7D3D0'}
+            strokeWidth="6"
+            strokeLinecap="round"
+            fill="none"
+            filter={aktivniTalasi ? 'url(#sjaj)' : undefined}
+            style={{ transition: 'stroke 250ms' }}
+          >
+            <path d="M76 130 a 42 46 0 0 1 0 84" opacity="0.95" />
+            <path d="M56 112 a 64 70 0 0 1 0 120" opacity="0.6" />
+            <path d="M36 94 a 86 94 0 0 1 0 156" opacity="0.35" />
           </g>
 
-          {/* vanjsko uho — stilizovana ušna školjka */}
+          {/* ušna školjka */}
+          <g filter="url(#meka)">
+            <path
+              d="M212 64 C 280 38, 348 80, 350 150 C 351 200, 322 224, 296 246 C 276 263, 270 292, 240 298 C 206 304, 178 284, 175 252 C 173 230, 184 218, 196 210"
+              fill="url(#kozaG)"
+              stroke="#C9BFB7"
+              strokeWidth="3.5"
+            />
+          </g>
           <path
-            d="M198 60 C 250 40, 296 74, 296 130 C 296 172, 272 192, 252 210 C 236 224, 230 248, 206 252 C 180 256, 160 240, 158 218"
-            fill="var(--color-neutral-100)"
-            stroke="var(--color-neutral-400)"
-            strokeWidth="4"
+            d="M232 102 C 280 88, 318 116, 316 156 C 314 186, 294 200, 278 214"
+            fill="none"
+            stroke="#C9BFB7"
+            strokeWidth="3.5"
+            strokeLinecap="round"
           />
           <path
-            d="M214 92 C 248 82, 272 102, 270 134 C 268 158, 252 170, 240 182"
+            d="M252 130 C 284 124, 300 146, 294 172"
             fill="none"
-            stroke="var(--color-neutral-400)"
-            strokeWidth="4"
+            stroke="#D9D0C9"
+            strokeWidth="3"
             strokeLinecap="round"
           />
 
           {/* ušni kanal */}
           <path
-            d="M236 196 C 280 200, 320 206, 348 218"
+            d="M268 218 C 310 224, 348 234, 376 252"
             fill="none"
-            stroke={faza !== 'zvuk' ? 'var(--color-brand-500)' : 'var(--color-neutral-300)'}
-            strokeWidth="14"
+            stroke={faza !== 'zvuk' ? '#F3656A' : '#D7D3D0'}
+            strokeWidth="16"
             strokeLinecap="round"
-            opacity="0.55"
+            opacity="0.5"
+            style={{ transition: 'stroke 250ms' }}
           />
 
-          {/* pužnica (unutrašnje uho) */}
-          <m.g
-            animate={
-              smanjeno || faza !== 'razumijevanje'
-                ? { scale: 1 }
-                : { scale: [1, 1.08, 1] }
-            }
-            transition={{ duration: 1.2, repeat: faza === 'razumijevanje' && !smanjeno ? Infinity : 0 }}
-            style={{ transformOrigin: '372px 230px' }}
-          >
+          {/* pužnica */}
+          <g filter={aktivnoUho ? 'url(#sjaj)' : undefined}>
             <path
-              d="M372 206 a 24 24 0 1 1 -24 24 a 18 18 0 1 0 18 -18 a 12 12 0 1 1 -12 12"
+              d="M398 234 a 27 27 0 1 1 -27 27 a 20 20 0 1 0 20 -20 a 13 13 0 1 1 -13 13 a 6 6 0 1 0 6 -6"
               fill="none"
-              stroke={faza === 'razumijevanje' ? 'var(--color-brand-600)' : 'var(--color-neutral-400)'}
-              strokeWidth="6"
+              stroke={aktivnoUho ? '#ED1C24' : '#A9A39E'}
+              strokeWidth="6.5"
               strokeLinecap="round"
+              style={{ transition: 'stroke 250ms' }}
             />
-          </m.g>
+          </g>
 
           {/* slušni aparat iza uha */}
-          <m.g
-            animate={smanjeno ? {} : faza === 'obrada' ? { y: [0, -3, 0] } : { y: 0 }}
-            transition={{ duration: 1, repeat: faza === 'obrada' && !smanjeno ? Infinity : 0 }}
-          >
-            <rect x="160" y="92" width="26" height="74" rx="13" fill={faza === 'obrada' ? 'var(--color-brand-600)' : 'var(--color-neutral-600)'} />
-            <path d="M173 92 C 173 70, 196 64, 208 76" fill="none" stroke={faza === 'obrada' ? 'var(--color-brand-600)' : 'var(--color-neutral-600)'} strokeWidth="6" strokeLinecap="round" />
-            <circle cx="214" cy="84" r="9" fill={faza === 'obrada' ? 'var(--color-brand-400)' : 'var(--color-neutral-400)'} />
-          </m.g>
+          <g filter="url(#meka)" className={aktivanAparat ? 'lebdi' : undefined} style={{ transformOrigin: '190px 130px' }}>
+            <rect
+              x="172"
+              y="92"
+              width="30"
+              height="82"
+              rx="15"
+              fill={aktivanAparat ? 'url(#aparatG)' : 'url(#aparatSivaG)'}
+              style={{ transition: 'fill 250ms' }}
+            />
+            <path
+              d="M187 92 C 187 66, 214 60, 228 74"
+              fill="none"
+              stroke={aktivanAparat ? '#ED1C24' : '#6B6360'}
+              strokeWidth="7"
+              strokeLinecap="round"
+              style={{ transition: 'stroke 250ms' }}
+            />
+            <circle cx="234" cy="82" r="10" fill={aktivanAparat ? '#F3656A' : '#A9A39E'} style={{ transition: 'fill 250ms' }} />
+            {/* mikrofonski prorezi */}
+            <g stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.8">
+              <line x1="180" y1="106" x2="194" y2="106" />
+              <line x1="180" y1="113" x2="194" y2="113" />
+            </g>
+          </g>
+
+          {/* putujuće zvučne tačkice (CSS offset-path) */}
+          {[0, 0.85, 1.7].map((kasni) => (
+            <circle
+              key={kasni}
+              r="5"
+              fill="#ED1C24"
+              className="zvucna-tacka"
+              style={{ animationDelay: `${kasni}s` }}
+              opacity="0"
+            />
+          ))}
         </svg>
         <figcaption className="sr-only">
           Zvučni talasi ulaze u mikrofon slušnog aparata, aparat ih obrađuje i pojačan, čist zvuk
@@ -113,8 +176,9 @@ export function UhoVizualizacija() {
       </figure>
 
       <div>
-        <h3 className="text-h3">Kako slušni aparat radi?</h3>
-        <div className="mt-4 space-y-2" role="tablist" aria-label="Faze rada slušnog aparata">
+        <p className="nadnaslov">Interaktivni prikaz</p>
+        <h3 className="text-h3 mt-2">Kako slušni aparat radi?</h3>
+        <div className="mt-5 space-y-2.5" role="tablist" aria-label="Faze rada slušnog aparata">
           {(Object.keys(FAZE) as Faza[]).map((f) => (
             <button
               key={f}
@@ -122,19 +186,21 @@ export function UhoVizualizacija() {
               role="tab"
               aria-selected={faza === f}
               onClick={() => setFaza(f)}
-              className={`block w-full cursor-pointer rounded-[12px] border p-4 text-left transition-colors duration-250 ${
+              className={`block w-full cursor-pointer rounded-[14px] border p-4 text-left transition-[border-color,background-color,box-shadow] duration-250 ${
                 faza === f
-                  ? 'border-brand-300 bg-brand-50'
-                  : 'border-neutral-200 bg-white hover:bg-neutral-50'
+                  ? 'border-brand-300 bg-white shadow-[var(--shadow-lift)]'
+                  : 'border-neutral-200 bg-white/60 hover:bg-white'
               }`}
             >
-              <span className="font-bold text-neutral-900">{FAZE[f].naslov}</span>
+              <span className={`font-bold ${faza === f ? 'text-brand-700' : 'text-neutral-900'}`}>
+                {FAZE[f].naslov}
+              </span>
               <span
                 className="grid transition-[grid-template-rows] duration-250"
                 style={{ gridTemplateRows: faza === f ? '1fr' : '0fr' }}
               >
                 <span className="overflow-hidden">
-                  <span className="mt-1 block text-[15px] text-neutral-600">{FAZE[f].opis}</span>
+                  <span className="mt-1.5 block text-[15px] text-neutral-600">{FAZE[f].opis}</span>
                 </span>
               </span>
             </button>

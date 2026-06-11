@@ -2,6 +2,20 @@ import Image from 'next/image'
 import type { Mediji } from '@/payload-types'
 
 /**
+ * Payload vraća apsolutne adrese medija (serverURL) — svodimo na relativnu
+ * putanju da ih next/image optimizator prihvati bez remotePatterns liste.
+ */
+function relativnaPutanja(url: string): string {
+  if (!url.startsWith('http')) return url
+  try {
+    const u = new URL(url)
+    return u.pathname + u.search
+  } catch {
+    return url
+  }
+}
+
+/**
  * Slika iz CMS-a preko next/image: LQIP mutna sličica → oštar prelaz,
  * eksplicitne dimenzije (bez pomjeranja rasporeda), AVIF/WebP automatski.
  */
@@ -33,7 +47,7 @@ export function SlikaMedija({
   }
 
   const zajednicko = {
-    src: medij.url,
+    src: relativnaPutanja(medij.url),
     alt: medij.alt ?? '',
     sizes,
     quality,

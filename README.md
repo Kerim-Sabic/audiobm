@@ -109,6 +109,13 @@ Vidljivo označeni na stranici i u administraciji; svaki nestaje unosom stvarnog
   mutnu sličicu pri svakom otpremanju; `next/image` servira AVIF/WebP.
 - **Animacije:** `motion` (LazyMotion — mali bundle); uz `prefers-reduced-motion`
   sve se svodi na trenutne promjene prozirnosti. Hero animacija ide jednom po sesiji.
+- **Otkrivanje pri skrolanju:** CSS + IntersectionObserver sa sigurnosnom mrežom —
+  sadržaj se bezuslovno prikazuje nakon 2 s, pa nijedna sekcija nikad ne ostaje prazna.
+- **3D hero (zvučni talasi):** three.js scena se učitava lijeno, samo na desktopu i
+  samo bez `prefers-reduced-motion` — ne ulazi u početni JS niti utiče na LCP.
+- **Dizajnerska revizija:** `node scripts/screenshot.mjs` snima sve ključne stranice
+  (desktop + mobilno) u `screenshots/`; `node scripts/shot-viewport.mjs <putanja> <ime> <skrol>`
+  snima jedan ekran.
 - **301 preusmjeravanja** sa starih Shopify adresa: `next.config.ts` (generišu se
   iz `products-manifest.json`).
 - **Stari sajt — greške koje su ispravljene:** prazan `<title>`; mrtvi CTA linkovi;

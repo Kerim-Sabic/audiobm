@@ -1,11 +1,13 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useInView, useReducedMotion, animate } from 'motion/react'
+
+const easeOutQuint = (t: number) => 1 - Math.pow(1 - t, 5)
 
 /**
- * Brojač statistike (npr. „32 godine"): broji do cilja 1,2 s uz usporavanje,
- * jednom kad uđe u ekran. Uz smanjene animacije prikazuje konačan broj odmah.
+ * Brojač statistike: broji do cilja 1,2 s (rAF, bez biblioteka), jednom kad
+ * uđe u ekran. Sigurnosna mreža prikazuje konačan broj nakon 2,5 s u svakom
+ * slučaju; uz smanjene animacije broj se prikazuje odmah.
  */
 export function Brojac({
   do: cilj,
@@ -17,23 +19,48 @@ export function Brojac({
   className?: string
 }) {
   const ref = useRef<HTMLSpanElement>(null)
-  const uEkranu = useInView(ref, { once: true, amount: 0.6 })
-  const smanjeno = useReducedMotion()
-  const [vrijednost, setVrijednost] = useState(smanjeno ? cilj : 0)
+  const [vrijednost, setVrijednost] = useState(0)
+  const pokrenut = useRef(false)
 
   useEffect(() => {
-    if (!uEkranu) return
-    if (smanjeno) {
-      setVrijednost(cilj)
-      return
+    const el = ref.current
+    if (!el) return
+
+    const pokreni = () => {
+      if (pokrenut.current) return
+      pokrenut.current = true
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        setVrijednost(cilj)
+        return
+      }
+      const start = performance.now()
+      const korak = (sada: number) => {
+        const t = Math.min((sada - start) / 1200, 1)
+        setVrijednost(Math.round(easeOutQuint(t) * cilj))
+        if (t < 1) requestAnimationFrame(korak)
+      }
+      requestAnimationFrame(korak)
     }
-    const kontrola = animate(0, cilj, {
-      duration: 1.2,
-      ease: [0.22, 1, 0.36, 1],
-      onUpdate: (v) => setVrijednost(Math.round(v)),
-    })
-    return () => kontrola.stop()
-  }, [uEkranu, cilj, smanjeno])
+
+    let posmatrac: IntersectionObserver | undefined
+    if ('IntersectionObserver' in window) {
+      posmatrac = new IntersectionObserver(
+        (unosi) => {
+          if (unosi.some((u) => u.isIntersecting)) {
+            pokreni()
+            posmatrac?.disconnect()
+          }
+        },
+        { threshold: 0.4 },
+      )
+      posmatrac.observe(el)
+    }
+    const rezerva = setTimeout(pokreni, 2500)
+    return () => {
+      posmatrac?.disconnect()
+      clearTimeout(rezerva)
+    }
+  }, [cilj])
 
   return (
     <span ref={ref} className={className} style={{ fontVariantNumeric: 'tabular-nums' }}>

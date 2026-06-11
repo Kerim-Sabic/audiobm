@@ -39,6 +39,31 @@ export async function Podnozje() {
 
   return (
     <footer className="bg-charcoal text-neutral-300">
+      {/* CTA pojas iznad podnožja */}
+      <div className="mreza-tacaka relative overflow-hidden border-b border-white/10">
+        <div className="absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-brand-600/20 blur-[100px]" aria-hidden />
+        <div className="kontejner relative flex flex-col items-center gap-6 py-14 text-center md:py-16">
+          <h2 className="text-h2 max-w-2xl text-white">Spremni da ponovo čujete svijet oko sebe?</h2>
+          <p className="max-w-xl text-neutral-400">
+            Prvi korak je najlakši — besplatna provjera sluha traje pola sata i ništa Vas ne obavezuje.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              href="/zakazivanje"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-b from-brand-500 to-brand-600 px-7 py-3.5 text-[17px] font-semibold text-white shadow-[0_8px_24px_-6px_rgb(237_28_36/0.55)] transition-[transform,box-shadow] duration-150 hover:-translate-y-px hover:shadow-[0_12px_28px_-6px_rgb(237_28_36/0.6)]"
+            >
+              Zakažite besplatnu provjeru sluha
+            </Link>
+            {podesavanja.telefonGlavni && (
+              <TelefonLink
+                broj={podesavanja.telefonGlavni}
+                lokacija="podnozje-cta"
+                className="inline-flex min-h-12 items-center rounded-[12px] border border-white/20 px-6 text-[19px] text-white transition-colors duration-150 hover:bg-white/10"
+              />
+            )}
+          </div>
+        </div>
+      </div>
       <div className="kontejner py-14 md:py-20">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>

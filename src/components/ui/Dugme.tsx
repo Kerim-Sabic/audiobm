@@ -15,9 +15,11 @@ const osnova =
   'min-h-12' // 48px ciljna površina
 
 const varijante: Record<Varijanta, string> = {
-  primarno: 'bg-brand-600 text-white shadow-sm hover:bg-brand-700 hover:shadow-md',
+  primarno:
+    'bg-gradient-to-b from-brand-500 to-brand-600 text-white shadow-[0_8px_20px_-6px_rgb(237_28_36/0.45)] ' +
+    'hover:from-brand-600 hover:to-brand-700 hover:shadow-[0_12px_26px_-6px_rgb(237_28_36/0.5)]',
   sekundarno:
-    'bg-white text-neutral-900 border border-neutral-300 shadow-sm hover:bg-neutral-50 hover:shadow-md',
+    'bg-white text-neutral-900 border border-neutral-300 shadow-sm hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-md',
   duh: 'bg-transparent text-brand-700 hover:bg-brand-50',
   destruktivno: 'bg-error-600 text-white shadow-sm hover:bg-red-800 hover:shadow-md',
 }

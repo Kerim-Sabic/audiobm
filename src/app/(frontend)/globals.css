@@ -204,6 +204,135 @@
   }
 }
 
+/* ——— Otkrivanje pri skrolanju (CSS + IntersectionObserver) ———
+   Skriva se SAMO kad je JS aktivan; bez JS-a sav sadržaj je vidljiv. */
+@media (scripting: enabled) {
+  [data-otkrij]:not(.otkrij-vidljivo) {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+[data-otkrij] {
+  transition:
+    opacity 450ms var(--ease-out-quint),
+    transform 450ms var(--ease-out-quint);
+  transition-delay: var(--otkrij-kasni, 0ms);
+}
+[data-otkrij].otkrij-vidljivo {
+  opacity: 1;
+  transform: none;
+}
+
+/* ——— Tipografski pomoćnici sekcija ——— */
+.nadnaslov {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-brand-600);
+}
+.nadnaslov::before {
+  content: '';
+  width: 26px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--color-brand-600);
+}
+.nadnaslov-centar::after {
+  content: '';
+  width: 26px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--color-brand-600);
+}
+.uvodni {
+  font-size: 19px;
+  line-height: 1.65;
+  color: var(--color-neutral-600);
+}
+
+/* ——— Dekorativne animacije (gase se uz reduced-motion globalnim pravilom) ——— */
+@keyframes lebdi {
+  from {
+    transform: translateY(-7px);
+  }
+  to {
+    transform: translateY(7px);
+  }
+}
+.lebdi {
+  animation: lebdi 5.5s ease-in-out infinite alternate;
+}
+.lebdi-sporije {
+  animation: lebdi 7s ease-in-out 0.8s infinite alternate;
+}
+
+@keyframes pulsiranje-prstena {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+.prsten-puls {
+  animation: pulsiranje-prstena 3.2s ease-out infinite;
+  transform-origin: center;
+}
+
+/* Zvučne tačkice koje putuju u uho (vizualizacija slušnog aparata) */
+@keyframes putovanje-zvuka {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+.zvucna-tacka {
+  offset-path: path('M30 165 C 90 150, 150 140, 196 142 C 250 146, 300 170, 342 208');
+  offset-rotate: 0deg;
+  animation: putovanje-zvuka 2.6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .zvucna-tacka {
+    display: none;
+  }
+}
+
+/* Tačkasta mreža za tamne sekcije */
+.mreza-tacaka {
+  background-image: radial-gradient(circle, rgb(255 255 255 / 0.07) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+/* Svijetla tačkasta mreža */
+.mreza-tacaka-svijetla {
+  background-image: radial-gradient(circle, rgb(28 25 23 / 0.05) 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+}
+
+/* Podvlaka naslova — ručno povučen potez kistom u brend crvenoj */
+.podvlaka {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M3 10 C 50 4, 150 4, 197 8' fill='none' stroke='%23ED1C24' stroke-width='5' stroke-linecap='round' opacity='0.85'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 0.34em;
+  padding-bottom: 0.18em;
+}
+
 /* Hero ulaz: postepeni fade-up (naslov → podnaslov → CTA → traka povjerenja),
    80ms međukorak, jednom po sesiji (klasa se dodaje klijentski) */
 .hero-animira [data-hero-stavka] {
@@ -247,6 +376,15 @@
   }
   .hero-animira [data-hero-stavka] {
     animation: none !important;
+  }
+  .lebdi,
+  .lebdi-sporije,
+  .prsten-puls {
+    animation: none !important;
+  }
+  [data-otkrij]:not(.otkrij-vidljivo) {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
