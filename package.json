@@ -16,6 +16,7 @@
     "seed": "cross-env PAYLOAD_SEED=true payload run scripts/seed.ts"
   },
   "dependencies": {
+    "@netlify/database": "^1.0.0",
     "@payloadcms/db-postgres": "3.85.1",
     "@payloadcms/db-sqlite": "3.85.1",
     "@payloadcms/email-nodemailer": "3.85.1",

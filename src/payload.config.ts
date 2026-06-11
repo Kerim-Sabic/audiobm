@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { buildConfig } from 'payload'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { getConnectionString } from '@netlify/database'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { s3Storage } from '@payloadcms/storage-s3'
@@ -26,10 +27,16 @@ import { Pocetna } from './globals/Pocetna'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// Produkcija: EU Postgres (Neon/Supabase). Lokalni razvoj: SQLite datoteka.
-const db = process.env.DATABASE_URL?.startsWith('postgres')
-  ? postgresAdapter({ pool: { connectionString: process.env.DATABASE_URL } })
-  : sqliteAdapter({ client: { url: process.env.DATABASE_URL || 'file:./audiobm.db' } })
+// Produkcija: Postgres (Netlify Database/Neon/Supabase). Lokalni razvoj: SQLite datoteka.
+const databaseUrl = process.env.DATABASE_URL?.startsWith('postgres')
+  ? process.env.DATABASE_URL
+  : process.env.NETLIFY_DB_URL
+    ? getConnectionString()
+    : process.env.DATABASE_URL
+
+const db = databaseUrl?.startsWith('postgres')
+  ? postgresAdapter({ pool: { connectionString: databaseUrl } })
+  : sqliteAdapter({ client: { url: databaseUrl || 'file:./audiobm.db' } })
 
 // E-pošta: SMTP iz okruženja; bez SMTP-a poruke se samo evidentiraju u konzoli (razvoj).
 const email = process.env.SMTP_HOST
