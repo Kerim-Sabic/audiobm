@@ -1,0 +1,62 @@
+{
+  "name": "audiobm",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Audio BM BiH — web stranica i CMS (slušni aparati i audiološke usluge)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "payload": "payload",
+    "generate:types": "payload generate:types",
+    "generate:importmap": "payload generate:importmap",
+    "crawl": "node scripts/crawl.mjs",
+    "brand": "node scripts/brand.mjs",
+    "seed": "cross-env PAYLOAD_SEED=true payload run scripts/seed.ts"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "3.85.1",
+    "@payloadcms/db-sqlite": "3.85.1",
+    "@payloadcms/email-nodemailer": "3.85.1",
+    "@payloadcms/next": "3.85.1",
+    "@payloadcms/richtext-lexical": "3.85.1",
+    "@payloadcms/translations": "3.85.1",
+    "@payloadcms/ui": "3.85.1",
+    "graphql": "^16.11.0",
+    "lucide-react": "^1.17.0",
+    "motion": "^12.40.0",
+    "next": "16.2.9",
+    "nodemailer": "^6.10.1",
+    "payload": "3.85.1",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "sharp": "0.34.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.0",
+    "@types/node": "^22.15.0",
+    "@types/nodemailer": "^6.4.17",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "cross-env": "^7.0.3",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.3.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@libsql/client",
+      "@swc/core",
+      "@tailwindcss/oxide",
+      "esbuild",
+      "libsql",
+      "sharp",
+      "unrs-resolver"
+    ]
+  }
+}

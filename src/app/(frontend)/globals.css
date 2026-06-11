@@ -1,0 +1,256 @@
+@import 'tailwindcss';
+
+/* ————— Dizajn tokeni — Audio BM —————
+   Brend crvena #ED1C24 ekstrahovana programski iz logotipa (public/brand/brand.json).
+   Crvena je isključivo akcenat/CTA — nikad puna pozadina sekcije. */
+@theme {
+  /* Brend skala (generisana iz #ED1C24) */
+  --color-brand-50: #fef1f2;
+  --color-brand-100: #fde4e5;
+  --color-brand-200: #fbc6c8;
+  --color-brand-300: #f7999c;
+  --color-brand-400: #f3656a;
+  --color-brand-500: #f03c43;
+  --color-brand-600: #ed1c24;
+  --color-brand-700: #bf181e;
+  --color-brand-800: #901318;
+  --color-brand-900: #660f13;
+
+  /* Topli neutralni sivi tonovi */
+  --color-neutral-50: #faf9f8;
+  --color-neutral-100: #f5f3f2;
+  --color-neutral-200: #e8e5e3;
+  --color-neutral-300: #d7d3d0;
+  --color-neutral-400: #a9a39e;
+  --color-neutral-500: #79726c;
+  --color-neutral-600: #57534e;
+  --color-neutral-700: #44403c;
+  --color-neutral-800: #292524;
+  --color-neutral-900: #1c1917;
+
+  /* Duboki topli ugljen za podnožje i kontrastne sekcije */
+  --color-charcoal: #211d1b;
+
+  /* Semantičke boje */
+  --color-success-50: #f0fdf4;
+  --color-success-600: #15803d;
+  --color-success-700: #166534;
+  --color-warning-50: #fffbeb;
+  --color-warning-600: #b45309;
+  --color-error-50: #fef2f2;
+  --color-error-600: #b91c1c;
+  --color-info-50: #eff6ff;
+  --color-info-600: #0369a1;
+
+  /* Fokus prsten — visok kontrast, namjerno NIJE crven */
+  --color-focus: #1d4ed8;
+
+  --font-sans: var(--font-inter), 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --shadow-lift: 0 1px 2px rgb(28 25 23 / 0.05), 0 4px 12px rgb(28 25 23 / 0.06);
+  --shadow-lift-lg: 0 2px 4px rgb(28 25 23 / 0.06), 0 12px 28px rgb(28 25 23 / 0.1);
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Motion tokeni (sekcija C specifikacije) */
+:root {
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 450ms;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-white font-sans text-neutral-900 antialiased;
+    font-size: 17px;
+    line-height: 1.65;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      font-size: 18px;
+    }
+  }
+
+  /* Vidljiv fokus prsten — visok kontrast, trenutan (bez animacije) */
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+    border-radius: 4px;
+    transition: none !important;
+  }
+
+  ::selection {
+    background: var(--color-brand-100);
+  }
+}
+
+@layer components {
+  /* Tipografska skala: display 56/40, h1 40/32, h2 32/26, h3 24/20 */
+  .text-display {
+    font-size: clamp(2.5rem, 1.6rem + 3vw, 3.5rem);
+    line-height: 1.12;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+  }
+  .text-h1 {
+    font-size: clamp(2rem, 1.55rem + 1.5vw, 2.5rem);
+    line-height: 1.18;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .text-h2 {
+    font-size: clamp(1.625rem, 1.4rem + 0.8vw, 2rem);
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .text-h3 {
+    font-size: clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem);
+    line-height: 1.35;
+    font-weight: 600;
+  }
+  .text-small {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Telefonski brojevi: uvijek veliki, podebljani, tabelarne cifre */
+  .telefon {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* Sadržajni kontejner: 12 kolona, max 1200px */
+  .kontejner {
+    @apply mx-auto w-full max-w-[1200px] px-4 sm:px-6;
+  }
+
+  /* Vertikalni ritam sekcija: 96px desktop / 64px mobilno */
+  .sekcija {
+    @apply py-16 md:py-24;
+  }
+
+  /* Skeleton shimmer 1.2s linear */
+  .skeleton {
+    @apply rounded-md bg-neutral-100;
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgb(255 255 255 / 0.7) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.2s linear infinite;
+  }
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+
+  /* Tihi ulaz poruke o grešci (bez tresenja — djeluje uznemirujuće starijim korisnicima) */
+  @keyframes uplov {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Bogati tekst iz CMS-a */
+  .prose-bm {
+    @apply max-w-prose;
+  }
+  .prose-bm p {
+    @apply mb-4;
+  }
+  .prose-bm h2 {
+    @apply mt-8 mb-3;
+    font-size: clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem);
+    line-height: 1.35;
+    font-weight: 600;
+  }
+  .prose-bm h3 {
+    @apply mt-6 mb-2 font-semibold;
+  }
+  .prose-bm ul {
+    @apply mb-4 list-disc space-y-1.5 pl-6;
+  }
+  .prose-bm ol {
+    @apply mb-4 list-decimal space-y-1.5 pl-6;
+  }
+  .prose-bm a {
+    @apply text-brand-700 underline underline-offset-2 hover:text-brand-800;
+  }
+  .prose-bm strong {
+    @apply font-semibold text-neutral-900;
+  }
+}
+
+/* Hero ulaz: postepeni fade-up (naslov → podnaslov → CTA → traka povjerenja),
+   80ms međukorak, jednom po sesiji (klasa se dodaje klijentski) */
+.hero-animira [data-hero-stavka] {
+  animation: heroUplov 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.hero-animira [data-hero-stavka='2'] {
+  animation-delay: 80ms;
+}
+.hero-animira [data-hero-stavka='3'] {
+  animation-delay: 160ms;
+}
+.hero-animira [data-hero-stavka='4'] {
+  animation-delay: 240ms;
+}
+.hero-animira [data-hero-stavka='5'] {
+  animation-delay: 320ms;
+}
+@keyframes heroUplov {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* prefers-reduced-motion: sve animacije se svode na trenutne promjene prozirnosti */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 120ms !important;
+    transition-property: opacity, background-color, border-color, color !important;
+  }
+  .hero-animira [data-hero-stavka] {
+    animation: none !important;
+  }
+}
+
+/* Sigurnosna zona za ljepljivu mobilnu traku (iPhone notch itd.) */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
