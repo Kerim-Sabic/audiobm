@@ -141,6 +141,15 @@ export function MobilniMeni({
                         <Link
                           href={s.putanja}
                           aria-current={aktivna ? 'page' : undefined}
+                          onClick={(e) => {
+                            // meni se zatvara odmah (klizi van dok se ruta učitava);
+                            // klik na trenutnu rutu samo glatko vraća na vrh
+                            setOtvoren(false)
+                            if (putanja === s.putanja) {
+                              e.preventDefault()
+                              window.scrollTo({ top: 0, behavior: 'smooth' })
+                            }
+                          }}
                           className={`flex min-h-[54px] items-center gap-3.5 rounded-2xl px-3.5 py-3 text-[17px] font-semibold transition-colors duration-150 ${
                             aktivna ? 'bg-brand-50 text-brand-800' : 'text-neutral-800 hover:bg-neutral-100'
                           }`}

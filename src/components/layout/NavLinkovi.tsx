@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 /**
  * Desktop navigacija: mirna pilula za aktivnu rutu, tihi hover.
  * Razmaci se stežu na lg i šire na xl — stavke se nikad ne lome u dva reda.
+ * Klik na već aktivnu stavku glatko vraća na vrh stranice (umjesto „mrtvog" klika).
  */
 export function NavLinkovi({ stavke }: { stavke: { oznaka: string; putanja: string }[] }) {
   const putanja = usePathname()
@@ -19,6 +20,12 @@ export function NavLinkovi({ stavke }: { stavke: { oznaka: string; putanja: stri
             <Link
               href={s.putanja}
               aria-current={aktivna ? 'page' : undefined}
+              onClick={(e) => {
+                if (putanja === s.putanja) {
+                  e.preventDefault()
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }
+              }}
               className={`block rounded-full px-3 py-2 text-[14.5px] font-semibold whitespace-nowrap transition-colors duration-150 xl:px-4 xl:text-[15.5px] ${
                 aktivna
                   ? 'bg-brand-50 text-brand-800'

@@ -41,8 +41,10 @@ export const viewport: Viewport = {
 export default async function KorijenskiRaspored({ children }: { children: React.ReactNode }) {
   const podesavanja = await dajPodesavanja()
 
+  // data-scroll-behavior: Next privremeno gasi CSS smooth-scroll pri promjeni
+  // rute, pa nova stranica počinje od vrha bez „dovlačenja" preko cijele dužine
   return (
-    <html lang="bs" className={inter.variable}>
+    <html lang="bs" className={inter.variable} data-scroll-behavior="smooth">
       <body className="flex min-h-screen flex-col">
         <script
           type="application/ld+json"

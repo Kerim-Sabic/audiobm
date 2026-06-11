@@ -17,7 +17,8 @@ await mkdir('screenshots/mob', { recursive: true })
 const browser = await chromium.launch()
 let problema = 0
 
-for (const sirina of [390, 430]) {
+const SIRINE = process.argv[2] ? process.argv[2].split(',').map(Number) : [390, 430]
+for (const sirina of SIRINE) {
   const ctx = await browser.newContext({ viewport: { width: sirina, height: 844 } })
   const page = await ctx.newPage()
   for (const [naziv, putanja] of STRANICE) {
