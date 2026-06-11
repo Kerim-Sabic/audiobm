@@ -14,11 +14,11 @@
 #   lokalni "media/" folder se na Netlify funkcijama ne čuva između poziva
 #   SMTP_HOST/PORT/USER/PASS + EMAIL_FROM — slanje e-pošte
 #
-# Nakon prvog deploya pokrenite seed na produkcijskoj bazi (lokalno):
-#   DATABASE_URL=postgres://... S3_BUCKET=... pnpm seed
+# Build pokreće seed prije Next builda. Seed je idempotentan: na svježoj bazi
+# kreira početni sadržaj, a na postojećoj preskače već unesene zapise.
 
 [build]
-  command = "pnpm build"
+  command = "pnpm seed && pnpm build"
   publish = ".next"
 
 [build.environment]

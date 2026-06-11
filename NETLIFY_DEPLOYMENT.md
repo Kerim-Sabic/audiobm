@@ -63,14 +63,10 @@ Na Netlifyu:
 
 Netlify će automatski:
 1. Preuzeti kod sa `main` grane
-2. Pokrenuti `pnpm install && pnpm build`
+2. Pokrenuti `pnpm install`, zatim build komandu iz `netlify.toml`: `pnpm seed && pnpm build`
 3. Objaviti `.next` folder
 
-**Prvi deploy:**
-```bash
-# Nakon što je deploy završen, pokrenite seed
-DATABASE_URL=postgresql://... pnpm seed
-```
+`pnpm seed` je idempotentan: na svježoj bazi kreira početni sadržaj, a na postojećoj preskače već unesene zapise.
 
 ## Redirekcije Starih Linkova
 
@@ -103,7 +99,7 @@ Sve redirekcije iz `next.config.ts` će automatski raditi preko Next.js (`_redir
 
 Svaka push na `main` će automatski triggerati novi deploy:
 1. Netlify izvlači kod
-2. Pokrenuta je `pnpm build`
+2. Pokrenuta je `pnpm seed && pnpm build`
 3. `.next` folder je objavljen
 4. Stari preview okruženja se čiste
 
