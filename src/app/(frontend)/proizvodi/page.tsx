@@ -39,8 +39,9 @@ export default async function ProizvodiStranica() {
   return (
     <div className="kontejner py-10 md:py-14">
       <Mrvice stavke={[{ naziv: 'Proizvodi' }]} />
-      <h1 className="text-h1 mt-6">Proizvodi</h1>
-      <p className="mt-3 max-w-2xl text-[18px] text-neutral-600">
+      <p className="nadnaslov mt-6">Maloprodaja i pribor</p>
+      <h1 className="text-h1 mt-3">Proizvodi</h1>
+      <p className="uvodni mt-3 max-w-2xl">
         Baterije, čepovi za uši, pribor za održavanje i kućni medicinski aparati. Naručujete
         jednostavno — upitom putem stranice ili telefonom, a preuzimate u najbližoj poslovnici.
       </p>

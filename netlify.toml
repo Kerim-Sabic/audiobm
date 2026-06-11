@@ -1,45 +1,42 @@
-# Netlify deployment configuration for Audio BM BiH
+# Netlify konfiguracija — Audio BM (Next.js 16 + Payload CMS 3)
+#
+# Rutiranjem (uključujući osvježavanje i direktne linkove) upravlja zvanični
+# Next.js runtime (@netlify/plugin-nextjs) — NE dodavati "/* -> /index.html"
+# preusmjeravanja: ona lome serverske rute Next aplikacije.
+#
+# OBAVEZNE varijable okruženja (Site settings → Environment variables):
+#   PAYLOAD_SECRET          dug nasumičan niz
+#   DATABASE_URL            postgres://... (Neon/Supabase, EU region!)
+#                           — SQLite NE radi na Netlifyju (datoteke se ne čuvaju)
+#   NEXT_PUBLIC_SERVER_URL  https://vaš-sajt.netlify.app ili https://audiobm.ba
+#   S3_BUCKET, S3_REGION, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY
+#   (+ S3_ENDPOINT za Cloudflare R2/Backblaze) — trajno skladište slika;
+#   lokalni "media/" folder se na Netlify funkcijama ne čuva između poziva
+#   SMTP_HOST/PORT/USER/PASS + EMAIL_FROM — slanje e-pošte
+#
+# Nakon prvog deploya pokrenite seed na produkcijskoj bazi (lokalno):
+#   DATABASE_URL=postgres://... S3_BUCKET=... pnpm seed
 
 [build]
-command = "pnpm install && pnpm build"
-publish = ".next"
-functions = ".netlify/functions"
-node_bundler = "pnpm"
+  command = "pnpm build"
+  publish = ".next"
 
 [build.environment]
-NODE_VERSION = "22"
-NEXT_PUBLIC_SERVER_URL = "https://audiobm.ba"
+  NODE_VERSION = "22"
 
-# Redirect all non-file routes to Next.js for client-side routing
-[[redirects]]
-from = "/*"
-to = "/index.html"
-status = 200
-force = false
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
-# Cache static assets
+# Keširanje statičkih resursa (Next runtime postavlja vlastite za /_next/*)
 [[headers]]
-for = "/_next/static/*"
-[headers.values]
-Cache-Control = "public, max-age=31536000, immutable"
+  for = "/brand/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
+# Sigurnosna zaglavlja
 [[headers]]
-for = "/_next/image*"
-[headers.values]
-Cache-Control = "public, max-age=31536000, immutable"
-
-# API routes
-[[headers]]
-for = "/api/*"
-[headers.values]
-Cache-Control = "no-cache, no-store, must-revalidate"
-
-# Disable X-Powered-By header for security
-[[headers]]
-for = "/*"
-[headers.values]
-X-Powered-By = ""
-X-Frame-Options = "SAMEORIGIN"
-X-Content-Type-Options = "nosniff"
-X-XSS-Protection = "1; mode=block"
-Referrer-Policy = "strict-origin-when-cross-origin"
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

@@ -5,6 +5,7 @@ import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
+import { s3Storage } from '@payloadcms/storage-s3'
 import { hr } from '@payloadcms/translations/languages/hr'
 import sharp from 'sharp'
 
@@ -44,7 +45,27 @@ const email = process.env.SMTP_HOST
     })
   : undefined
 
+// Produkcija na serverless platformama (Netlify/Vercel): slike idu u S3/R2
+// jer se lokalne datoteke ne čuvaju između poziva funkcija.
+const plugins = process.env.S3_BUCKET
+  ? [
+      s3Storage({
+        collections: { mediji: true },
+        bucket: process.env.S3_BUCKET,
+        config: {
+          region: process.env.S3_REGION ?? 'auto',
+          credentials: {
+            accessKeyId: process.env.S3_ACCESS_KEY_ID ?? '',
+            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '',
+          },
+          ...(process.env.S3_ENDPOINT ? { endpoint: process.env.S3_ENDPOINT } : {}),
+        },
+      }),
+    ]
+  : []
+
 export default buildConfig({
+  plugins,
   admin: {
     user: Korisnici.slug,
     importMap: { baseDir: path.resolve(dirname) },

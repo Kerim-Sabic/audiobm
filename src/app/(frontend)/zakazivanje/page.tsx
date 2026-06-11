@@ -34,8 +34,9 @@ export default async function ZakazivanjeStranica({
     <div className="kontejner py-10 md:py-14">
       <Mrvice stavke={[{ naziv: 'Zakazivanje termina' }]} />
       <div className="mx-auto mt-6 max-w-3xl">
-        <h1 className="text-h1">Zakažite besplatnu provjeru sluha</h1>
-        <p className="mt-3 mb-10 text-[18px] text-neutral-600">
+        <p className="nadnaslov">Bez obaveze · traje 2 minute</p>
+        <h1 className="text-h1 mt-3">Zakažite besplatnu provjeru sluha</h1>
+        <p className="uvodni mt-3 mb-10">
           Potrebne su samo dvije minute. Provjera je besplatna i ne obavezuje Vas ni na šta.
         </p>
         <ZakazivanjeKoraci lokacije={lokacije} predodabranaLokacija={predodabrana as number | undefined} />

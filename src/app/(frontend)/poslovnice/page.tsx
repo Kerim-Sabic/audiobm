@@ -4,7 +4,7 @@ import { metaStranice } from '@/lib/seo'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { MapaBiH } from '@/components/poslovnice/MapaBiH'
 import { LokacijaKartica } from '@/components/poslovnice/LokacijaKartica'
-import { OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
+import { Otkrij, OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
 import { DugmeLink } from '@/components/ui/Dugme'
 
 export const metadata: Metadata = metaStranice({
@@ -19,27 +19,32 @@ export default async function PoslovniceStranica() {
   return (
     <div className="kontejner py-10 md:py-14">
       <Mrvice stavke={[{ naziv: 'Poslovnice' }]} />
-      <h1 className="text-h1 mt-6">Naše poslovnice</h1>
-      <p className="mt-3 max-w-2xl text-[18px] text-neutral-600">
-        Dobro došli u šest gradova širom Bosne i Hercegovine — od sada i u Sarajevu.
-      </p>
+      <div className="mt-6 max-w-2xl">
+        <p className="nadnaslov">Uvijek blizu Vas</p>
+        <h1 className="text-h1 mt-3">Naše poslovnice</h1>
+        <p className="uvodni mt-4">
+          Dobro došli u šest gradova širom Bosne i Hercegovine — od sada i u Sarajevu.
+        </p>
+      </div>
 
-      <div className="mt-10 grid items-start gap-10 lg:grid-cols-2">
-        <div className="rounded-[16px] border border-neutral-200 bg-white p-6">
-          <MapaBiH
-            lokacije={poslovnice.map((p) => ({
-              slug: p.slug,
-              grad: p.grad,
-              geoSirina: p.geoSirina,
-              geoDuzina: p.geoDuzina,
-              novaPoslovnica: p.novaPoslovnica,
-            }))}
-          />
-        </div>
+      <div className="mt-12 grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+        <Otkrij className="lg:sticky lg:top-28">
+          <div className="rounded-[24px] border border-neutral-200 bg-gradient-to-b from-white to-neutral-50 p-6 shadow-[var(--shadow-lift)] md:p-9">
+            <MapaBiH
+              lokacije={poslovnice.map((p) => ({
+                slug: p.slug,
+                grad: p.grad,
+                geoSirina: p.geoSirina,
+                geoDuzina: p.geoDuzina,
+                novaPoslovnica: p.novaPoslovnica,
+              }))}
+            />
+          </div>
+        </Otkrij>
 
         <OtkrijGrupu className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
           {poslovnice.map((p) => (
-            <OtkrijStavku key={p.id}>
+            <OtkrijStavku key={p.id} className="h-full">
               <LokacijaKartica
                 lokacija={{
                   slug: p.slug,
@@ -54,15 +59,15 @@ export default async function PoslovniceStranica() {
         </OtkrijGrupu>
       </div>
 
-      <div className="mt-14 rounded-[16px] bg-neutral-50 p-8 text-center md:p-12">
+      <Otkrij className="mreza-tacaka-svijetla mt-16 rounded-[24px] border border-neutral-100 bg-neutral-50 p-8 text-center md:p-12">
         <h2 className="text-h2">Niste sigurni koja Vam je poslovnica najbliža?</h2>
-        <p className="mx-auto mt-3 max-w-xl text-neutral-600">
+        <p className="uvodni mx-auto mt-3 max-w-xl">
           Zakažite termin, a mi ćemo Vas pozvati i pomoći da odaberete.
         </p>
-        <DugmeLink href="/zakazivanje" velicina="veliko" className="mt-6">
+        <DugmeLink href="/zakazivanje" velicina="veliko" className="mt-7">
           Zakažite besplatnu provjeru sluha
         </DugmeLink>
-      </div>
+      </Otkrij>
     </div>
   )
 }

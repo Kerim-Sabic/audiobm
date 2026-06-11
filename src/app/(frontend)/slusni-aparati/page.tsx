@@ -31,8 +31,9 @@ export default async function SlusniAparatiStranica() {
     <div className="kontejner py-10 md:py-14">
       <Mrvice stavke={[{ naziv: 'Slušni aparati' }]} />
       <div className="mt-6 max-w-3xl">
-        <h1 className="text-h1">Slušni aparati</h1>
-        <p className="mt-4 text-[18px] text-neutral-600">
+        <p className="nadnaslov">Edukativni vodič</p>
+        <h1 className="text-h1 mt-3">Slušni aparati</h1>
+        <p className="uvodni mt-4">
           Audio BM već više od 30 godina sarađuje sa svjetski poznatim brendovima — švajcarskim{' '}
           <strong>Bernafonom</strong> i kanadskim <strong>Unitronom</strong>. Naši akustičari će Vam
           pomoći da odaberete aparat prilagođen Vašem sluhu, navikama i budžetu.

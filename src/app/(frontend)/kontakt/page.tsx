@@ -19,8 +19,9 @@ export default async function KontaktStranica() {
   return (
     <div className="kontejner py-10 md:py-14">
       <Mrvice stavke={[{ naziv: 'Kontakt' }]} />
-      <h1 className="text-h1 mt-6">Kontaktirajte nas</h1>
-      <p className="mt-3 max-w-2xl text-[18px] text-neutral-600">
+      <p className="nadnaslov mt-6">Odgovaramo isti radni dan</p>
+      <h1 className="text-h1 mt-3">Kontaktirajte nas</h1>
+      <p className="uvodni mt-3 max-w-2xl">
         Tu smo za svako pitanje — odgovaramo <strong>isti radni dan</strong>.
       </p>
 

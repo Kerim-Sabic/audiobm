@@ -70,6 +70,23 @@ pnpm dev                    # http://localhost:3000  (admin: /admin)
 Alternativa: jedan EU VPS (Docker: app + Postgres + Caddy) — `pnpm build && pnpm start`
 iza Caddy reverse-proxyja sa automatskim HTTPS-om.
 
+## Produkcija na Netlifyju
+
+Projekat je spreman za Netlify (`netlify.toml` je u repozitoriju; rutiranjem,
+osvježavanjem i direktnim linkovima upravlja zvanični `@netlify/plugin-nextjs`).
+
+1. **Baza:** kreirajte Postgres na Neonu (EU) — SQLite na Netlifyju ne radi
+   (datoteke se ne čuvaju između poziva funkcija).
+2. **Slike:** kreirajte S3/Cloudflare R2 bucket — lokalni `media/` folder se na
+   serverless platformi ne čuva. Adapter se uključuje sam kad postavite `S3_BUCKET`.
+3. Na Netlifyju: **Add new site → Import from Git** → varijable okruženja:
+   `PAYLOAD_SECRET`, `DATABASE_URL`, `NEXT_PUBLIC_SERVER_URL`,
+   `S3_BUCKET`/`S3_REGION`/`S3_ACCESS_KEY_ID`/`S3_SECRET_ACCESS_KEY`
+   (+ `S3_ENDPOINT` za R2), `SMTP_*`, `EMAIL_FROM`.
+4. Deploy (build: `pnpm build`; radi i `npm install && npm run build`).
+5. Jednom napunite produkcijsku bazu sa svog računara:
+   `DATABASE_URL=postgres://… S3_BUCKET=… pnpm seed`
+
 ## Analitika
 
 Plausible (EU, bez kolačića). Aktivira se unosom domene u Admin → Podešavanja →

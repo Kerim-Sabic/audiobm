@@ -4,6 +4,7 @@ import { dajNavigaciju, dajPodesavanja } from '@/lib/podaci'
 import { TelefonLink } from '@/components/ui/TelefonLink'
 import { DugmeLink } from '@/components/ui/Dugme'
 import { MobilniMeni } from './MobilniMeni'
+import { NavLinkovi } from './NavLinkovi'
 
 /** Zaglavlje: logo, do 7 stavki menija, veliki telefon + glavni CTA. */
 export async function Zaglavlje() {
@@ -26,18 +27,7 @@ export async function Zaglavlje() {
         </Link>
 
         <nav aria-label="Glavna navigacija" className="hidden xl:block">
-          <ul className="flex items-center gap-0.5">
-            {stavke.map((s) => (
-              <li key={s.id ?? s.putanja}>
-                <Link
-                  href={s.putanja}
-                  className="relative rounded-md px-3.5 py-2.5 text-[15.5px] font-semibold text-neutral-700 transition-colors duration-150 after:absolute after:inset-x-3.5 after:-bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-brand-600 after:transition-transform after:duration-250 hover:text-neutral-950 hover:after:scale-x-100"
-                >
-                  {s.oznaka}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <NavLinkovi stavke={stavke.map((s) => ({ oznaka: s.oznaka, putanja: s.putanja }))} />
         </nav>
 
         <div className="flex items-center gap-3 md:gap-6">
