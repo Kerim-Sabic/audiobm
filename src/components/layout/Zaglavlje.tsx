@@ -1,19 +1,65 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { dajNavigaciju, dajPodesavanja } from '@/lib/podaci'
+import { MapPin, Phone, ShieldCheck } from 'lucide-react'
+import { dajNavigaciju, dajPodesavanja, dajPoslovnice } from '@/lib/podaci'
+import { stvarno } from '@/lib/tekst'
 import { TelefonLink } from '@/components/ui/TelefonLink'
+import { telHref } from '@/lib/telefon'
 import { DugmeLink } from '@/components/ui/Dugme'
 import { MobilniMeni } from './MobilniMeni'
 import { NavLinkovi } from './NavLinkovi'
 
-/** Zaglavlje: logo, do 7 stavki menija, veliki telefon + glavni CTA. */
+/**
+ * Zaglavlje u dva pojasa:
+ *  - servisni pojas (samo desktop): poslovnice + telefon — skliže pri skrolu (sticky -top trik)
+ *  - glavni pojas: logo, navigacija, CTA — uvijek vidljiv, nikad se ne lomi
+ * Mobilno: logo + okrugla tipka za poziv + meni. CTA živi u meniju i ljepljivoj traci.
+ */
 export async function Zaglavlje() {
-  const [navigacija, podesavanja] = await Promise.all([dajNavigaciju(), dajPodesavanja()])
-  const stavke = navigacija.glavniMeni ?? []
+  const [navigacija, podesavanja, poslovnice] = await Promise.all([
+    dajNavigaciju(),
+    dajPodesavanja(),
+    dajPoslovnice(),
+  ])
+  const stavke = (navigacija.glavniMeni ?? []).map((s) => ({ oznaka: s.oznaka, putanja: s.putanja }))
+  const telefon = stvarno(podesavanja.telefonGlavni)
 
   return (
-    <header className="sticky top-0 z-40 border-b border-neutral-200/80 bg-white/92 shadow-[0_1px_12px_rgb(28_25_23/0.04)] backdrop-blur-md">
-      <div className="kontejner flex h-[68px] items-center justify-between gap-4 md:h-20">
+    <header className="sticky top-0 z-40 border-b border-neutral-200/70 bg-white/92 shadow-[0_1px_16px_rgb(28_25_23/0.05)] backdrop-blur-xl lg:-top-10">
+      {/* servisni pojas — skliže nakon 40px skrola */}
+      <div className="hidden border-b border-neutral-100 bg-neutral-50/85 lg:block">
+        <div className="kontejner flex h-10 items-center justify-between text-[13.5px] font-medium text-neutral-600">
+          <div className="flex items-center gap-6">
+            <Link
+              href="/poslovnice"
+              className="inline-flex items-center gap-1.5 transition-colors duration-150 hover:text-neutral-900"
+            >
+              <MapPin className="size-3.5 text-brand-600" aria-hidden />
+              {poslovnice.length} poslovnica širom Bosne i Hercegovine
+            </Link>
+            <span className="inline-flex items-center gap-1.5 text-neutral-500">
+              <ShieldCheck className="size-3.5 text-success-600" aria-hidden />
+              Provjera sluha je besplatna i bez obaveze
+            </span>
+          </div>
+          {telefon && (
+            <span className="inline-flex items-baseline gap-2.5">
+              <span className="text-[12px] font-semibold tracking-[0.08em] text-neutral-500 uppercase">
+                Pozovite nas
+              </span>
+              <TelefonLink
+                broj={telefon}
+                lokacija="zaglavlje"
+                saIkonom={false}
+                className="!text-[15px] text-neutral-900 hover:text-brand-700"
+              />
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* glavni pojas */}
+      <div className="kontejner flex h-16 items-center justify-between gap-4 md:h-[72px] lg:gap-8">
         <Link href="/" className="flex shrink-0 items-center" aria-label="Audio BM — početna stranica">
           {/* prostor oko logotipa ≥ visina slova A (pravilo čistog prostora) */}
           <Image
@@ -22,35 +68,33 @@ export async function Zaglavlje() {
             width={168}
             height={35}
             priority
-            className="h-8 w-auto md:h-9"
+            className="h-7 w-auto md:h-8"
           />
         </Link>
 
-        <nav aria-label="Glavna navigacija" className="hidden xl:block">
-          <NavLinkovi stavke={stavke.map((s) => ({ oznaka: s.oznaka, putanja: s.putanja }))} />
+        <nav aria-label="Glavna navigacija" className="hidden min-w-0 lg:block">
+          <NavLinkovi stavke={stavke} />
         </nav>
 
-        <div className="flex items-center gap-3 md:gap-6">
-          {podesavanja.telefonGlavni && (
-            <span className="hidden flex-col items-end leading-tight md:flex">
-              <span className="text-[12px] font-semibold tracking-wide text-neutral-500 uppercase">
-                Pozovite nas
-              </span>
-              <TelefonLink
-                broj={podesavanja.telefonGlavni}
-                lokacija="zaglavlje"
-                saIkonom={false}
-                className="text-[19px] text-neutral-900 hover:text-brand-700"
-              />
-            </span>
+        <div className="flex shrink-0 items-center gap-2.5">
+          {/* omotač rješava sukob display utiliti klasa (hidden vs inline-flex) */}
+          <div className="hidden lg:block">
+            <DugmeLink href="/zakazivanje" velicina="malo" className="!px-5 xl:min-h-11">
+              Zakažite termin
+            </DugmeLink>
+          </div>
+
+          {/* mobilno: poziv jednim dodirom */}
+          {telefon && (
+            <a
+              href={telHref(telefon)}
+              aria-label={`Pozovite nas: ${telefon}`}
+              className="grid size-11 place-items-center rounded-full border border-neutral-200 bg-neutral-50 text-brand-700 transition-colors duration-150 hover:bg-brand-50 lg:hidden"
+            >
+              <Phone className="size-5" aria-hidden />
+            </a>
           )}
-          <DugmeLink href="/zakazivanje" className="hidden sm:inline-flex">
-            Zakažite termin
-          </DugmeLink>
-          <MobilniMeni
-            stavke={stavke.map((s) => ({ oznaka: s.oznaka, putanja: s.putanja }))}
-            telefon={podesavanja.telefonGlavni ?? undefined}
-          />
+          <MobilniMeni stavke={stavke} telefon={telefon ?? undefined} />
         </div>
       </div>
     </header>

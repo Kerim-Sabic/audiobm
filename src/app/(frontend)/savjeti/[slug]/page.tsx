@@ -84,17 +84,17 @@ export default async function ObjavaStranica({ params }: { params: Promise<{ slu
         <p className="mt-4 text-[19px] text-neutral-600">{objava.izvod}</p>
 
         {objava.naslovnaSlika && typeof objava.naslovnaSlika === 'object' && (
-          <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-[16px]">
+          <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-[24px] shadow-[var(--shadow-lift)]">
             <SlikaMedija medij={objava.naslovnaSlika as Mediji} fill sizes="(min-width: 768px) 768px, 100vw" prioritet />
           </div>
         )}
 
         <RichText data={objava.sadrzaj} className="prose-bm mt-10 text-[18px] text-neutral-800" />
 
-        <div className="mt-14 rounded-[16px] bg-brand-50/60 p-8 text-center">
+        <div className="mt-14 rounded-[28px] border border-brand-200/60 bg-gradient-to-br from-white to-brand-50/50 p-8 text-center md:p-10">
           <h2 className="text-h3">Brinete za svoj sluh?</h2>
           <p className="mt-2 text-neutral-700">Provjera sluha kod nas je besplatna i traje pola sata.</p>
-          <DugmeLink href="/zakazivanje" velicina="veliko" className="mt-5">
+          <DugmeLink href="/zakazivanje" velicina="veliko" className="mt-6">
             Zakažite besplatan termin
           </DugmeLink>
         </div>
@@ -107,7 +107,7 @@ export default async function ObjavaStranica({ params }: { params: Promise<{ slu
                 <li key={p.id}>
                   <Link
                     href={`/savjeti/${p.slug}`}
-                    className="block rounded-[12px] border border-neutral-200 bg-white p-4 font-semibold text-neutral-900 transition-colors duration-150 hover:border-brand-300 hover:text-brand-700"
+                    className="povrsina block p-4.5 font-semibold text-neutral-900 transition-colors duration-150 hover:border-brand-300 hover:text-brand-700"
                   >
                     {p.naslov}
                   </Link>

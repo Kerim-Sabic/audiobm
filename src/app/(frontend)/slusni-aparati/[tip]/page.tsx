@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { Check } from 'lucide-react'
 import { dajPayload } from '@/lib/podaci'
 import { metaStranice } from '@/lib/seo'
-import { Mrvice } from '@/components/ui/Mrvice'
+import { ZaglavljeStranice } from '@/components/ui/ZaglavljeStranice'
 import { DugmeLink } from '@/components/ui/Dugme'
-import { OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
+import { SekcijaZaglavlje } from '@/components/ui/SekcijaZaglavlje'
+import { Otkrij, OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
 import { ProizvodKartica } from '@/components/proizvodi/ProizvodKartica'
 import { TIPOVI_APARATA } from '@/lib/catalog'
 
@@ -67,37 +69,47 @@ export default async function TipAparataStranica({ params }: { params: Promise<{
   })
 
   return (
-    <div className="kontejner py-10 md:py-14">
-      <Mrvice
-        stavke={[{ naziv: 'Slušni aparati', putanja: '/slusni-aparati' }, { naziv: info.naziv }]}
+    <>
+      <ZaglavljeStranice
+        mrvice={[{ naziv: 'Slušni aparati', putanja: '/slusni-aparati' }, { naziv: info.naziv }]}
+        nadnaslov={info.kratko}
+        naslov={info.naziv}
+        uvod={detalji.opis}
       />
-      <div className="mt-6 max-w-3xl">
-        <h1 className="text-h1">{info.naziv}</h1>
-        <p className="mt-1 text-[18px] font-medium text-brand-700">{info.kratko}</p>
-        <p className="mt-4 text-[18px] text-neutral-600">{detalji.opis}</p>
-        <h2 className="text-h3 mt-8">Pogodni su za:</h2>
-        <ul className="mt-3 list-disc space-y-1.5 pl-6 text-neutral-700">
-          {detalji.pogodniZa.map((z) => (
-            <li key={z}>{z}</li>
-          ))}
-        </ul>
-        <DugmeLink href="/zakazivanje" velicina="veliko" className="mt-8">
-          Zakažite besplatno savjetovanje
-        </DugmeLink>
-      </div>
 
-      {aparati.length > 0 && (
-        <section className="sekcija" aria-label="Modeli">
-          <h2 className="text-h2">Modeli iz ove grupe</h2>
-          <OtkrijGrupu className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {aparati.map((p) => (
-              <OtkrijStavku key={p.id}>
-                <ProizvodKartica proizvod={p} />
-              </OtkrijStavku>
-            ))}
-          </OtkrijGrupu>
-        </section>
-      )}
-    </div>
+      <div className="kontejner">
+        <Otkrij className="mt-12 md:mt-16">
+          <div className="povrsina max-w-3xl !rounded-[24px] p-7 md:p-9">
+            <h2 className="text-h3">Pogodni su za:</h2>
+            <ul className="mt-4 space-y-3">
+              {detalji.pogodniZa.map((z) => (
+                <li key={z} className="flex items-start gap-3 text-neutral-700">
+                  <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-success-50">
+                    <Check className="size-3.5 text-success-600" strokeWidth={2.5} aria-hidden />
+                  </span>
+                  {z}
+                </li>
+              ))}
+            </ul>
+            <DugmeLink href="/zakazivanje" velicina="veliko" className="mt-7">
+              Zakažite besplatno savjetovanje
+            </DugmeLink>
+          </div>
+        </Otkrij>
+
+        {aparati.length > 0 && (
+          <section className="sekcija" aria-labelledby="modeli-naslov">
+            <SekcijaZaglavlje id="modeli-naslov" nadnaslov="Katalog" naslov="Modeli iz ove grupe" centrirano={false} />
+            <OtkrijGrupu className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {aparati.map((p) => (
+                <OtkrijStavku key={p.id} className="h-full">
+                  <ProizvodKartica proizvod={p} />
+                </OtkrijStavku>
+              ))}
+            </OtkrijGrupu>
+          </section>
+        )}
+      </div>
+    </>
   )
 }

@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { ShieldCheck, CalendarCheck } from 'lucide-react'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { dajPayload } from '@/lib/podaci'
 import { metaStranice } from '@/lib/seo'
+import { stvarno } from '@/lib/tekst'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { DugmeLink } from '@/components/ui/Dugme'
 import { SlikaMedija } from '@/components/ui/SlikaMedija'
@@ -52,9 +54,10 @@ export default async function ModelStranica({ params }: { params: Promise<{ slug
 
   const slike = (proizvod.slike as (Mediji | number)[] | undefined) ?? []
   const tip = proizvod.tipAparata ? TIPOVI_APARATA[proizvod.tipAparata as keyof typeof TIPOVI_APARATA] : null
+  const napomena = stvarno(proizvod.cijenaNapomena)
 
   return (
-    <div className="kontejner py-10 md:py-14">
+    <div className="kontejner py-8 md:py-12">
       <Mrvice
         stavke={[
           { naziv: 'Slušni aparati', putanja: '/slusni-aparati' },
@@ -65,28 +68,23 @@ export default async function ModelStranica({ params }: { params: Promise<{ slug
         ]}
       />
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_1fr]">
-        <div>
-          {slike[0] && typeof slike[0] === 'object' ? (
-            <div className="grid aspect-square place-items-center overflow-hidden rounded-[20px] border border-neutral-200 bg-gradient-to-br from-white to-neutral-100/70 p-10 shadow-[var(--shadow-lift)]">
-              <SlikaMedija
-                medij={slike[0]}
-                sizes="(min-width: 1024px) 560px, 100vw"
-                prioritet
-                className="max-h-full w-auto object-contain drop-shadow-xl"
-              />
-            </div>
-          ) : (
-            <div className="grid aspect-square place-items-center rounded-[16px] bg-neutral-100 text-neutral-400">
-              [MISSING_ASSET]
-            </div>
-          )}
+      <div className="mt-8 grid items-start gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+        <div className="lg:sticky lg:top-32">
+          <div className="povrsina relative grid aspect-square place-items-center overflow-hidden !rounded-[28px] bg-gradient-to-br from-white to-neutral-50 p-10">
+            <div className="mreza-audiogram absolute inset-0" aria-hidden />
+            <SlikaMedija
+              medij={typeof slike[0] === 'object' ? slike[0] : null}
+              sizes="(min-width: 1024px) 560px, 100vw"
+              prioritet
+              className="relative max-h-full w-auto object-contain drop-shadow-xl"
+            />
+          </div>
           {slike.length > 1 && (
             <div className="mt-4 grid grid-cols-4 gap-3">
               {slike.slice(1, 5).map(
                 (s, i) =>
                   typeof s === 'object' && (
-                    <div key={i} className="grid aspect-square place-items-center overflow-hidden rounded-[12px] border border-neutral-200 bg-white p-3">
+                    <div key={i} className="povrsina grid aspect-square place-items-center overflow-hidden !rounded-[14px] p-3">
                       <SlikaMedija medij={s} sizes="140px" className="max-h-full w-auto object-contain" />
                     </div>
                   ),
@@ -97,28 +95,32 @@ export default async function ModelStranica({ params }: { params: Promise<{ slug
 
         <div>
           {proizvod.brend && (
-            <p className="text-small font-semibold tracking-wide text-neutral-500 uppercase">{proizvod.brend}</p>
+            <p className="text-[13px] font-bold tracking-[0.16em] text-neutral-500 uppercase">{proizvod.brend}</p>
           )}
-          <h1 className="text-h1 mt-1">{proizvod.naziv}</h1>
+          <h1 className="text-h1 mt-1.5">{proizvod.naziv}</h1>
           {tip && <p className="mt-2 font-medium text-brand-700">{tip.naziv}</p>}
 
-          <div className="mt-5 rounded-[12px] bg-neutral-50 p-4">
+          <div className="povrsina mt-6 !rounded-[18px] bg-neutral-50 p-5">
             {proizvod.cijenaOd && proizvod.cijenaDo ? (
-              <p className="telefon text-[22px]">{proizvod.cijenaOd} – {proizvod.cijenaDo} KM</p>
+              <p className="telefon text-[24px] text-neutral-900">
+                {proizvod.cijenaOd} – {proizvod.cijenaDo} KM
+              </p>
             ) : null}
             <p className="text-[15px] text-neutral-600">
-              {proizvod.cijenaNapomena?.startsWith('[')
-                ? proizvod.cijenaNapomena
-                : (proizvod.cijenaNapomena ?? 'Cijena zavisi od modela i stepena oštećenja sluha — saznajte na besplatnom savjetovanju.')}
+              {napomena ??
+                'Cijena zavisi od modela i stepena oštećenja sluha — saznajte na besplatnom savjetovanju.'}
+            </p>
+            <p className="mt-3 flex items-center gap-2 border-t border-neutral-200/70 pt-3 text-[14px] font-medium text-neutral-600">
+              <ShieldCheck className="size-4 text-success-600" aria-hidden />
+              Proba aparata i savjetovanje su besplatni i bez obaveze
             </p>
           </div>
 
-          {proizvod.opis && (
-            <RichText data={proizvod.opis} className="prose-bm mt-6 text-neutral-700" />
-          )}
+          {proizvod.opis && <RichText data={proizvod.opis} className="prose-bm mt-7 text-neutral-700" />}
 
           <div className="mt-8 space-y-3">
             <DugmeLink href="/zakazivanje" velicina="veliko" className="w-full">
+              <CalendarCheck className="size-5" aria-hidden />
               Zakažite besplatno savjetovanje
             </DugmeLink>
             <DugmeLink href="#upit" varijanta="sekundarno" velicina="veliko" className="w-full">
@@ -126,8 +128,8 @@ export default async function ModelStranica({ params }: { params: Promise<{ slug
             </DugmeLink>
           </div>
 
-          <div className="mt-10 rounded-[16px] border border-neutral-200 p-6">
-            <h2 className="text-h3 mb-4">Upit za ovaj model</h2>
+          <div id="upit" className="povrsina mt-10 scroll-mt-32 !rounded-[24px] p-6 md:p-8">
+            <h2 className="text-h3 mb-5">Upit za ovaj model</h2>
             <UpitZaProizvod
               proizvodId={proizvod.id as number}
               nazivProizvoda={proizvod.naziv}

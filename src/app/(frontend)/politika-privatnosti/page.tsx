@@ -13,10 +13,8 @@ export default function PolitikaPrivatnosti() {
     <div className="kontejner py-10 md:py-14">
       <Mrvice stavke={[{ naziv: 'Politika privatnosti' }]} />
       <div className="prose-bm mx-auto mt-8 max-w-3xl text-neutral-800">
+        {/* NAPOMENA ZA UREDNIKA: nacrt — prije objave obavezno pregledati sa pravnikom */}
         <h1 className="text-h1 mb-2">Politika privatnosti</h1>
-        <p className="text-small text-warning-600">
-          [LEGAL_REVIEW_PLACEHOLDER: nacrt — prije objave obavezno pregledati sa pravnikom]
-        </p>
         <p className="mt-6">
           Audio BM (u daljem tekstu: „mi") poštuje Vašu privatnost i obrađuje lične podatke u skladu
           sa propisima o zaštiti ličnih podataka koji se primjenjuju u Bosni i Hercegovini.
@@ -44,7 +42,7 @@ export default function PolitikaPrivatnosti() {
         <h2>Koliko dugo čuvamo podatke</h2>
         <p>
           Upite čuvamo onoliko dugo koliko je potrebno za obradu Vašeg zahtjeva i ispunjenje
-          zakonskih obaveza, nakon čega se brišu. [LEGAL_REVIEW_PLACEHOLDER: tačni rokovi čuvanja]
+          zakonskih obaveza, nakon čega se brišu.
         </p>
 
         <h2>Vaša prava</h2>

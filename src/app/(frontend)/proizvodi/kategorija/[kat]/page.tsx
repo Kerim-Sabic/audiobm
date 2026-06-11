@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { dajPayload } from '@/lib/podaci'
 import { metaStranice } from '@/lib/seo'
-import { Mrvice } from '@/components/ui/Mrvice'
+import { ZaglavljeStranice } from '@/components/ui/ZaglavljeStranice'
 import { OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
 import { ProizvodKartica } from '@/components/proizvodi/ProizvodKartica'
 import { KATEGORIJE, type Kategorija } from '@/lib/catalog'
@@ -40,24 +40,29 @@ export default async function KategorijaStranica({ params }: { params: Promise<{
   })
 
   return (
-    <div className="kontejner py-10 md:py-14">
-      <Mrvice stavke={[{ naziv: 'Proizvodi', putanja: '/proizvodi' }, { naziv: info.naziv }]} />
-      <h1 className="text-h1 mt-6">{info.naziv}</h1>
-      <p className="mt-3 max-w-2xl text-[18px] text-neutral-600">{info.opis}</p>
+    <>
+      <ZaglavljeStranice
+        mrvice={[{ naziv: 'Proizvodi', putanja: '/proizvodi' }, { naziv: info.naziv }]}
+        nadnaslov="Kategorija proizvoda"
+        naslov={info.naziv}
+        uvod={info.opis}
+      />
 
-      {proizvodi.length > 0 ? (
-        <OtkrijGrupu className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {proizvodi.map((p) => (
-            <OtkrijStavku key={p.id}>
-              <ProizvodKartica proizvod={p} />
-            </OtkrijStavku>
-          ))}
-        </OtkrijGrupu>
-      ) : (
-        <p className="mt-10 rounded-[16px] bg-neutral-50 p-8 text-center text-neutral-600">
-          Trenutno nema proizvoda u ovoj kategoriji. Kontaktirajte nas za informacije o ponudi.
-        </p>
-      )}
-    </div>
+      <div className="kontejner pb-16 md:pb-24">
+        {proizvodi.length > 0 ? (
+          <OtkrijGrupu className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {proizvodi.map((p) => (
+              <OtkrijStavku key={p.id} className="h-full">
+                <ProizvodKartica proizvod={p} />
+              </OtkrijStavku>
+            ))}
+          </OtkrijGrupu>
+        ) : (
+          <p className="povrsina mt-12 p-10 text-center text-neutral-600">
+            Trenutno nema proizvoda u ovoj kategoriji. Kontaktirajte nas za informacije o ponudi.
+          </p>
+        )}
+      </div>
+    </>
   )
 }

@@ -12,6 +12,8 @@ import {
   ArrowRight,
   Quote,
   Star,
+  MapPin,
+  Check,
 } from 'lucide-react'
 import heroOsoba from '@/assets/hero-osoba.png'
 import {
@@ -24,9 +26,11 @@ import {
   dajRecenzije,
   dajUsluge,
 } from '@/lib/podaci'
+import { stvarno, ocisti } from '@/lib/tekst'
 import { metaStranice, pitanjaJsonLd } from '@/lib/seo'
 import { HeroUlaz } from '@/components/pocetna/HeroUlaz'
 import { PovratniPoziv } from '@/components/pocetna/PovratniPoziv'
+import { Audiogram } from '@/components/pocetna/Audiogram'
 import { PromoBaner } from '@/components/ui/PromoBaner'
 import { DugmeLink } from '@/components/ui/Dugme'
 import { TelefonLink } from '@/components/ui/TelefonLink'
@@ -34,9 +38,8 @@ import { Harmonika } from '@/components/ui/Harmonika'
 import { SekcijaZaglavlje } from '@/components/ui/SekcijaZaglavlje'
 import { Otkrij, OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
 import { Brojac } from '@/components/motion/Brojac'
-import { Tilt3D } from '@/components/motion/Tilt3D'
 import { ZvucniTalasiOmot } from '@/components/motion/ZvucniTalasiOmot'
-import { LokacijaKartica } from '@/components/poslovnice/LokacijaKartica'
+import { MapaBiH } from '@/components/poslovnice/MapaBiH'
 import { SlikaMedija } from '@/components/ui/SlikaMedija'
 import { TIPOVI_APARATA } from '@/lib/catalog'
 import type { Mediji } from '@/payload-types'
@@ -60,12 +63,12 @@ const IKONE_USLUGA: Record<string, typeof Ear> = {
   shield: ShieldCheck,
 }
 
-/** Naslov iz CMS-a: prva riječ dobija crvenu podvlaku kistom. */
+/** Naslov iz CMS-a: prva riječ u brend crvenoj — miran, samouvjeren akcenat. */
 function NaslovSaAkcentom({ tekst }: { tekst: string }) {
   const [prva, ...ostatak] = tekst.split(' ')
   return (
     <>
-      <span className="podvlaka">{prva}</span> {ostatak.join(' ')}
+      <span className="text-brand-600">{prva}</span> {ostatak.join(' ')}
     </>
   )
 }
@@ -83,7 +86,7 @@ export default async function Pocetna() {
       dajPayload(),
     ])
 
-  // po jedan stvarni proizvod po tipu aparata (za sekciju tipova)
+  // po jedan stvarni proizvod po tipu aparata (za uporedni prikaz tipova)
   const tipovi = await Promise.all(
     (Object.keys(TIPOVI_APARATA) as (keyof typeof TIPOVI_APARATA)[]).map(async (tip) => {
       const { docs } = await payload.find({
@@ -99,8 +102,13 @@ export default async function Pocetna() {
 
   const pitanjaPocetna = pitanja.filter((p) => p.naPocetnoj).slice(0, 4)
   const istaknutaAkcija = akcije.find((a) => a.istaknutaNaPocetnoj) ?? akcije[0]
-  const sarajevo = poslovnice.find((p) => p.slug === 'sarajevo')
   const redoslijed = (pocetna.redoslijedSekcija ?? []).map((s) => s.sekcija)
+  const telefon = stvarno(podesavanja.telefonGlavni)
+  const godine = pocetna.povjerenje?.godineRada ?? 32
+  // samo stvarne statistike — placeholderi se ne prikazuju
+  const statistike = (pocetna.povjerenje?.statistike ?? []).filter(
+    (s) => stvarno(s.broj) && stvarno(s.oznaka),
+  )
 
   const sekcije: Record<string, React.ReactNode> = {
     /* ——— Kako izgleda besplatna provjera sluha — povezani koraci ——— */
@@ -113,13 +121,13 @@ export default async function Pocetna() {
             naslov="Kako izgleda besplatna provjera sluha?"
             uvod="Bezbolno, besplatno i bez ikakve obaveze — za pola sata znate na čemu ste."
           />
-          <div className="relative mt-14">
-            {/* spojna linija između koraka (desktop) */}
+          <div className="relative mt-16">
+            {/* isprekidana spojnica između koraka (desktop) */}
             <div
-              className="absolute top-7 right-[16%] left-[16%] hidden h-0.5 bg-[linear-gradient(90deg,transparent,var(--color-brand-200)_15%,var(--color-brand-200)_85%,transparent)] md:block"
+              className="absolute top-[26px] right-[17%] left-[17%] hidden border-t-2 border-dashed border-brand-200/80 md:block"
               aria-hidden
             />
-            <OtkrijGrupu className="grid gap-10 md:grid-cols-3 md:gap-6">
+            <OtkrijGrupu className="grid gap-12 md:grid-cols-3 md:gap-8">
               {[
                 {
                   ikona: CalendarCheck,
@@ -139,60 +147,106 @@ export default async function Pocetna() {
               ].map((korak, i) => (
                 <OtkrijStavku key={korak.naslov} className="relative">
                   <div className="flex h-full flex-col items-center text-center">
-                    <div className="relative z-10 grid size-14 place-items-center rounded-2xl bg-gradient-to-b from-brand-500 to-brand-600 text-white shadow-[0_10px_24px_-8px_rgb(237_28_36/0.5)]">
-                      <korak.ikona className="size-7" strokeWidth={1.75} aria-hidden />
+                    <div className="relative z-10 grid size-[52px] place-items-center rounded-2xl border border-brand-100 bg-white text-brand-600 shadow-[var(--shadow-lift)] ring-8 ring-white">
+                      <korak.ikona className="size-6" strokeWidth={1.75} aria-hidden />
                     </div>
-                    <span className="nadnaslov mt-5">Korak {i + 1}</span>
-                    <h3 className="text-h3 mt-2">{korak.naslov}</h3>
-                    <p className="mt-2 max-w-xs text-neutral-600">{korak.opis}</p>
+                    <span className="nadnaslov mt-6">Korak {i + 1}</span>
+                    <h3 className="text-h3 mt-2.5">{korak.naslov}</h3>
+                    <p className="mt-2.5 max-w-xs text-neutral-600">{korak.opis}</p>
                   </div>
                 </OtkrijStavku>
               ))}
             </OtkrijGrupu>
           </div>
-          <Otkrij className="mt-12 text-center">
+          <Otkrij className="mt-14 flex flex-col items-center gap-3 text-center">
             <DugmeLink href="/zakazivanje" velicina="veliko">
               Zakažite svoj termin <ArrowRight className="size-5" aria-hidden />
             </DugmeLink>
+            <p className="text-small text-neutral-500">Traje 30–45 minuta · besplatno i bez obaveze</p>
           </Otkrij>
         </div>
       </section>
     ),
 
-    /* ——— Poslovnice ——— */
+    /* ——— Poslovnice — mapa + uredan popis umjesto mreže kartica ——— */
     poslovnice: (
       <section
         key="poslovnice"
-        className="sekcija mreza-tacaka-svijetla border-y border-neutral-100 bg-neutral-50"
+        className="sekcija relative overflow-hidden border-y border-neutral-200/60 bg-neutral-50"
         aria-labelledby="poslovnice-naslov"
       >
-        <div className="kontejner">
-          <SekcijaZaglavlje
-            id="poslovnice-naslov"
-            nadnaslov="6 gradova širom BiH"
-            naslov="Posjetite nas — sada i u Sarajevu"
-            uvod="Dođite na kafu i besplatnu provjeru sluha u Vama najbližu poslovnicu."
-          />
-          <OtkrijGrupu className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {poslovnice.map((p) => (
-              <OtkrijStavku key={p.id}>
-                <LokacijaKartica
-                  lokacija={{
-                    slug: p.slug,
-                    grad: p.grad,
-                    adresa: p.adresa,
-                    telefon: p.telefoni?.[0]?.broj,
-                    novaPoslovnica: p.novaPoslovnica,
-                  }}
-                />
-              </OtkrijStavku>
-            ))}
-          </OtkrijGrupu>
+        <div className="mreza-audiogram absolute inset-0" aria-hidden />
+        <div className="kontejner relative grid items-center gap-14 lg:grid-cols-[0.92fr_1.08fr]">
+          <div>
+            <Otkrij>
+              <p className="nadnaslov">{poslovnice.length} gradova širom BiH</p>
+              <h2 id="poslovnice-naslov" className="text-h2 mt-3.5">
+                Posjetite nas — sada i u Sarajevu
+              </h2>
+              <p className="uvodni mt-4 max-w-lg">
+                Dođite na kafu i besplatnu provjeru sluha u Vama najbližu poslovnicu.
+              </p>
+            </Otkrij>
+            <OtkrijGrupu className="mt-9 divide-y divide-neutral-200/80 border-y border-neutral-200/80">
+              {poslovnice.map((p) => {
+                const adresa = stvarno(p.adresa)
+                const brojTel = stvarno(p.telefoni?.[0]?.broj)
+                return (
+                  <OtkrijStavku key={p.id}>
+                    <Link
+                      href={`/poslovnice/${p.slug}`}
+                      className="group flex items-center gap-4 py-3.5 transition-colors duration-150 hover:bg-white/70"
+                    >
+                      <span className="grid size-10 shrink-0 place-items-center rounded-full border border-neutral-200 bg-white text-brand-600 shadow-sm transition-colors duration-250 group-hover:bg-brand-600 group-hover:text-white">
+                        <MapPin className="size-4.5" aria-hidden />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center gap-2 font-bold text-neutral-900">
+                          {p.grad}
+                          {p.novaPoslovnica && (
+                            <span className="rounded-full bg-brand-600 px-2 py-0.5 text-[10.5px] font-bold tracking-wide text-white uppercase">
+                              Novo
+                            </span>
+                          )}
+                        </span>
+                        {adresa && <span className="text-small block truncate text-neutral-500">{adresa}</span>}
+                      </span>
+                      {brojTel && (
+                        <span className="telefon hidden text-[15px] text-neutral-600 sm:block">{brojTel}</span>
+                      )}
+                      <ArrowRight
+                        className="size-4.5 shrink-0 text-neutral-300 transition-[color,transform] duration-150 group-hover:translate-x-1 group-hover:text-brand-600"
+                        aria-hidden
+                      />
+                    </Link>
+                  </OtkrijStavku>
+                )
+              })}
+            </OtkrijGrupu>
+            <Otkrij className="mt-7">
+              <DugmeLink href="/poslovnice" varijanta="sekundarno">
+                Sve poslovnice i radna vremena
+              </DugmeLink>
+            </Otkrij>
+          </div>
+          <Otkrij delay={0.1} className="hidden lg:block">
+            <div className="povrsina !rounded-[28px] p-8 md:p-10">
+              <MapaBiH
+                lokacije={poslovnice.map((p) => ({
+                  slug: p.slug,
+                  grad: p.grad,
+                  geoSirina: p.geoSirina,
+                  geoDuzina: p.geoDuzina,
+                  novaPoslovnica: p.novaPoslovnica,
+                }))}
+              />
+            </div>
+          </Otkrij>
         </div>
       </section>
     ),
 
-    /* ——— Vrste slušnih aparata ——— */
+    /* ——— Vrste slušnih aparata — jedna uporedna površina ——— */
     tipovi: (
       <section key="tipovi" className="sekcija" aria-labelledby="tipovi-naslov">
         <div className="kontejner">
@@ -202,85 +256,104 @@ export default async function Pocetna() {
             naslov="Koji slušni aparat je pravi za Vas?"
             uvod="Tri osnovne vrste — od gotovo nevidljivih do snažnih. Zajedno ćemo pronaći pravi."
           />
-          <OtkrijGrupu className="mt-12 grid gap-6 md:grid-cols-3">
-            {tipovi.map(({ tip, info, primjer }, i) => {
-              const slika = (primjer?.slike as (Mediji | number)[] | undefined)?.[0]
-              return (
-                <OtkrijStavku key={tip} className="h-full">
-                  <Tilt3D className="h-full">
-                    <Link
-                      href={`/slusni-aparati/${tip}`}
-                      className="group flex h-full flex-col overflow-hidden rounded-[16px] border border-neutral-200 bg-white shadow-[var(--shadow-lift)] transition-[box-shadow,border-color] duration-250 hover:border-brand-200 hover:shadow-[var(--shadow-lift-lg)]"
-                    >
-                      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-neutral-50 to-brand-50/50">
-                        <span className="absolute top-4 left-4 z-10 text-[44px] leading-none font-extrabold text-brand-200/70" aria-hidden>
-                          {String(i + 1).padStart(2, '0')}
-                        </span>
-                        {slika && typeof slika === 'object' ? (
-                          <div className="grid h-full w-full place-items-center p-8">
-                            <SlikaMedija
-                              medij={slika}
-                              sizes="(min-width: 768px) 340px, 85vw"
-                              className="max-h-full w-auto object-contain drop-shadow-lg transition-transform duration-250 group-hover:scale-[1.06]"
-                            />
-                          </div>
-                        ) : (
-                          <div className="grid h-full place-items-center text-neutral-300">
-                            <Ear className="size-16" strokeWidth={1.25} aria-hidden />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex flex-1 flex-col p-6">
-                        <h3 className="text-h3">{info.naziv}</h3>
-                        <p className="mt-2 flex-1 text-neutral-600">{info.kratko}</p>
-                        <span className="mt-4 inline-flex items-center gap-2 font-semibold text-brand-700">
-                          <span className="grid size-8 place-items-center rounded-full bg-brand-50 transition-colors duration-150 group-hover:bg-brand-600 group-hover:text-white">
-                            <ArrowRight className="size-4" aria-hidden />
-                          </span>
-                          Saznajte više
-                        </span>
-                      </div>
-                    </Link>
-                  </Tilt3D>
-                </OtkrijStavku>
-              )
-            })}
-          </OtkrijGrupu>
+          <Otkrij className="mt-14">
+            <div className="povrsina grid overflow-hidden !rounded-[28px] divide-y divide-neutral-200/70 md:grid-cols-3 md:divide-x md:divide-y-0">
+              {tipovi.map(({ tip, info, primjer }, i) => {
+                const slika = (primjer?.slike as (Mediji | number)[] | undefined)?.[0]
+                return (
+                  <Link
+                    key={tip}
+                    href={`/slusni-aparati/${tip}`}
+                    className="group relative flex flex-col p-7 transition-colors duration-250 hover:bg-neutral-50/70 lg:p-9"
+                  >
+                    <span className="text-[13px] font-extrabold tracking-[0.2em] text-neutral-300" aria-hidden>
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <div className="my-6 grid h-40 place-items-center lg:h-44">
+                      {slika && typeof slika === 'object' ? (
+                        <SlikaMedija
+                          medij={slika}
+                          sizes="(min-width: 768px) 320px, 80vw"
+                          className="max-h-full w-auto object-contain drop-shadow-lg transition-transform duration-250 group-hover:scale-[1.07]"
+                        />
+                      ) : (
+                        <Ear className="size-16 text-neutral-200" strokeWidth={1.25} aria-hidden />
+                      )}
+                    </div>
+                    <h3 className="text-h3">{info.naziv}</h3>
+                    <p className="mt-2 flex-1 text-neutral-600">{info.kratko}</p>
+                    <span className="mt-5 inline-flex items-center gap-2.5 font-semibold text-brand-700">
+                      <span className="grid size-8 place-items-center rounded-full bg-brand-50 transition-colors duration-150 group-hover:bg-brand-600 group-hover:text-white">
+                        <ArrowRight className="size-4" aria-hidden />
+                      </span>
+                      Saznajte više
+                    </span>
+                  </Link>
+                )
+              })}
+            </div>
+          </Otkrij>
+          <Otkrij className="mt-8 text-center">
+            <p className="text-neutral-600">
+              Niste sigurni koji je pravi za Vas?{' '}
+              <Link
+                href="/zakazivanje"
+                className="font-semibold text-brand-700 underline decoration-brand-200 decoration-2 underline-offset-4 transition-colors duration-150 hover:text-brand-800 hover:decoration-brand-400"
+              >
+                Pomoći ćemo Vam — besplatno
+              </Link>
+            </p>
+          </Otkrij>
         </div>
       </section>
     ),
 
-    /* ——— Usluge ——— */
+    /* ——— Usluge — uvodni stub + uredska lista umjesto kartica ——— */
     usluge: (
       <section
         key="usluge"
-        className="sekcija border-y border-neutral-100 bg-neutral-50"
+        className="sekcija border-y border-neutral-200/60 bg-neutral-50"
         aria-labelledby="usluge-naslov"
       >
-        <div className="kontejner">
-          <SekcijaZaglavlje
-            id="usluge-naslov"
-            nadnaslov="Uz Vas u svakom koraku"
-            naslov="Naše usluge"
-          />
-          <OtkrijGrupu className="mt-12 grid gap-6 md:grid-cols-3">
-            {usluge.map((u) => {
+        <div className="kontejner grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+          <Otkrij className="lg:sticky lg:top-36 lg:self-start">
+            <p className="nadnaslov">Uz Vas u svakom koraku</p>
+            <h2 id="usluge-naslov" className="text-h2 mt-3.5">
+              Naše usluge
+            </h2>
+            <p className="uvodni mt-4">
+              Od prve provjere sluha do svakodnevnog održavanja aparata — sve na jednom mjestu, uz
+              strpljiv i stručan pristup.
+            </p>
+            <DugmeLink href="/usluge" varijanta="sekundarno" className="mt-8">
+              Sve usluge <ArrowRight className="size-4.5" aria-hidden />
+            </DugmeLink>
+          </Otkrij>
+          <OtkrijGrupu>
+            {usluge.map((u, i) => {
               const Ikona = IKONE_USLUGA[u.ikona ?? 'ear'] ?? Ear
               return (
-                <OtkrijStavku key={u.id} className="h-full">
+                <OtkrijStavku key={u.id}>
                   <Link
                     href={`/usluge/${u.slug}`}
-                    className="group flex h-full flex-col rounded-[16px] border border-neutral-200 bg-white p-7 shadow-[var(--shadow-lift)] transition-[box-shadow,transform,border-color] duration-250 hover:-translate-y-1 hover:border-brand-200 hover:shadow-[var(--shadow-lift-lg)]"
+                    className="group flex items-start gap-5 border-b border-neutral-200/80 py-6 first:pt-0 lg:gap-6"
                   >
-                    <div className="grid size-14 place-items-center rounded-2xl bg-brand-50 transition-colors duration-250 group-hover:bg-brand-600">
-                      <Ikona className="size-7 text-brand-600 transition-colors duration-250 group-hover:text-white" strokeWidth={1.75} aria-hidden />
-                    </div>
-                    <h3 className="text-h3 mt-5">{u.naziv}</h3>
-                    <p className="mt-2 flex-1 text-neutral-600">{u.kratkiOpis}</p>
-                    <span className="mt-4 inline-flex items-center gap-1.5 font-semibold text-brand-700">
-                      Detalji usluge
-                      <ArrowRight className="size-4 transition-transform duration-150 group-hover:translate-x-1" aria-hidden />
+                    <span className="hidden pt-1 text-[13px] font-extrabold tracking-[0.18em] text-neutral-300 sm:block" aria-hidden>
+                      {String(i + 1).padStart(2, '0')}
                     </span>
+                    <span className="grid size-12 shrink-0 place-items-center rounded-2xl border border-neutral-200 bg-white text-brand-600 shadow-sm transition-colors duration-250 group-hover:border-brand-600 group-hover:bg-brand-600 group-hover:text-white">
+                      <Ikona className="size-5.5" strokeWidth={1.75} aria-hidden />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[19px] font-bold text-neutral-900 transition-colors duration-150 group-hover:text-brand-700">
+                        {u.naziv}
+                      </span>
+                      <span className="mt-1 block text-neutral-600">{u.kratkiOpis}</span>
+                    </span>
+                    <ArrowRight
+                      className="mt-2 size-5 shrink-0 text-neutral-300 transition-[color,transform] duration-150 group-hover:translate-x-1 group-hover:text-brand-600"
+                      aria-hidden
+                    />
                   </Link>
                 </OtkrijStavku>
               )
@@ -290,64 +363,85 @@ export default async function Pocetna() {
       </section>
     ),
 
-    /* ——— Povjerenje ——— */
+    /* ——— Povjerenje — tamna pripovjedna traka sa stvarnim brojkama ——— */
     povjerenje: (
       <section key="povjerenje" className="sekcija" aria-labelledby="povjerenje-naslov">
         <div className="kontejner">
           <Otkrij>
-            <div className="mreza-tacaka relative overflow-hidden rounded-[24px] bg-charcoal px-6 py-14 text-white md:px-14 md:py-20">
-              {/* crveni odsjaj */}
+            <div className="relative overflow-hidden rounded-[32px] bg-charcoal px-7 py-14 text-white md:px-14 md:py-20">
+              {/* dekorativna zvučna krivulja preko cijele trake */}
+              <svg
+                viewBox="0 0 1200 400"
+                className="absolute inset-0 h-full w-full"
+                preserveAspectRatio="none"
+                aria-hidden
+              >
+                <path
+                  d="M0 290 C 200 270, 320 180, 480 190 S 760 290, 920 250 S 1120 130, 1200 120"
+                  fill="none"
+                  stroke="white"
+                  strokeOpacity="0.06"
+                  strokeWidth="90"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M0 310 C 220 290, 340 200, 500 210 S 780 310, 940 270 S 1140 150, 1200 140"
+                  fill="none"
+                  stroke="#ED1C24"
+                  strokeOpacity="0.25"
+                  strokeWidth="2.5"
+                />
+              </svg>
               <div
-                className="absolute -top-32 -right-24 size-96 rounded-full bg-brand-600/25 blur-[120px]"
+                className="absolute -top-32 -right-24 size-96 rounded-full bg-brand-600/20 blur-[120px]"
                 aria-hidden
               />
-              <div className="absolute -bottom-40 -left-24 size-80 rounded-full bg-brand-600/15 blur-[100px]" aria-hidden />
-              <div className="relative">
-                <p className="nadnaslov nadnaslov-centar justify-center !text-brand-400">Audio BM u brojkama</p>
-                <h2 id="povjerenje-naslov" className="text-h2 mt-3 text-center">
-                  Povjerenje koje se gradi decenijama
-                </h2>
-                <div className="mt-12 grid gap-10 text-center sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-white/10">
-                  <div className="px-6">
-                    <p className="text-display bg-gradient-to-b from-white to-neutral-400 bg-clip-text text-transparent">
-                      <Brojac do={pocetna.povjerenje?.godineRada ?? 32} sufiks="+" />
+              <div className="relative grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
+                <div>
+                  <p className="nadnaslov !text-brand-400">Audio BM u brojkama</p>
+                  <h2 id="povjerenje-naslov" className="text-h2 mt-3.5">
+                    Povjerenje koje se gradi decenijama
+                  </h2>
+                  <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-neutral-300">
+                    Sluh se ne vraća reklamom, nego strpljivim radom — pregledom, probom aparata i
+                    podešavanjima dok zvuk ne sjedne. Tako radimo od prvog dana, u svih{' '}
+                    {poslovnice.length} poslovnica.
+                  </p>
+                  <div className="mt-10 border-t border-white/10 pt-7">
+                    <p className="text-[12.5px] font-bold tracking-[0.18em] text-neutral-400 uppercase">
+                      Brendovi koje nudimo
                     </p>
-                    <p className="mt-2 text-[17px] text-neutral-300">godine iskustva</p>
+                    <p className="mt-4 flex flex-wrap items-center gap-x-10 gap-y-2 text-[21px] font-bold tracking-tight text-white/80">
+                      <span>Bernafon</span>
+                      <span>Unitron</span>
+                      <span>Cochlear</span>
+                      <span>Varta</span>
+                    </p>
                   </div>
-                  <div className="px-6">
-                    <p className="text-display bg-gradient-to-b from-white to-neutral-400 bg-clip-text text-transparent">
+                </div>
+                <dl className="divide-y divide-white/10 border-y border-white/10 lg:border-y-0 lg:border-l lg:border-white/10 lg:pl-14">
+                  <div className="flex items-baseline justify-between gap-6 py-6 lg:flex-col lg:items-start lg:gap-1">
+                    <dd className="order-1 text-[52px] leading-none font-extrabold tracking-tight">
+                      <Brojac do={godine} sufiks="+" />
+                    </dd>
+                    <dt className="order-2 text-[16px] text-neutral-400">godine iskustva</dt>
+                  </div>
+                  <div className="flex items-baseline justify-between gap-6 py-6 lg:flex-col lg:items-start lg:gap-1">
+                    <dd className="order-1 text-[52px] leading-none font-extrabold tracking-tight">
                       <Brojac do={poslovnice.length} />
-                    </p>
-                    <p className="mt-2 text-[17px] text-neutral-300">poslovnica u BiH</p>
+                    </dd>
+                    <dt className="order-2 text-[16px] text-neutral-400">poslovnica u BiH</dt>
                   </div>
-                  {pocetna.povjerenje?.statistike?.[0] ? (
-                    <div className="px-6">
-                      <p className="text-display bg-gradient-to-b from-white to-neutral-400 bg-clip-text text-transparent">
-                        {pocetna.povjerenje.statistike[0].broj}
-                      </p>
-                      <p className="mt-2 text-[17px] text-neutral-300">{pocetna.povjerenje.statistike[0].oznaka}</p>
+                  {statistike.map((s) => (
+                    <div
+                      key={s.id ?? s.oznaka}
+                      className="flex items-baseline justify-between gap-6 py-6 lg:flex-col lg:items-start lg:gap-1"
+                    >
+                      <dd className="order-1 text-[52px] leading-none font-extrabold tracking-tight">{s.broj}</dd>
+                      <dt className="order-2 text-[16px] text-neutral-400">{s.oznaka}</dt>
                     </div>
-                  ) : (
-                    <div className="px-6">
-                      <p className="text-display text-neutral-600">—</p>
-                      <p className="text-small mt-2 text-neutral-500">[REAL_NUMBERS_PLACEHOLDER] — unosi vlasnik</p>
-                    </div>
-                  )}
-                </div>
-                <div className="mt-14 border-t border-white/10 pt-10 text-center">
-                  <p className="text-small tracking-[0.14em] text-neutral-400 uppercase">
-                    Brendovi koje nudimo <span className="text-neutral-500">[CONFIRM_PARTNERSHIP_PLACEHOLDER]</span>
-                  </p>
-                  <p className="mt-5 flex flex-wrap items-center justify-center gap-x-12 gap-y-3 text-[24px] font-bold tracking-tight text-white/85">
-                    <span>Bernafon</span>
-                    <span className="text-white/30">·</span>
-                    <span>Unitron</span>
-                    <span className="text-white/30">·</span>
-                    <span>Cochlear</span>
-                    <span className="text-white/30">·</span>
-                    <span>Varta</span>
-                  </p>
-                </div>
+                  ))}
+                </dl>
               </div>
             </div>
           </Otkrij>
@@ -355,37 +449,57 @@ export default async function Pocetna() {
       </section>
     ),
 
-    /* ——— Recenzije ——— */
+    /* ——— Recenzije — istaknuti citat + prateći glasovi ——— */
     recenzije:
       recenzije.length > 0 ? (
-        <section key="recenzije" className="sekcija" aria-labelledby="recenzije-naslov">
+        <section key="recenzije" className="sekcija pt-0" aria-labelledby="recenzije-naslov">
           <div className="kontejner">
             <SekcijaZaglavlje
               id="recenzije-naslov"
               nadnaslov="Riječ naših korisnika"
               naslov="Iskustva koja nas pokreću"
             />
-            <OtkrijGrupu className="mt-12 grid gap-5 md:grid-cols-3">
-              {recenzije.slice(0, 6).map((r) => (
-                <OtkrijStavku key={r.id} className="h-full">
-                  <blockquote className="relative h-full rounded-[16px] border border-neutral-200 bg-white p-7 shadow-[var(--shadow-lift)]">
-                    <Quote className="absolute top-6 right-6 size-8 text-brand-100" aria-hidden />
-                    <div className="flex gap-0.5 text-warning-600" aria-label={`Ocjena ${r.ocjena} od 5`}>
-                      {Array.from({ length: r.ocjena ?? 5 }).map((_, i) => (
-                        <Star key={i} className="size-4 fill-current" aria-hidden />
-                      ))}
-                    </div>
-                    <p className="mt-4 text-neutral-700">„{r.tekst}"</p>
-                    <footer className="mt-5 flex items-center gap-3">
-                      <span className="grid size-10 place-items-center rounded-full bg-brand-50 font-bold text-brand-700">
-                        {r.ime.charAt(0)}
-                      </span>
-                      <span className="font-semibold text-neutral-900">{r.ime}</span>
-                    </footer>
+            <div className="mt-14 grid gap-6 lg:grid-cols-[1.25fr_1fr]">
+              <Otkrij>
+                <figure className="povrsina relative flex h-full flex-col justify-center !rounded-[28px] p-8 md:p-12">
+                  <Quote className="absolute top-8 right-8 size-12 text-brand-100" aria-hidden />
+                  <div className="flex gap-1 text-warning-600" aria-label={`Ocjena ${recenzije[0].ocjena ?? 5} od 5`}>
+                    {Array.from({ length: recenzije[0].ocjena ?? 5 }).map((_, i) => (
+                      <Star key={i} className="size-4.5 fill-current" aria-hidden />
+                    ))}
+                  </div>
+                  <blockquote className="mt-6 max-w-xl text-[21px] leading-relaxed font-medium text-neutral-800 md:text-[23px]">
+                    „{recenzije[0].tekst}"
                   </blockquote>
-                </OtkrijStavku>
-              ))}
-            </OtkrijGrupu>
+                  <figcaption className="mt-7 flex items-center gap-3.5">
+                    <span className="grid size-11 place-items-center rounded-full bg-brand-50 text-[17px] font-bold text-brand-700">
+                      {recenzije[0].ime.charAt(0)}
+                    </span>
+                    <span className="font-semibold text-neutral-900">{recenzije[0].ime}</span>
+                  </figcaption>
+                </figure>
+              </Otkrij>
+              <OtkrijGrupu className="grid gap-6">
+                {recenzije.slice(1, 3).map((r) => (
+                  <OtkrijStavku key={r.id}>
+                    <blockquote className="povrsina h-full p-7">
+                      <div className="flex gap-0.5 text-warning-600" aria-label={`Ocjena ${r.ocjena ?? 5} od 5`}>
+                        {Array.from({ length: r.ocjena ?? 5 }).map((_, i) => (
+                          <Star key={i} className="size-3.5 fill-current" aria-hidden />
+                        ))}
+                      </div>
+                      <p className="mt-3.5 text-neutral-700">„{r.tekst}"</p>
+                      <footer className="mt-4 flex items-center gap-2.5">
+                        <span className="grid size-8 place-items-center rounded-full bg-neutral-100 text-[14px] font-bold text-neutral-600">
+                          {r.ime.charAt(0)}
+                        </span>
+                        <span className="text-[15px] font-semibold text-neutral-800">{r.ime}</span>
+                      </footer>
+                    </blockquote>
+                  </OtkrijStavku>
+                ))}
+              </OtkrijGrupu>
+            </div>
           </div>
         </section>
       ) : null,
@@ -395,10 +509,13 @@ export default async function Pocetna() {
       <section key="akcija" className="sekcija pt-0" aria-labelledby="akcija-naslov">
         <div className="kontejner">
           <Otkrij>
-            <div className="overflow-hidden rounded-[24px] border border-brand-200 bg-gradient-to-br from-brand-50 to-white shadow-[var(--shadow-lift)] md:flex">
+            <div className="povrsina overflow-hidden !rounded-[28px] !border-brand-200/70 bg-gradient-to-br from-white to-brand-50/50 md:flex">
               <div className="flex-1 p-8 md:p-12">
-                <p className="nadnaslov">Aktuelna akcija</p>
-                <h2 id="akcija-naslov" className="text-h2 mt-3">
+                <span className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-3.5 py-1.5 text-[12px] font-bold tracking-[0.1em] text-white uppercase">
+                  <span className="size-1.5 animate-pulse rounded-full bg-white" aria-hidden />
+                  Aktuelna akcija
+                </span>
+                <h2 id="akcija-naslov" className="text-h2 mt-5">
                   {istaknutaAkcija.naslov}
                 </h2>
                 <p className="uvodni mt-3">{istaknutaAkcija.kratkiOpis}</p>
@@ -420,7 +537,7 @@ export default async function Pocetna() {
     /* ——— Česta pitanja (4) ——— */
     pitanja:
       pitanjaPocetna.length > 0 ? (
-        <section key="pitanja" className="sekcija border-t border-neutral-100" aria-labelledby="pitanja-naslov">
+        <section key="pitanja" className="sekcija pt-0" aria-labelledby="pitanja-naslov">
           <div className="kontejner max-w-3xl">
             <script
               type="application/ld+json"
@@ -431,10 +548,10 @@ export default async function Pocetna() {
               }}
             />
             <SekcijaZaglavlje id="pitanja-naslov" nadnaslov="Imate pitanja?" naslov="Često nas pitate" />
-            <Otkrij className="mt-10">
+            <Otkrij className="mt-12">
               <Harmonika stavke={pitanjaPocetna.map((p) => ({ pitanje: p.pitanje, odgovor: p.odgovor }))} />
             </Otkrij>
-            <Otkrij className="mt-8 text-center">
+            <Otkrij className="mt-9 text-center">
               <DugmeLink href="/cesta-pitanja" varijanta="sekundarno">
                 Sva pitanja i odgovori
               </DugmeLink>
@@ -445,22 +562,27 @@ export default async function Pocetna() {
 
     /* ——— Kontakt traka ——— */
     kontakt: (
-      <section key="kontakt" className="sekcija bg-gradient-to-b from-white to-brand-50/60" aria-labelledby="kontakt-naslov">
-        <div className="kontejner grid items-center gap-10 lg:grid-cols-2">
+      <section
+        key="kontakt"
+        className="sekcija relative overflow-hidden border-t border-neutral-200/60 bg-neutral-50"
+        aria-labelledby="kontakt-naslov"
+      >
+        <div className="mreza-audiogram absolute inset-0" aria-hidden />
+        <div className="kontejner relative grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <Otkrij>
             <p className="nadnaslov">Tu smo za Vas</p>
-            <h2 id="kontakt-naslov" className="text-h2 mt-3">
+            <h2 id="kontakt-naslov" className="text-h2 mt-3.5">
               Niste sigurni odakle početi?
             </h2>
             <p className="uvodni mt-4 max-w-md">
               Ostavite broj — nazvat ćemo Vas, odgovoriti na pitanja i pomoći da zakažete termin koji
               Vam odgovara. Bez obaveze.
             </p>
-            {podesavanja.telefonGlavni && (
-              <p className="mt-7 text-neutral-700">
+            {telefon && (
+              <p className="mt-8 text-neutral-700">
                 Ili nas pozovite odmah:{' '}
                 <TelefonLink
-                  broj={podesavanja.telefonGlavni}
+                  broj={telefon}
                   lokacija="kontakt-traka"
                   className="text-[26px] text-neutral-900 hover:text-brand-700"
                 />
@@ -468,7 +590,7 @@ export default async function Pocetna() {
             )}
           </Otkrij>
           <Otkrij delay={0.1}>
-            <div className="rounded-[20px] border border-neutral-200 bg-white p-6 shadow-[var(--shadow-lift-lg)] md:p-8">
+            <div className="povrsina !rounded-[28px] p-6 !shadow-[var(--shadow-lift-lg)] md:p-9">
               <PovratniPoziv izvor="/" />
             </div>
           </Otkrij>
@@ -477,32 +599,33 @@ export default async function Pocetna() {
     ),
   }
 
+  const banerTekst = pocetna.sarajevoBaner?.aktivan
+    ? ocisti(pocetna.sarajevoBaner.tekst) ?? 'Otvorili smo poslovnicu u Sarajevu'
+    : null
+
   return (
     <>
-      {/* Sarajevo baner — iznad pregiba */}
-      {pocetna.sarajevoBaner?.aktivan && sarajevo && (
-        <PromoBaner
-          tekst={pocetna.sarajevoBaner.tekst ?? 'Otvorili smo poslovnicu u Sarajevu'}
-          link={pocetna.sarajevoBaner.link ?? '/poslovnice/sarajevo'}
-        />
+      {/* Sarajevo baner — iznad pregiba, bez placeholder teksta */}
+      {banerTekst && (
+        <PromoBaner tekst={banerTekst} link={pocetna.sarajevoBaner?.link ?? '/poslovnice/sarajevo'} />
       )}
 
       {/* ——— Hero ——— */}
       <HeroUlaz>
-        <section className="relative overflow-hidden border-b border-neutral-100 bg-gradient-to-b from-neutral-50/80 via-white to-white">
-          {/* 3D zvučni talasi (desktop, lijeno učitavanje) */}
+        <section className="relative overflow-hidden border-b border-neutral-200/60 bg-white">
+          {/* 3D polje zvučnih talasa (desktop, lijeno učitavanje) */}
           <ZvucniTalasiOmot />
-          {/* mekani brend odsjaj gore desno */}
+          {/* mekani brend odsjaj — samo desktop, mobilno ostaje čisto bijelo */}
           <div
-            className="pointer-events-none absolute -top-40 right-[-10%] size-[560px] rounded-full bg-brand-100/50 blur-[140px]"
+            className="pointer-events-none absolute -top-44 right-[-12%] hidden size-[560px] rounded-full bg-brand-100/35 blur-[150px] lg:block"
             aria-hidden
           />
-          <div className="kontejner relative grid items-center gap-12 py-14 md:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
+          <div className="kontejner relative grid items-center gap-14 py-14 md:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:py-24">
             <div className="relative z-10 max-w-2xl">
               <p data-hero-stavka="1" className="nadnaslov">
                 Slušni aparati i briga o sluhu
               </p>
-              <h1 data-hero-stavka="2" className="text-display mt-4 text-neutral-900">
+              <h1 data-hero-stavka="2" className="text-display mt-5 text-neutral-900">
                 <NaslovSaAkcentom
                   tekst={pocetna.hero?.naslov ?? 'Besplatna provjera sluha — više od 30 godina povjerenja'}
                 />
@@ -510,95 +633,89 @@ export default async function Pocetna() {
               <p data-hero-stavka="3" className="uvodni mt-6 max-w-xl md:text-[20px]">
                 {pocetna.hero?.podnaslov}
               </p>
-              <div data-hero-stavka="4" className="mt-9 flex flex-wrap items-center gap-5">
+              <div data-hero-stavka="4" className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5">
                 <DugmeLink href="/zakazivanje" velicina="veliko">
                   {pocetna.hero?.ctaTekst ?? 'Zakažite besplatnu provjeru sluha'}
                   <ArrowRight className="size-5" aria-hidden />
                 </DugmeLink>
-                {podesavanja.telefonGlavni && (
+                {telefon && (
                   <span className="flex flex-col">
                     <span className="text-small font-medium text-neutral-500">Pozovite nas direktno</span>
                     <TelefonLink
-                      broj={podesavanja.telefonGlavni}
+                      broj={telefon}
                       lokacija="hero"
-                      className="text-[26px] text-neutral-900 hover:text-brand-700"
+                      className="text-[24px] text-neutral-900 hover:text-brand-700"
                     />
                   </span>
                 )}
               </div>
-              <ul data-hero-stavka="5" className="mt-10 flex flex-wrap gap-3">
-                {[
-                  { ikona: ShieldCheck, tekst: 'Besplatno i bez obaveze' },
-                  { ikona: Ear, tekst: '30+ godina iskustva' },
-                  { ikona: CalendarCheck, tekst: 'Termin za 2 minute' },
-                ].map((z) => (
-                  <li
-                    key={z.tekst}
-                    className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white/90 px-4 py-2 text-[15px] font-semibold text-neutral-700 shadow-sm backdrop-blur-sm"
-                  >
-                    <z.ikona className="size-4.5 text-brand-600" aria-hidden />
-                    {z.tekst}
+              <ul data-hero-stavka="5" className="mt-11 flex flex-wrap items-center gap-x-7 gap-y-3.5">
+                {['Besplatno i bez obaveze', '30+ godina iskustva', 'Termin za 2 minute'].map((t) => (
+                  <li key={t} className="flex items-center gap-2.5 text-[15px] font-semibold text-neutral-700">
+                    <span className="grid size-5.5 place-items-center rounded-full bg-success-50">
+                      <Check className="size-3.5 text-success-600" strokeWidth={2.5} aria-hidden />
+                    </span>
+                    {t}
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* fotografija u luku sa lebdećim karticama */}
-            <div data-hero-stavka="5" className="relative mx-auto w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[400px]">
-              {/* zvučni prsteni iza fotografije */}
+            {/* klinička kompozicija: portret + stakleni audiogram + živi zvuk */}
+            <div data-hero-stavka="5" className="relative mx-auto w-full max-w-[330px] sm:max-w-[400px] lg:max-w-[440px]">
+              {/* koncentrični zvučni prsteni iza portreta */}
               <svg
-                viewBox="0 0 120 120"
-                className="absolute top-1/2 -left-16 w-36 -translate-y-1/2 text-brand-300"
+                viewBox="0 0 200 200"
+                className="absolute -top-10 -left-14 w-48 text-brand-200/70 lg:-left-20 lg:w-60"
                 aria-hidden
               >
-                {[20, 34, 48].map((r, i) => (
+                {[40, 62, 84].map((r, i) => (
                   <circle
                     key={r}
-                    cx="60"
-                    cy="60"
+                    cx="100"
+                    cy="100"
                     r={r}
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeDasharray={`${r * 1.9} ${r * 8}`}
-                    strokeDashoffset={r * 5.2}
+                    strokeWidth="1.5"
+                    strokeDasharray={`${r * 2.2} ${r * 4.1}`}
                     className="prsten-puls"
-                    style={{ animationDelay: `${i * 0.5}s` }}
+                    style={{ animationDelay: `${i * 0.55}s` }}
                   />
                 ))}
               </svg>
 
-              <div className="relative overflow-hidden rounded-t-[190px] rounded-b-[28px] bg-gradient-to-b from-brand-100 via-brand-50 to-white shadow-[var(--shadow-lift-lg)] ring-8 ring-white">
+              <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-b from-brand-50 via-neutral-50 to-white shadow-[var(--shadow-lift-lg)] ring-1 ring-neutral-900/5">
+                <div className="mreza-audiogram absolute inset-0" aria-hidden />
                 <Image
                   src={heroOsoba}
-                  alt="Nasmijana starija žena sa slušalicama pokazuje prema pozivu za besplatnu provjeru sluha"
+                  alt="Nasmijana starija žena sa slušalicama"
                   priority
                   placeholder="blur"
-                  sizes="(min-width: 1024px) 400px, (min-width: 640px) 360px, 300px"
-                  className="relative mt-10 h-auto w-full"
+                  sizes="(min-width: 1024px) 440px, (min-width: 640px) 400px, 330px"
+                  className="relative mt-8 h-auto w-full"
                 />
               </div>
 
-              {/* lebdeće kartice povjerenja */}
-              <div className="lebdi absolute -top-2 -left-8 flex items-center gap-3 rounded-2xl border border-neutral-100 bg-white px-4 py-3 shadow-[var(--shadow-lift-lg)]">
-                <span className="grid size-10 place-items-center rounded-xl bg-brand-50">
-                  <Ear className="size-5 text-brand-600" aria-hidden />
-                </span>
-                <span className="leading-tight">
-                  <span className="block text-[20px] font-extrabold text-neutral-900">
-                    <Brojac do={pocetna.povjerenje?.godineRada ?? 32} sufiks="+" />
-                  </span>
-                  <span className="text-small text-neutral-500">godine uz Vas</span>
-                </span>
+              {/* stakleni audiogram — medicinski UI detalj */}
+              <div className="staklo lebdi-sporije absolute -bottom-7 -left-4 w-[225px] rounded-[20px] p-4 sm:-left-10">
+                <Audiogram />
               </div>
-              <div className="lebdi-sporije absolute -right-6 bottom-10 flex items-center gap-3 rounded-2xl border border-neutral-100 bg-white px-4 py-3 shadow-[var(--shadow-lift-lg)]">
-                <span className="grid size-10 place-items-center rounded-xl bg-success-50">
-                  <ShieldCheck className="size-5 text-success-600" aria-hidden />
+
+              {/* živi zvuk — godine iskustva */}
+              <div className="staklo lebdi absolute -top-5 -right-3 flex items-center gap-3 rounded-full py-2.5 pr-5 pl-3.5 sm:-right-6">
+                <span className="ekvilajzer flex h-5 items-end gap-[3px]" aria-hidden>
+                  <span className="block h-2.5 w-[3px] rounded-full bg-brand-600" />
+                  <span className="block h-4 w-[3px] rounded-full bg-brand-600" />
+                  <span className="block h-5 w-[3px] rounded-full bg-brand-500" />
+                  <span className="block h-3.5 w-[3px] rounded-full bg-brand-600" />
+                  <span className="block h-2 w-[3px] rounded-full bg-brand-400" />
                 </span>
                 <span className="leading-tight">
-                  <span className="block text-[16px] font-bold text-neutral-900">Provjera sluha</span>
-                  <span className="text-small text-success-700">100% besplatna</span>
+                  <span className="block text-[19px] font-extrabold text-neutral-900">
+                    <Brojac do={godine} sufiks="+" />
+                  </span>
+                  <span className="block text-[12.5px] font-medium text-neutral-500">godine uz Vas</span>
                 </span>
               </div>
             </div>

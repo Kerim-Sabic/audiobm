@@ -105,7 +105,9 @@ export function ZakazivanjeKoraci({
                         </span>
                       )}
                     </span>
-                    <span className="mt-0.5 block text-[15px] text-neutral-600">{l.adresa}</span>
+                    {l.adresa && (
+                      <span className="mt-0.5 block text-[15px] text-neutral-600">{l.adresa}</span>
+                    )}
                   </span>
                 </button>
               ))}

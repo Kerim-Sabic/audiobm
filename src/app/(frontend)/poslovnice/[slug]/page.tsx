@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Camera, Clock, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
+import { Clock, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
 import { dajPayload, dajPoslovnice, dajPoslovnicu } from '@/lib/podaci'
 import { metaStranice, poslovnicaJsonLd } from '@/lib/seo'
+import { stvarno } from '@/lib/tekst'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { TelefonLink, ViberLink, WhatsAppLink } from '@/components/ui/TelefonLink'
 import { DugmeLink } from '@/components/ui/Dugme'
@@ -61,11 +62,14 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
     }),
   ])
 
-  const telefon = poslovnica.telefoni?.[0]?.broj
-  const telefonPlaceholder = !telefon || telefon.startsWith('[')
-  const adresaPlaceholder = poslovnica.adresa.startsWith('[')
-  const email = poslovnica.emaili?.[0]?.email
+  const telefon = stvarno(poslovnica.telefoni?.[0]?.broj)
+  const adresa = stvarno(poslovnica.adresa)
+  const email = stvarno(poslovnica.emaili?.[0]?.email)
   const fotografija = (poslovnica.fotografije as (Mediji | number)[] | undefined)?.[0]
+  const imaFotografiju = fotografija && typeof fotografija === 'object'
+  // nova poslovnica bez fotografije, mape, tima i recenzija → jedna centrirana kolona
+  const imaGlavniSadrzaj =
+    Boolean(imaFotografiju) || Boolean(adresa) || tim.docs.length > 0 || recenzije.docs.length > 0
 
   return (
     <>
@@ -73,43 +77,66 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(poslovnicaJsonLd(poslovnica)) }}
       />
-      <div className="kontejner py-10 md:py-14">
-        <Mrvice stavke={[{ naziv: 'Poslovnice', putanja: '/poslovnice' }, { naziv: poslovnica.grad }]} />
-
-        <div className="mt-6 flex flex-wrap items-center gap-3">
-          <h1 className="text-h1">Audio BM {poslovnica.grad}</h1>
-          {poslovnica.novaPoslovnica && (
-            <span className="rounded-full bg-brand-600 px-3 py-1 text-[13px] font-bold tracking-wide text-white uppercase">
-              Novo otvoreno
-            </span>
-          )}
+      <header className="relative overflow-hidden border-b border-neutral-200/70 bg-neutral-50">
+        <div className="mreza-audiogram absolute inset-0" aria-hidden />
+        <div
+          className="absolute -top-48 right-[-8%] size-[480px] rounded-full bg-brand-100/40 blur-[130px]"
+          aria-hidden
+        />
+        <div className="kontejner relative py-10 md:py-16">
+          <Mrvice stavke={[{ naziv: 'Poslovnice', putanja: '/poslovnice' }, { naziv: poslovnica.grad }]} />
+          <div className="mt-7 flex flex-wrap items-center gap-3.5">
+            <h1 className="text-h1">Audio BM {poslovnica.grad}</h1>
+            {poslovnica.novaPoslovnica && (
+              <span className="flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1 text-[12px] font-bold tracking-wide text-white uppercase">
+                <span className="size-1.5 animate-pulse rounded-full bg-white" aria-hidden />
+                Novo otvoreno
+              </span>
+            )}
+          </div>
+          {poslovnica.opis && <p className="uvodni mt-4 max-w-2xl">{poslovnica.opis}</p>}
+          <div className="mt-6 flex flex-wrap items-center gap-x-7 gap-y-2.5 text-[15.5px] font-medium text-neutral-700">
+            {adresa && (
+              <span className="inline-flex items-center gap-2">
+                <MapPin className="size-4.5 text-brand-600" aria-hidden />
+                {adresa}, {poslovnica.grad}
+              </span>
+            )}
+            {telefon && (
+              <TelefonLink
+                broj={telefon}
+                lokacija={poslovnica.slug}
+                className="text-[18px] text-neutral-900 hover:text-brand-700"
+              />
+            )}
+          </div>
         </div>
-        {poslovnica.opis && <p className="mt-3 max-w-2xl text-[18px] text-neutral-600">{poslovnica.opis}</p>}
+      </header>
 
-        <div className="mt-10 grid gap-10 lg:grid-cols-[1.2fr_1fr]">
-          <div className="space-y-8">
-            {/* fotografija poslovnice */}
-            {fotografija && typeof fotografija === 'object' ? (
-              <div className="relative aspect-[16/9] overflow-hidden rounded-[16px]">
+      <div className="kontejner py-10 md:py-14">
+        <div
+          className={
+            imaGlavniSadrzaj
+              ? 'grid items-start gap-10 lg:grid-cols-[1.2fr_1fr]'
+              : 'mx-auto grid max-w-xl items-start gap-10'
+          }
+        >
+          {imaGlavniSadrzaj && (
+          <div className="space-y-10">
+            {/* fotografija poslovnice — prikazuje se samo ako postoji */}
+            {imaFotografiju && (
+              <div className="relative aspect-[16/9] overflow-hidden rounded-[24px] shadow-[var(--shadow-lift)]">
                 <SlikaMedija medij={fotografija} fill sizes="(min-width: 1024px) 640px, 100vw" />
-              </div>
-            ) : (
-              <div className="grid aspect-[16/9] place-items-center rounded-[16px] border-2 border-dashed border-neutral-300 bg-neutral-50 text-center">
-                <div className="px-6 text-neutral-500">
-                  <Camera className="mx-auto mb-2 size-8 text-neutral-400" aria-hidden />
-                  <p className="font-medium">[OWNER_PHOTOSHOOT_PLACEHOLDER]</p>
-                  <p className="text-small">Fotografija poslovnice — dodajte je u administraciji</p>
-                </div>
               </div>
             )}
 
-            {/* mapa */}
-            {!adresaPlaceholder ? (
-              <div className="overflow-hidden rounded-[16px] border border-neutral-200">
+            {/* mapa — samo uz stvarnu adresu */}
+            {adresa && (
+              <div className="povrsina overflow-hidden !rounded-[24px]">
                 <iframe
                   title={`Mapa — Audio BM ${poslovnica.grad}`}
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(`${poslovnica.adresa}, ${poslovnica.grad}`)}&z=16&output=embed`}
-                  className="h-[320px] w-full border-0"
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(`${adresa}, ${poslovnica.grad}`)}&z=16&output=embed`}
+                  className="h-[340px] w-full border-0"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                 />
@@ -118,32 +145,29 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
                     href={poslovnica.googleMapsLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex min-h-12 items-center justify-center gap-2 bg-white py-3 font-semibold text-brand-700 transition-colors duration-150 hover:bg-brand-50"
+                    className="flex min-h-12 items-center justify-center gap-2 border-t border-neutral-100 bg-white py-3.5 font-semibold text-brand-700 transition-colors duration-150 hover:bg-brand-50"
                   >
                     <MapPin className="size-4" aria-hidden />
                     Upute za dolazak
                   </a>
                 )}
               </div>
-            ) : (
-              <div className="rounded-[16px] bg-warning-50 p-6 text-warning-600">
-                <p className="font-semibold">[ADRESA_PLACEHOLDER]</p>
-                <p className="text-small mt-1">
-                  Tačna adresa poslovnice u Sarajevu biće objavljena uskoro. Za informacije nas
-                  kontaktirajte telefonom ili putem obrasca.
-                </p>
-              </div>
             )}
 
             {/* tim */}
             {tim.docs.length > 0 && (
               <Otkrij>
-                <h2 className="text-h2 mb-5">Vaš tim {uGradu(poslovnica.grad)}</h2>
+                <h2 className="text-h2 mb-6">Vaš tim {uGradu(poslovnica.grad)}</h2>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {tim.docs.map((clan) => (
-                    <div key={clan.id} className="rounded-[16px] border border-neutral-200 bg-white p-5">
-                      <p className="font-bold">{clan.ime}</p>
-                      {clan.titula && <p className="text-small text-neutral-600">{clan.titula}</p>}
+                    <div key={clan.id} className="povrsina flex items-center gap-4 p-5">
+                      <span className="grid size-12 shrink-0 place-items-center rounded-full bg-brand-50 text-[18px] font-bold text-brand-700">
+                        {clan.ime.charAt(0)}
+                      </span>
+                      <div>
+                        <p className="font-bold text-neutral-900">{clan.ime}</p>
+                        {clan.titula && <p className="text-small text-neutral-600">{clan.titula}</p>}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -153,12 +177,12 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
             {/* lokalne recenzije */}
             {recenzije.docs.length > 0 && (
               <Otkrij>
-                <h2 className="text-h2 mb-5">Iskustva korisnika</h2>
+                <h2 className="text-h2 mb-6">Iskustva korisnika</h2>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {recenzije.docs.map((r) => (
-                    <blockquote key={r.id} className="rounded-[16px] border border-neutral-200 bg-white p-5">
+                    <blockquote key={r.id} className="povrsina p-6">
                       <p className="text-[16px] text-neutral-700">„{r.tekst}"</p>
-                      <footer className="mt-3 text-small font-semibold text-neutral-900">{r.ime}</footer>
+                      <footer className="text-small mt-3.5 font-semibold text-neutral-900">{r.ime}</footer>
                     </blockquote>
                   ))}
                 </div>
@@ -167,29 +191,29 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
           </div>
 
           {/* bočna kolona: kontakt + radno vrijeme + CTA */}
-          <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
-            <div className="rounded-[16px] border border-neutral-200 bg-white p-6 shadow-sm">
-              <h2 className="text-h3 mb-4">Kontakt</h2>
+          <aside className="space-y-5 lg:sticky lg:top-32 lg:self-start">
+            <div className="povrsina !rounded-[24px] p-6 md:p-7">
+              <h2 className="text-h3 mb-5">Kontakt</h2>
               <ul className="space-y-4">
-                <li className="flex items-start gap-3">
-                  <MapPin className="mt-1 size-5 shrink-0 text-brand-600" aria-hidden />
-                  <span className={adresaPlaceholder ? 'font-medium text-warning-600' : ''}>
-                    {poslovnica.adresa}, {poslovnica.grad}
-                  </span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Phone className="mt-1 size-5 shrink-0 text-brand-600" aria-hidden />
-                  {telefonPlaceholder ? (
-                    <span className="font-medium text-warning-600">[TELEFON_PLACEHOLDER]</span>
-                  ) : (
+                {adresa && (
+                  <li className="flex items-start gap-3">
+                    <MapPin className="mt-1 size-5 shrink-0 text-brand-600" aria-hidden />
+                    <span>
+                      {adresa}, {poslovnica.grad}
+                    </span>
+                  </li>
+                )}
+                {telefon && (
+                  <li className="flex items-start gap-3">
+                    <Phone className="mt-1.5 size-5 shrink-0 text-brand-600" aria-hidden />
                     <TelefonLink
-                      broj={telefon!}
+                      broj={telefon}
                       lokacija={poslovnica.slug}
                       saIkonom={false}
                       className="text-[22px] text-neutral-900 hover:text-brand-700"
                     />
-                  )}
-                </li>
+                  </li>
+                )}
                 {email && (
                   <li className="flex items-start gap-3">
                     <Mail className="mt-1 size-5 shrink-0 text-brand-600" aria-hidden />
@@ -198,17 +222,22 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
                     </a>
                   </li>
                 )}
+                {!adresa && !telefon && (
+                  <li className="text-neutral-600">
+                    Uskoro objavljujemo kontakt podatke ove poslovnice. U međuvremenu nas
+                    kontaktirajte putem obrasca ili centralnog telefona.
+                  </li>
+                )}
               </ul>
 
-              {/* Viber / WhatsApp */}
-              {poslovnica.viber || poslovnica.whatsapp ? (
-                <div className="mt-5 grid grid-cols-2 gap-3">
+              {(poslovnica.whatsapp || poslovnica.viber) && (
+                <div className="mt-6 grid grid-cols-2 gap-3">
                   {poslovnica.whatsapp && (
                     <WhatsAppLink
                       broj={poslovnica.whatsapp}
                       lokacija={poslovnica.slug}
                       poruka={`Poštovani, javljam se sa stranice poslovnice ${poslovnica.grad}. `}
-                      className="flex min-h-12 items-center justify-center gap-2 rounded-[12px] bg-success-600 font-semibold text-white transition-colors duration-150 hover:bg-success-700"
+                      className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-success-600 font-semibold text-white transition-colors duration-150 hover:bg-success-700"
                     >
                       <MessageCircle className="size-5" aria-hidden /> WhatsApp
                     </WhatsAppLink>
@@ -217,23 +246,20 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
                     <ViberLink
                       broj={poslovnica.viber}
                       lokacija={poslovnica.slug}
-                      className="flex min-h-12 items-center justify-center gap-2 rounded-[12px] bg-[#7360f2] font-semibold text-white transition-opacity duration-150 hover:opacity-90"
+                      className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#7360f2] font-semibold text-white transition-opacity duration-150 hover:opacity-90"
                     >
                       <MessageCircle className="size-5" aria-hidden /> Viber
                     </ViberLink>
                   )}
                 </div>
-              ) : (
-                <p className="text-small mt-5 rounded-[8px] bg-neutral-50 p-3 text-neutral-500">
-                  [BROJEVI_PLACEHOLDER] Viber i WhatsApp brojevi se dodaju u administraciji
-                  (Poslovnice → {poslovnica.grad}).
-                </p>
               )}
             </div>
 
-            <div className="rounded-[16px] border border-neutral-200 bg-white p-6 shadow-sm">
-              <h2 className="text-h3 mb-4 flex items-center gap-2">
-                <Clock className="size-5 text-brand-600" aria-hidden />
+            <div className="povrsina !rounded-[24px] p-6 md:p-7">
+              <h2 className="text-h3 mb-4 flex items-center gap-2.5">
+                <span className="grid size-9 place-items-center rounded-xl bg-brand-50">
+                  <Clock className="size-4.5 text-brand-600" aria-hidden />
+                </span>
                 Radno vrijeme
               </h2>
               {poslovnica.radnoVrijemePotvrdjeno && poslovnica.radnoVrijeme?.length ? (
@@ -253,9 +279,7 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
                 </table>
               ) : (
                 <p className="text-[15px] text-neutral-600">
-                  <span className="font-medium text-warning-600">[RADNO_VRIJEME_PLACEHOLDER]</span>
-                  <br />
-                  Molimo provjerite radno vrijeme telefonom prije dolaska — rado ćemo Vas dočekati.
+                  Radno vrijeme provjerite telefonom prije dolaska — rado ćemo Vas dočekati.
                 </p>
               )}
             </div>
@@ -267,6 +291,9 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
             >
               Zakažite termin {uGradu(poslovnica.grad)}
             </DugmeLink>
+            <p className="text-small text-center text-neutral-500">
+              Besplatno i bez obaveze · odgovaramo isti radni dan
+            </p>
           </aside>
         </div>
       </div>

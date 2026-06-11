@@ -9,13 +9,13 @@ export function cijenaPrikaz(p: Proizvodi): string {
     return ''
   }
   if (p.cijena != null && p.cijena > 0) return `${p.cijena} KM`
-  return '[CIJENA_PLACEHOLDER]'
+  return ''
 }
 
 /**
  * Kartica proizvoda — dvije varijante:
  *  - konsultacija (slušni aparati): bez cijene i korpe, CTA na savjetovanje
- *  - maloprodaja: stvarna cijena ili vidljiv [CIJENA_PLACEHOLDER]
+ *  - maloprodaja: stvarna cijena ili mirno „Cijena na upit" (bez placeholder oznaka)
  */
 export function ProizvodKartica({ proizvod }: { proizvod: Proizvodi }) {
   const slika = (proizvod.slike as (Mediji | number)[] | undefined)?.[0]
@@ -24,30 +24,35 @@ export function ProizvodKartica({ proizvod }: { proizvod: Proizvodi }) {
       ? `/slusni-aparati/modeli/${proizvod.slug}`
       : `/proizvodi/${proizvod.slug}`
   const cijena = cijenaPrikaz(proizvod)
+  const napomena = proizvod.cijenaNapomena?.startsWith('[') ? null : proizvod.cijenaNapomena
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-[16px] border border-neutral-200 bg-white shadow-[var(--shadow-lift)] transition-[box-shadow,transform,border-color] duration-250 hover:-translate-y-1 hover:border-brand-200 hover:shadow-[var(--shadow-lift-lg)]">
-      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-neutral-50 to-neutral-100/60">
+    <article className="povrsina povrsina-hover group relative flex h-full flex-col overflow-hidden">
+      <div className="relative aspect-square overflow-hidden border-b border-neutral-100 bg-neutral-50">
         {proizvod.brend && (
-          <span className="absolute top-3 left-3 z-10 rounded-full border border-neutral-200 bg-white/95 px-3 py-1 text-[12px] font-bold tracking-wide text-neutral-600 uppercase shadow-sm">
+          <span className="absolute top-3.5 left-3.5 z-10 rounded-full border border-neutral-200/80 bg-white/95 px-3 py-1 text-[11.5px] font-bold tracking-[0.08em] text-neutral-600 uppercase shadow-sm backdrop-blur-sm">
             {proizvod.brend}
           </span>
         )}
-        {slika && typeof slika === 'object' ? (
-          <div className="grid h-full w-full place-items-center p-7">
+        <div className="grid h-full w-full place-items-center p-7">
+          {slika && typeof slika === 'object' ? (
             <SlikaMedija
               medij={slika}
               sizes="(min-width: 1024px) 280px, (min-width: 640px) 42vw, 86vw"
               className="max-h-full w-auto object-contain drop-shadow-md transition-transform duration-250 group-hover:scale-[1.06]"
             />
-          </div>
-        ) : (
-          <div className="grid h-full place-items-center text-small text-neutral-400">[MISSING_ASSET]</div>
-        )}
+          ) : (
+            <svg viewBox="0 0 24 24" className="size-12 text-neutral-200" fill="none" stroke="currentColor" strokeWidth="1.25" aria-hidden>
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <circle cx="9" cy="10" r="1.6" />
+              <path d="m5 17 4.5-4 3 2.5L17 11l2 2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="text-[17px] leading-snug font-bold text-neutral-900">
+        <h3 className="text-[16.5px] leading-snug font-bold text-neutral-900">
           <Link
             href={putanja}
             className="after:absolute after:inset-0 focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-[var(--color-focus)]"
@@ -56,31 +61,27 @@ export function ProizvodKartica({ proizvod }: { proizvod: Proizvodi }) {
           </Link>
         </h3>
 
-        <div className="mt-3">
+        <div className="mt-3 flex-1">
           {proizvod.nacin === 'maloprodaja' ? (
-            cijena === '[CIJENA_PLACEHOLDER]' ? (
-              <p className="text-[15px] font-semibold text-warning-600">Cijena na upit [CIJENA_PLACEHOLDER]</p>
+            cijena ? (
+              <p className="telefon text-[21px] text-neutral-900">{cijena}</p>
             ) : (
-              <p className="telefon text-[22px] text-brand-700">{cijena}</p>
+              <p className="text-[15px] font-semibold text-neutral-600">Cijena na upit</p>
             )
           ) : (
             <>
               {cijena && <p className="telefon text-[18px] text-neutral-800">{cijena}</p>}
-              <p className="text-small text-neutral-500">
-                {proizvod.cijenaNapomena?.startsWith('[')
-                  ? 'Cijena na besplatnom savjetovanju'
-                  : (proizvod.cijenaNapomena ?? 'Cijena na besplatnom savjetovanju')}
-              </p>
+              <p className="text-small text-neutral-500">{napomena ?? 'Cijena na besplatnom savjetovanju'}</p>
             </>
           )}
         </div>
 
-        <div className="mt-auto pt-4">
-          <span className="flex items-center justify-center gap-2 rounded-[10px] bg-neutral-100 py-2.5 text-[15px] font-semibold text-neutral-800 transition-colors duration-250 group-hover:bg-brand-600 group-hover:text-white">
-            {proizvod.nacin === 'konsultacija' ? 'Detalji i savjetovanje' : 'Detalji i narudžba'}
+        <span className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3.5 text-[15px] font-semibold text-neutral-700 transition-colors duration-150 group-hover:text-brand-700">
+          {proizvod.nacin === 'konsultacija' ? 'Detalji i savjetovanje' : 'Detalji i narudžba'}
+          <span className="grid size-7.5 place-items-center rounded-full bg-neutral-100 transition-colors duration-250 group-hover:bg-brand-600 group-hover:text-white">
             <ArrowRight className="size-4" aria-hidden />
           </span>
-        </div>
+        </span>
       </div>
     </article>
   )

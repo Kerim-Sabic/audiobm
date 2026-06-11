@@ -13,15 +13,13 @@ export default function UsloviKoristenja() {
     <div className="kontejner py-10 md:py-14">
       <Mrvice stavke={[{ naziv: 'Uslovi korištenja' }]} />
       <div className="prose-bm mx-auto mt-8 max-w-3xl text-neutral-800">
+        {/* NAPOMENA ZA UREDNIKA: nacrt — prije objave obavezno pregledati sa pravnikom
+            (dopuniti puni naziv pravnog lica, sjedište, matični/PDV broj) */}
         <h1 className="text-h1 mb-2">Uslovi korištenja</h1>
-        <p className="text-small text-warning-600">
-          [LEGAL_REVIEW_PLACEHOLDER: nacrt — prije objave obavezno pregledati sa pravnikom]
-        </p>
 
         <h2>Opšte odredbe</h2>
         <p>
           Korištenjem web stranice audiobm.ba prihvatate ove uslove. Stranicom upravlja Audio BM.
-          [LEGAL_REVIEW_PLACEHOLDER: puni naziv pravnog lica, sjedište, matični/PDV broj]
         </p>
 
         <h2>Informativni karakter sadržaja</h2>

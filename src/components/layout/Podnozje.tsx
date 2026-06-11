@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { ArrowRight, MapPin } from 'lucide-react'
 import { dajNavigaciju, dajPodesavanja, dajPoslovnice } from '@/lib/podaci'
+import { stvarno } from '@/lib/tekst'
 import { TelefonLink } from '@/components/ui/TelefonLink'
 
 // Lucide više ne sadrži brend-ikone — jednostavne inline SVG zamjene
@@ -29,43 +31,74 @@ const REGIJA = [
   { naziv: 'Makedonija', url: 'https://audiobm.mk' },
 ]
 
-/** Podnožje: duboki topli ugljen, bijela varijanta logotipa, ispravni podaci po poslovnici. */
+/**
+ * Podnožje: završni CTA pojas sa zvučnom krivuljom, zatim uredna
+ * informacijska arhitektura — brend, poslovnice (svaka sa SVOJIM podacima),
+ * navigacija i region. Placeholder podaci se nikad ne prikazuju.
+ */
 export async function Podnozje() {
   const [navigacija, podesavanja, poslovnice] = await Promise.all([
     dajNavigaciju(),
     dajPodesavanja(),
     dajPoslovnice(),
   ])
+  const telefon = stvarno(podesavanja.telefonGlavni)
 
   return (
     <footer className="bg-charcoal text-neutral-300">
       {/* CTA pojas iznad podnožja */}
-      <div className="mreza-tacaka relative overflow-hidden border-b border-white/10">
-        <div className="absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-brand-600/20 blur-[100px]" aria-hidden />
-        <div className="kontejner relative flex flex-col items-center gap-6 py-14 text-center md:py-16">
-          <h2 className="text-h2 max-w-2xl text-white">Spremni da ponovo čujete svijet oko sebe?</h2>
-          <p className="max-w-xl text-neutral-400">
-            Prvi korak je najlakši — besplatna provjera sluha traje pola sata i ništa Vas ne obavezuje.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
+      <div className="relative overflow-hidden border-b border-white/10">
+        <svg
+          viewBox="0 0 1200 260"
+          className="absolute inset-0 h-full w-full"
+          preserveAspectRatio="none"
+          aria-hidden
+        >
+          <path
+            d="M0 200 C 220 180, 340 90, 500 100 S 780 200, 940 160 S 1140 60, 1200 50"
+            fill="none"
+            stroke="white"
+            strokeOpacity="0.05"
+            strokeWidth="70"
+            strokeLinecap="round"
+          />
+          <path
+            d="M0 215 C 230 195, 350 105, 510 115 S 790 215, 950 175 S 1150 75, 1200 65"
+            fill="none"
+            stroke="#ED1C24"
+            strokeOpacity="0.3"
+            strokeWidth="2"
+          />
+        </svg>
+        <div className="absolute -top-28 right-[12%] size-72 rounded-full bg-brand-600/15 blur-[110px]" aria-hidden />
+        <div className="kontejner relative flex flex-col items-start justify-between gap-8 py-14 md:flex-row md:items-center md:py-16">
+          <div className="max-w-xl">
+            <h2 className="text-h2 text-white">Spremni da ponovo čujete svijet oko sebe?</h2>
+            <p className="mt-3 text-neutral-400">
+              Prvi korak je najlakši — besplatna provjera sluha traje pola sata i ništa Vas ne
+              obavezuje.
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-wrap items-center gap-4">
             <Link
               href="/zakazivanje"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[12px] bg-gradient-to-b from-brand-500 to-brand-600 px-7 py-3.5 text-[17px] font-semibold text-white shadow-[0_8px_24px_-6px_rgb(237_28_36/0.55)] transition-[transform,box-shadow] duration-150 hover:-translate-y-px hover:shadow-[0_12px_28px_-6px_rgb(237_28_36/0.6)]"
+              className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-brand-600 px-8 py-3.5 text-[17px] font-semibold text-white shadow-[var(--shadow-cta)] transition-[background-color,transform,box-shadow] duration-150 hover:-translate-y-px hover:bg-brand-700 hover:shadow-[var(--shadow-cta-hover)]"
             >
-              Zakažite besplatnu provjeru sluha
+              Zakažite termin <ArrowRight className="size-5" aria-hidden />
             </Link>
-            {podesavanja.telefonGlavni && (
+            {telefon && (
               <TelefonLink
-                broj={podesavanja.telefonGlavni}
+                broj={telefon}
                 lokacija="podnozje-cta"
-                className="inline-flex min-h-12 items-center rounded-[12px] border border-white/20 px-6 text-[19px] text-white transition-colors duration-150 hover:bg-white/10"
+                className="inline-flex min-h-[52px] items-center rounded-full border border-white/20 px-7 text-[18px] text-white transition-colors duration-150 hover:bg-white/10"
               />
             )}
           </div>
         </div>
       </div>
+
       <div className="kontejner py-14 md:py-20">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-[1.1fr_1.5fr_0.8fr]">
           <div>
             <Image
               src="/brand/logo-bijeli.png"
@@ -74,18 +107,31 @@ export async function Podnozje() {
               height={33}
               className="h-8 w-auto"
             />
-            <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-neutral-400">
+            <p className="mt-5 max-w-xs text-[15px] leading-relaxed text-neutral-400">
               Više od 30 godina brinemo o sluhu — slušni aparati, besplatne provjere sluha i stručno
               savjetovanje u šest gradova Bosne i Hercegovine.
             </p>
-            <div className="mt-5 flex gap-3">
+            {telefon && (
+              <p className="mt-6">
+                <span className="block text-[12px] font-bold tracking-[0.16em] text-neutral-500 uppercase">
+                  Centralni telefon
+                </span>
+                <TelefonLink
+                  broj={telefon}
+                  lokacija="podnozje"
+                  saIkonom={false}
+                  className="mt-1 text-[22px] text-white hover:text-brand-300"
+                />
+              </p>
+            )}
+            <div className="mt-6 flex gap-3">
               {podesavanja.facebook && (
                 <a
                   href={podesavanja.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Audio BM na Facebooku"
-                  className="grid size-11 place-items-center rounded-full bg-white/10 transition-colors duration-150 hover:bg-white/20"
+                  className="grid size-11 place-items-center rounded-full border border-white/10 bg-white/5 transition-colors duration-150 hover:bg-white/15"
                 >
                   <Facebook className="size-5" aria-hidden />
                 </a>
@@ -96,7 +142,7 @@ export async function Podnozje() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Audio BM na Instagramu"
-                  className="grid size-11 place-items-center rounded-full bg-white/10 transition-colors duration-150 hover:bg-white/20"
+                  className="grid size-11 place-items-center rounded-full border border-white/10 bg-white/5 transition-colors duration-150 hover:bg-white/15"
                 >
                   <Instagram className="size-5" aria-hidden />
                 </a>
@@ -107,7 +153,7 @@ export async function Podnozje() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Audio BM na YouTube-u"
-                  className="grid size-11 place-items-center rounded-full bg-white/10 transition-colors duration-150 hover:bg-white/20"
+                  className="grid size-11 place-items-center rounded-full border border-white/10 bg-white/5 transition-colors duration-150 hover:bg-white/15"
                 >
                   <Youtube className="size-5" aria-hidden />
                 </a>
@@ -115,42 +161,53 @@ export async function Podnozje() {
             </div>
           </div>
 
-          {/* Poslovnice — svaka sa SVOJIM telefonom (stara stranica je miješala podatke) */}
-          <div className="lg:col-span-2">
-            <h2 className="mb-4 text-[16px] font-semibold text-white">Naše poslovnice</h2>
-            <ul className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
-              {poslovnice.map((p) => (
-                <li key={p.id} className="text-[15px]">
-                  <Link
-                    href={`/poslovnice/${p.slug}`}
-                    className="font-semibold text-white transition-colors duration-150 hover:text-brand-300"
-                  >
-                    {p.grad}
-                    {p.novaPoslovnica && (
-                      <span className="ml-2 rounded-full bg-brand-600 px-2 py-0.5 text-[11px] font-bold tracking-wide text-white uppercase">
-                        Novo
-                      </span>
+          {/* Poslovnice — svaka sa SVOJIM telefonom; placeholder podaci se preskaču */}
+          <nav aria-label="Poslovnice">
+            <h2 className="text-[13px] font-bold tracking-[0.16em] text-neutral-500 uppercase">
+              Naše poslovnice
+            </h2>
+            <ul className="mt-5 grid gap-x-10 gap-y-5 sm:grid-cols-2">
+              {poslovnice.map((p) => {
+                const adresa = stvarno(p.adresa)
+                const brojTel = stvarno(p.telefoni?.[0]?.broj)
+                return (
+                  <li key={p.id} className="text-[15px]">
+                    <Link
+                      href={`/poslovnice/${p.slug}`}
+                      className="group inline-flex items-center gap-2 font-semibold text-white transition-colors duration-150 hover:text-brand-300"
+                    >
+                      <MapPin className="size-3.5 text-brand-500" aria-hidden />
+                      {p.grad}
+                      {p.novaPoslovnica && (
+                        <span className="rounded-full bg-brand-600 px-2 py-0.5 text-[10.5px] font-bold tracking-wide text-white uppercase">
+                          Novo
+                        </span>
+                      )}
+                    </Link>
+                    {adresa && <div className="mt-0.5 pl-[22px] text-neutral-400">{adresa}</div>}
+                    {brojTel && (
+                      <div className="pl-[22px]">
+                        <TelefonLink
+                          broj={brojTel}
+                          lokacija={p.slug}
+                          saIkonom={false}
+                          className="!font-semibold text-[15px] text-neutral-300 hover:text-white"
+                        />
+                      </div>
                     )}
-                  </Link>
-                  <div className="text-neutral-400">{p.adresa}</div>
-                  {p.telefoni?.[0] && (
-                    <TelefonLink
-                      broj={p.telefoni[0].broj}
-                      lokacija={p.slug}
-                      saIkonom={false}
-                      className="text-[15px] text-neutral-300 hover:text-white"
-                    />
-                  )}
-                </li>
-              ))}
+                  </li>
+                )
+              })}
             </ul>
-          </div>
+          </nav>
 
-          <div className="space-y-8">
+          <div className="space-y-9">
             {(navigacija.podnozje ?? []).map((kolona) => (
-              <div key={kolona.id ?? kolona.naslov}>
-                <h2 className="mb-4 text-[16px] font-semibold text-white">{kolona.naslov}</h2>
-                <ul className="space-y-2.5">
+              <nav key={kolona.id ?? kolona.naslov} aria-label={kolona.naslov}>
+                <h2 className="text-[13px] font-bold tracking-[0.16em] text-neutral-500 uppercase">
+                  {kolona.naslov}
+                </h2>
+                <ul className="mt-5 space-y-2.5">
                   {(kolona.linkovi ?? []).map((l) => (
                     <li key={l.id ?? l.putanja}>
                       <Link
@@ -162,11 +219,13 @@ export async function Podnozje() {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </nav>
             ))}
-            <div>
-              <h2 className="mb-4 text-[16px] font-semibold text-white">Audio BM u regionu</h2>
-              <ul className="space-y-2.5">
+            <nav aria-label="Audio BM u regionu">
+              <h2 className="text-[13px] font-bold tracking-[0.16em] text-neutral-500 uppercase">
+                Audio BM u regionu
+              </h2>
+              <ul className="mt-5 space-y-2.5">
                 {REGIJA.map((r) => (
                   <li key={r.url}>
                     <a
@@ -180,11 +239,11 @@ export async function Podnozje() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </nav>
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 text-[14px] text-neutral-500 sm:flex-row">
+        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-7 text-[14px] text-neutral-500 sm:flex-row">
           <p>© {new Date().getFullYear()} Audio BM. Sva prava zadržana.</p>
           <div className="flex gap-6">
             <Link href="/politika-privatnosti" className="transition-colors duration-150 hover:text-white">

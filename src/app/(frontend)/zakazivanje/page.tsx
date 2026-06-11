@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import { ShieldCheck, Clock, PhoneCall } from 'lucide-react'
 import { dajPoslovnice } from '@/lib/podaci'
 import { metaStranice } from '@/lib/seo'
+import { stvarno } from '@/lib/tekst'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { ZakazivanjeKoraci } from '@/components/zakazivanje/ZakazivanjeKoraci'
 
@@ -21,8 +23,8 @@ export default async function ZakazivanjeStranica({
     id: p.id as number,
     naziv: p.naziv,
     grad: p.grad,
-    adresa: p.adresa,
-    telefon: p.telefoni?.[0]?.broj,
+    adresa: stvarno(p.adresa) ?? '',
+    telefon: stvarno(p.telefoni?.[0]?.broj) ?? undefined,
     novaPoslovnica: Boolean(p.novaPoslovnica),
   }))
 
@@ -31,15 +33,36 @@ export default async function ZakazivanjeStranica({
     : undefined
 
   return (
-    <div className="kontejner py-10 md:py-14">
-      <Mrvice stavke={[{ naziv: 'Zakazivanje termina' }]} />
-      <div className="mx-auto mt-6 max-w-3xl">
-        <p className="nadnaslov">Bez obaveze · traje 2 minute</p>
-        <h1 className="text-h1 mt-3">Zakažite besplatnu provjeru sluha</h1>
-        <p className="uvodni mt-3 mb-10">
-          Potrebne su samo dvije minute. Provjera je besplatna i ne obavezuje Vas ni na šta.
-        </p>
-        <ZakazivanjeKoraci lokacije={lokacije} predodabranaLokacija={predodabrana as number | undefined} />
+    <div className="relative overflow-hidden">
+      <div className="mreza-audiogram absolute inset-x-0 top-0 h-[420px] [mask-image:linear-gradient(to_bottom,black,transparent)]" aria-hidden />
+      <div className="kontejner relative py-8 md:py-12">
+        <Mrvice stavke={[{ naziv: 'Zakazivanje termina' }]} />
+        <div className="mx-auto mt-8 max-w-3xl">
+          <p className="nadnaslov">Bez obaveze · traje 2 minute</p>
+          <h1 className="text-h1 mt-3.5">Zakažite besplatnu provjeru sluha</h1>
+          <p className="uvodni mt-4">
+            Potrebne su samo dvije minute. Provjera je besplatna i ne obavezuje Vas ni na šta.
+          </p>
+
+          <ul className="mt-7 mb-10 flex flex-wrap gap-x-7 gap-y-2.5 text-[14.5px] font-semibold text-neutral-600">
+            <li className="flex items-center gap-2">
+              <ShieldCheck className="size-4.5 text-success-600" aria-hidden />
+              100% besplatno
+            </li>
+            <li className="flex items-center gap-2">
+              <Clock className="size-4.5 text-brand-600" aria-hidden />
+              Pregled traje 30–45 min
+            </li>
+            <li className="flex items-center gap-2">
+              <PhoneCall className="size-4.5 text-brand-600" aria-hidden />
+              Potvrda telefonom isti radni dan
+            </li>
+          </ul>
+
+          <div className="povrsina !rounded-[28px] p-6 !shadow-[var(--shadow-lift-lg)] md:p-10">
+            <ZakazivanjeKoraci lokacije={lokacije} predodabranaLokacija={predodabrana as number | undefined} />
+          </div>
+        </div>
       </div>
     </div>
   )

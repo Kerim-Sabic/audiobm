@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { ArrowRight, Tag } from 'lucide-react'
 import { dajAktivneAkcije } from '@/lib/podaci'
 import { metaStranice } from '@/lib/seo'
-import { Mrvice } from '@/components/ui/Mrvice'
+import { ZaglavljeStranice } from '@/components/ui/ZaglavljeStranice'
 import { SlikaMedija } from '@/components/ui/SlikaMedija'
 import { DugmeLink } from '@/components/ui/Dugme'
 import { OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
@@ -21,19 +21,20 @@ export default async function AkcijeStranica() {
   const akcije = await dajAktivneAkcije()
 
   return (
-    <div className="kontejner py-10 md:py-14">
-      <Mrvice stavke={[{ naziv: 'Akcije' }]} />
-      <h1 className="text-h1 mt-6">Aktuelne akcije</h1>
-      <p className="mt-3 max-w-2xl text-[18px] text-neutral-600">
-        Promocije vrijede do navedenog datuma ili do isteka zaliha — istekle akcije se automatski
-        sklanjaju sa stranice.
-      </p>
+    <>
+      <ZaglavljeStranice
+        mrvice={[{ naziv: 'Akcije' }]}
+        nadnaslov="Promocije i popusti"
+        naslov="Aktuelne akcije"
+        uvod="Promocije vrijede do navedenog datuma ili do isteka zaliha — istekle akcije se automatski sklanjaju sa stranice."
+      />
 
+      <div className="kontejner pb-16 md:pb-24">
       {akcije.length > 0 ? (
         <OtkrijGrupu className="mt-12 grid gap-6 md:grid-cols-2">
           {akcije.map((a) => (
             <OtkrijStavku key={a.id}>
-              <article className="group relative flex h-full flex-col overflow-hidden rounded-[16px] border border-neutral-200 bg-white shadow-sm transition-[box-shadow,transform] duration-250 hover:-translate-y-1 hover:shadow-lg">
+              <article className="povrsina povrsina-hover group relative flex h-full flex-col overflow-hidden">
                 {a.slika && typeof a.slika === 'object' && (
                   <div className="relative aspect-[16/7] overflow-hidden">
                     <SlikaMedija
@@ -68,17 +69,21 @@ export default async function AkcijeStranica() {
           ))}
         </OtkrijGrupu>
       ) : (
-        <div className="mt-12 rounded-[16px] bg-neutral-50 p-12 text-center">
-          <p className="text-h3 text-neutral-700">Trenutno nema aktivnih akcija.</p>
-          <p className="mx-auto mt-3 max-w-md text-neutral-600">
-            Pratite nas — nove promocije objavljujemo ovdje. U međuvremenu, provjera sluha je uvijek
-            besplatna.
-          </p>
-          <DugmeLink href="/zakazivanje" className="mt-6">
-            Zakažite besplatnu provjeru sluha
-          </DugmeLink>
+        <div className="relative mt-12 overflow-hidden rounded-[28px] border border-neutral-200/70 bg-neutral-50 p-12 text-center">
+          <div className="mreza-audiogram absolute inset-0" aria-hidden />
+          <div className="relative">
+            <p className="text-h3 text-neutral-700">Trenutno nema aktivnih akcija.</p>
+            <p className="mx-auto mt-3 max-w-md text-neutral-600">
+              Pratite nas — nove promocije objavljujemo ovdje. U međuvremenu, provjera sluha je uvijek
+              besplatna.
+            </p>
+            <DugmeLink href="/zakazivanje" className="mt-7">
+              Zakažite besplatnu provjeru sluha
+            </DugmeLink>
+          </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }

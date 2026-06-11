@@ -65,7 +65,7 @@ export default async function AkcijaStranica({ params }: { params: Promise<{ slu
       </div>
 
       {akcija.slika && typeof akcija.slika === 'object' && (
-        <div className="relative mt-8 aspect-[21/9] max-w-4xl overflow-hidden rounded-[16px]">
+        <div className="relative mt-8 aspect-[21/9] max-w-4xl overflow-hidden rounded-[24px] shadow-[var(--shadow-lift)]">
           <SlikaMedija medij={akcija.slika as Mediji} fill sizes="(min-width: 1024px) 900px, 100vw" prioritet />
         </div>
       )}
@@ -83,10 +83,10 @@ export default async function AkcijaStranica({ params }: { params: Promise<{ slu
         </section>
       )}
 
-      <div className="mt-12 rounded-[16px] bg-brand-50/60 p-8 text-center">
+      <div className="mt-12 rounded-[28px] border border-brand-200/60 bg-gradient-to-br from-white to-brand-50/50 p-8 text-center md:p-10">
         <h2 className="text-h3">Iskoristite akciju</h2>
         <p className="mt-2 text-neutral-700">Pozovite najbližu poslovnicu ili zakažite termin.</p>
-        <DugmeLink href="/zakazivanje" velicina="veliko" className="mt-5">
+        <DugmeLink href="/zakazivanje" velicina="veliko" className="mt-6">
           Zakažite termin
         </DugmeLink>
       </div>

@@ -1,6 +1,7 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { cache } from 'react'
+import { ocisti } from '@/lib/tekst'
 
 /** Lokalni Payload API — bez klijentskog dohvata sadržaja (SSG/ISR). */
 export const dajPayload = cache(async () => getPayload({ config }))
@@ -95,5 +96,10 @@ export const dajPitanja = cache(async () => {
     sort: '_order',
     limit: 100,
   })
-  return docs
+  // uredničke oznake ([CIJENA_PLACEHOLDER] i sl.) se nikad ne prikazuju javno
+  return docs.map((d) => ({
+    ...d,
+    pitanje: ocisti(d.pitanje) ?? d.pitanje,
+    odgovor: ocisti(d.odgovor) ?? d.odgovor,
+  }))
 })

@@ -4,29 +4,31 @@ import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
-type Varijanta = 'primarno' | 'sekundarno' | 'duh' | 'destruktivno'
-type Velicina = 'normalno' | 'veliko'
+type Varijanta = 'primarno' | 'sekundarno' | 'duh' | 'tamno' | 'destruktivno'
+type Velicina = 'malo' | 'normalno' | 'veliko'
 
 const osnova =
-  'inline-flex items-center justify-center gap-2 rounded-[12px] font-semibold cursor-pointer select-none ' +
-  'transition-[background-color,box-shadow,transform] duration-150 ' +
-  'hover:-translate-y-px active:translate-y-0 active:scale-[0.98] ' +
-  'disabled:pointer-events-none disabled:opacity-60 ' +
-  'min-h-12' // 48px ciljna površina
+  'inline-flex items-center justify-center gap-2 rounded-full font-semibold cursor-pointer select-none whitespace-nowrap ' +
+  'transition-[background-color,border-color,box-shadow,transform] duration-150 ' +
+  'hover:-translate-y-px active:translate-y-0 active:scale-[0.985] ' +
+  'disabled:pointer-events-none disabled:opacity-60'
 
 const varijante: Record<Varijanta, string> = {
   primarno:
-    'bg-gradient-to-b from-brand-500 to-brand-600 text-white shadow-[0_8px_20px_-6px_rgb(237_28_36/0.45)] ' +
-    'hover:from-brand-600 hover:to-brand-700 hover:shadow-[0_12px_26px_-6px_rgb(237_28_36/0.5)]',
+    'bg-brand-600 text-white shadow-[var(--shadow-cta)] ' +
+    'hover:bg-brand-700 hover:shadow-[var(--shadow-cta-hover)]',
   sekundarno:
-    'bg-white text-neutral-900 border border-neutral-300 shadow-sm hover:border-neutral-400 hover:bg-neutral-50 hover:shadow-md',
+    'bg-white text-neutral-900 border border-neutral-300 shadow-sm hover:border-neutral-400 hover:bg-neutral-50',
   duh: 'bg-transparent text-brand-700 hover:bg-brand-50',
-  destruktivno: 'bg-error-600 text-white shadow-sm hover:bg-red-800 hover:shadow-md',
+  tamno:
+    'bg-white/10 text-white border border-white/20 backdrop-blur-sm hover:bg-white/15 hover:border-white/30',
+  destruktivno: 'bg-error-600 text-white shadow-sm hover:bg-red-800',
 }
 
 const velicine: Record<Velicina, string> = {
-  normalno: 'px-5 py-3 text-[16px]',
-  veliko: 'px-7 py-3.5 text-[17px] md:text-[18px]',
+  malo: 'min-h-10 px-4 py-2 text-[15px]',
+  normalno: 'min-h-12 px-6 py-3 text-[16px]',
+  veliko: 'min-h-[52px] px-8 py-3.5 text-[17px] md:text-[18px]',
 }
 
 type Zajednicko = {

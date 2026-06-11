@@ -69,7 +69,7 @@ export function LjepljivaTraka({ telefon }: { telefon?: string }) {
               <a
                 href={telHref(telefon)}
                 onClick={() => zabiljezi('call_click', { lokacija: 'mobilna-traka' })}
-                className="telefon flex min-h-12 items-center justify-center gap-2 rounded-[12px] border border-neutral-300 bg-white px-3 text-[16px] text-neutral-900"
+                className="telefon flex min-h-12 items-center justify-center gap-2 rounded-full border border-neutral-300 bg-white px-3 text-[16px] text-neutral-900"
               >
                 <Phone className="size-5 text-brand-600" aria-hidden />
                 Pozovite nas
@@ -79,7 +79,7 @@ export function LjepljivaTraka({ telefon }: { telefon?: string }) {
             )}
             <Link
               href="/zakazivanje"
-              className="flex min-h-12 items-center justify-center gap-2 rounded-[12px] bg-brand-600 px-3 text-[16px] font-semibold text-white"
+              className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-brand-600 px-3 text-[16px] font-semibold text-white shadow-[var(--shadow-cta)]"
             >
               <CalendarCheck className="size-5" aria-hidden />
               Zakažite termin

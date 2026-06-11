@@ -2,19 +2,20 @@
 
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react'
 import { useId } from 'react'
-import { Check } from 'lucide-react'
+import { Check, CircleAlert } from 'lucide-react'
 
 /**
  * Polja obrazaca: trajno vidljive oznake, velike dodirne površine (48px+),
  * poruke o greškama na bosanskom ispod polja (bez tresenja — fade-in).
+ * Smiren, klinički izgled: mekani rub, jasna stanja, bez vizuelne buke.
  */
 
 const poljeKlase = (greska?: string) =>
-  `w-full rounded-[12px] border bg-white px-4 py-3.5 text-[17px] min-h-12 ` +
-  `transition-colors duration-250 placeholder:text-neutral-400 ` +
+  `w-full rounded-[14px] border bg-white px-4 py-3.5 text-[17px] min-h-12 ` +
+  `transition-[border-color,box-shadow] duration-250 placeholder:text-neutral-400 ` +
   (greska
-    ? 'border-error-600 focus-visible:outline-error-600'
-    : 'border-neutral-300 hover:border-neutral-400')
+    ? 'border-error-600 shadow-[0_0_0_3px_rgb(185_28_28/0.08)] focus-visible:outline-error-600'
+    : 'border-neutral-300 shadow-[inset_0_1px_2px_rgb(28_25_23/0.03)] hover:border-neutral-400')
 
 function Omotac({
   id,
@@ -32,8 +33,8 @@ function Omotac({
   children: ReactNode
 }) {
   return (
-    <div className="space-y-1.5">
-      <label htmlFor={id} className="flex items-center gap-2 text-[16px] font-semibold text-neutral-800">
+    <div className="space-y-2">
+      <label htmlFor={id} className="flex items-center gap-2 text-[15.5px] font-semibold text-neutral-800">
         {oznaka}
         {uspjeh && !greska && (
           <Check className="size-4 text-success-600 opacity-0 transition-opacity duration-250 [.uspjeh_&]:opacity-100" aria-hidden />
@@ -45,8 +46,9 @@ function Omotac({
         <p
           id={`${id}-greska`}
           role="alert"
-          className="text-small animate-[uplov_250ms_ease-out] font-medium text-error-600"
+          className="text-small flex items-center gap-1.5 animate-[uplov_250ms_ease-out] font-medium text-error-600"
         >
+          <CircleAlert className="size-4 shrink-0" aria-hidden />
           {greska}
         </p>
       )}
@@ -145,7 +147,8 @@ export function PoljeSaglasnost({
         </span>
       </label>
       {greska && (
-        <p role="alert" className="text-small font-medium text-error-600">
+        <p role="alert" className="text-small flex items-center gap-1.5 font-medium text-error-600">
+          <CircleAlert className="size-4 shrink-0" aria-hidden />
           {greska}
         </p>
       )}

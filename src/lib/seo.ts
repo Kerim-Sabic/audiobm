@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { stvarno, ocisti } from '@/lib/tekst'
 
 export const OSNOVNI_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? 'https://audiobm.ba'
 
@@ -87,8 +88,12 @@ const DAN_SHEMA: Record<string, string> = {
   nedjelja: 'Sunday',
 }
 
-/** MedicalBusiness/LocalBusiness JSON-LD po poslovnici, sa geo i radnim vremenom. */
+/** MedicalBusiness/LocalBusiness JSON-LD po poslovnici, sa geo i radnim vremenom.
+ *  Placeholder podaci (adresa/telefon koji još nisu uneseni) se izostavljaju. */
 export function poslovnicaJsonLd(p: PoslovnicaZaShemu) {
+  const telefon = stvarno(p.telefoni?.[0]?.broj)
+  const email = stvarno(p.emaili?.[0]?.email)
+  const adresa = stvarno(p.adresa)
   return {
     '@context': 'https://schema.org',
     '@type': ['MedicalBusiness', 'LocalBusiness'],
@@ -96,11 +101,11 @@ export function poslovnicaJsonLd(p: PoslovnicaZaShemu) {
     name: `Audio BM ${p.grad}`,
     url: `${OSNOVNI_URL}/poslovnice/${p.slug}`,
     image: `${OSNOVNI_URL}/brand/og-podrazumijevana.png`,
-    telephone: p.telefoni?.[0]?.broj,
-    email: p.emaili?.[0]?.email,
+    ...(telefon ? { telephone: telefon } : {}),
+    ...(email ? { email } : {}),
     address: {
       '@type': 'PostalAddress',
-      streetAddress: p.adresa,
+      ...(adresa ? { streetAddress: adresa } : {}),
       addressLocality: p.grad,
       addressCountry: 'BA',
     },
@@ -123,15 +128,15 @@ export function poslovnicaJsonLd(p: PoslovnicaZaShemu) {
   }
 }
 
-/** FAQPage JSON-LD. */
+/** FAQPage JSON-LD — uredničke oznake se uklanjaju iz teksta. */
 export function pitanjaJsonLd(stavke: { pitanje: string; odgovor: string }[]) {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: stavke.map((s) => ({
       '@type': 'Question',
-      name: s.pitanje,
-      acceptedAnswer: { '@type': 'Answer', text: s.odgovor },
+      name: ocisti(s.pitanje) ?? s.pitanje,
+      acceptedAnswer: { '@type': 'Answer', text: ocisti(s.odgovor) ?? '' },
     })),
   }
 }

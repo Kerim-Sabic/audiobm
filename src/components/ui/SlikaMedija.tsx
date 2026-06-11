@@ -35,13 +35,18 @@ export function SlikaMedija({
   quality?: number
 }) {
   if (!medij || typeof medij === 'number' || !medij.url) {
+    // bez vidljivog placeholder teksta — tiha neutralna površina sa ikonom
     return (
       <div
-        className={`grid place-items-center bg-neutral-100 text-small text-neutral-400 ${className}`}
+        className={`grid place-items-center bg-neutral-100 ${className}`}
         role="img"
         aria-label="Slika nije dostupna"
       >
-        [MISSING_ASSET]
+        <svg viewBox="0 0 24 24" className="size-10 text-neutral-300" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+          <rect x="3" y="5" width="18" height="14" rx="2" />
+          <circle cx="9" cy="10" r="1.6" />
+          <path d="m5 17 4.5-4 3 2.5L17 11l2 2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </div>
     )
   }

@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { Store } from 'lucide-react'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { dajPayload, dajPodesavanja } from '@/lib/podaci'
 import { metaStranice } from '@/lib/seo'
+import { stvarno } from '@/lib/tekst'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { SlikaMedija } from '@/components/ui/SlikaMedija'
 import { TelefonLink } from '@/components/ui/TelefonLink'
@@ -53,9 +55,11 @@ export default async function ProizvodStranica({ params }: { params: Promise<{ s
   const slike = (proizvod.slike as (Mediji | number)[] | undefined) ?? []
   const kategorija = KATEGORIJE[proizvod.kategorija as Kategorija]
   const imaCijenu = proizvod.nacin === 'maloprodaja' && proizvod.cijena != null && proizvod.cijena > 0
+  const napomena = stvarno(proizvod.cijenaNapomena)
+  const telefon = stvarno(podesavanja.telefonGlavni)
 
   return (
-    <div className="kontejner py-10 md:py-14">
+    <div className="kontejner py-8 md:py-12">
       <Mrvice
         stavke={[
           { naziv: 'Proizvodi', putanja: '/proizvodi' },
@@ -66,31 +70,24 @@ export default async function ProizvodStranica({ params }: { params: Promise<{ s
         ]}
       />
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-2">
-        <div>
-          {slike[0] && typeof slike[0] === 'object' ? (
-            <div className="grid aspect-square place-items-center overflow-hidden rounded-[20px] border border-neutral-200 bg-gradient-to-br from-white to-neutral-100/70 p-10 shadow-[var(--shadow-lift)]">
-              <SlikaMedija
-                medij={slike[0]}
-                sizes="(min-width: 1024px) 560px, 100vw"
-                prioritet
-                className="max-h-full w-auto object-contain drop-shadow-xl"
-              />
-            </div>
-          ) : (
-            <div className="grid aspect-square place-items-center rounded-[16px] bg-neutral-100 text-neutral-400">
-              [MISSING_ASSET]
-            </div>
-          )}
+      <div className="mt-8 grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
+        <div className="povrsina relative grid aspect-square place-items-center overflow-hidden !rounded-[28px] bg-gradient-to-br from-white to-neutral-50 p-10 lg:sticky lg:top-32">
+          <div className="mreza-audiogram absolute inset-0" aria-hidden />
+          <SlikaMedija
+            medij={typeof slike[0] === 'object' ? slike[0] : null}
+            sizes="(min-width: 1024px) 560px, 100vw"
+            prioritet
+            className="relative max-h-full w-auto object-contain drop-shadow-xl"
+          />
         </div>
 
         <div>
           {proizvod.brend && (
-            <p className="text-small font-semibold tracking-wide text-neutral-500 uppercase">{proizvod.brend}</p>
+            <p className="text-[13px] font-bold tracking-[0.16em] text-neutral-500 uppercase">{proizvod.brend}</p>
           )}
-          <h1 className="text-h1 mt-1">{proizvod.naziv}</h1>
+          <h1 className="text-h1 mt-1.5">{proizvod.naziv}</h1>
 
-          <div className="mt-5 rounded-[12px] bg-neutral-50 p-5">
+          <div className="povrsina mt-6 !rounded-[18px] bg-neutral-50 p-5">
             {imaCijenu ? (
               <>
                 <p className="telefon text-[30px] text-neutral-900">{proizvod.cijena} KM</p>
@@ -99,29 +96,26 @@ export default async function ProizvodStranica({ params }: { params: Promise<{ s
                 )}
               </>
             ) : (
-              <p className="text-[18px] font-semibold text-warning-600">
-                Cijena na upit {proizvod.cijenaNapomena?.startsWith('[') ? '[CIJENA_PLACEHOLDER]' : ''}
-              </p>
+              <p className="text-[19px] font-bold text-neutral-900">Cijena na upit</p>
             )}
-            {proizvod.cijenaNapomena && !proizvod.cijenaNapomena.startsWith('[') && (
-              <p className="text-small mt-1 text-neutral-600">{proizvod.cijenaNapomena}</p>
-            )}
-            <p className="text-small mt-3 text-neutral-600">
+            {napomena && <p className="text-small mt-1 text-neutral-600">{napomena}</p>}
+            <p className="mt-3 flex items-center gap-2 border-t border-neutral-200/70 pt-3 text-[14.5px] text-neutral-600">
+              <Store className="size-4 shrink-0 text-brand-600" aria-hidden />
               Narudžba upitom ili telefonom — preuzimanje u najbližoj poslovnici.
             </p>
-            {podesavanja.telefonGlavni && (
+            {telefon && (
               <TelefonLink
-                broj={podesavanja.telefonGlavni}
+                broj={telefon}
                 lokacija={`proizvod-${slug}`}
-                className="mt-2 text-[20px] text-neutral-900 hover:text-brand-700"
+                className="mt-2.5 text-[20px] text-neutral-900 hover:text-brand-700"
               />
             )}
           </div>
 
-          {proizvod.opis && <RichText data={proizvod.opis} className="prose-bm mt-6 text-neutral-700" />}
+          {proizvod.opis && <RichText data={proizvod.opis} className="prose-bm mt-7 text-neutral-700" />}
 
-          <div className="mt-8 rounded-[16px] border border-neutral-200 p-6">
-            <h2 className="text-h3 mb-4">Naručite ili pošaljite pitanje</h2>
+          <div className="povrsina mt-8 !rounded-[24px] p-6 md:p-8">
+            <h2 className="text-h3 mb-5">Naručite ili pošaljite pitanje</h2>
             <UpitZaProizvod
               proizvodId={proizvod.id as number}
               nazivProizvoda={proizvod.naziv}

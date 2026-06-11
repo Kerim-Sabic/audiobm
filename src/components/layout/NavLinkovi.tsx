@@ -3,12 +3,15 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-/** Desktop navigacija sa aktivnim stanjem trenutne rute i animiranom podvlakom. */
+/**
+ * Desktop navigacija: mirna pilula za aktivnu rutu, tihi hover.
+ * Razmaci se stežu na lg i šire na xl — stavke se nikad ne lome u dva reda.
+ */
 export function NavLinkovi({ stavke }: { stavke: { oznaka: string; putanja: string }[] }) {
   const putanja = usePathname()
 
   return (
-    <ul className="flex items-center gap-0.5">
+    <ul className="flex items-center gap-0.5 xl:gap-1">
       {stavke.map((s) => {
         const aktivna = s.putanja === '/' ? putanja === '/' : putanja.startsWith(s.putanja)
         return (
@@ -16,10 +19,10 @@ export function NavLinkovi({ stavke }: { stavke: { oznaka: string; putanja: stri
             <Link
               href={s.putanja}
               aria-current={aktivna ? 'page' : undefined}
-              className={`relative rounded-md px-3.5 py-2.5 text-[15.5px] font-semibold transition-colors duration-150 after:absolute after:inset-x-3.5 after:-bottom-0.5 after:h-0.5 after:origin-left after:rounded-full after:bg-brand-600 after:transition-transform after:duration-250 ${
+              className={`block rounded-full px-3 py-2 text-[14.5px] font-semibold whitespace-nowrap transition-colors duration-150 xl:px-4 xl:text-[15.5px] ${
                 aktivna
-                  ? 'text-brand-700 after:scale-x-100'
-                  : 'text-neutral-700 after:scale-x-0 hover:text-neutral-950 hover:after:scale-x-100'
+                  ? 'bg-brand-50 text-brand-800'
+                  : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-950'
               }`}
             >
               {s.oznaka}

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { dajPayload } from '@/lib/podaci'
 import { metaStranice } from '@/lib/seo'
-import { Mrvice } from '@/components/ui/Mrvice'
+import { ZaglavljeStranice } from '@/components/ui/ZaglavljeStranice'
 import { SlikaMedija } from '@/components/ui/SlikaMedija'
 import { OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
 import type { Mediji } from '@/payload-types'
@@ -38,43 +38,45 @@ export default async function SavjetiStranica({
   })
 
   return (
-    <div className="kontejner py-10 md:py-14">
-      <Mrvice stavke={[{ naziv: 'Savjeti' }]} />
-      <h1 className="text-h1 mt-6">Savjeti i novosti</h1>
-      <p className="mt-3 max-w-2xl text-[18px] text-neutral-600">
-        Razumljivi tekstovi o sluhu, aparatima i svemu što Vas zanima — bez komplikovanih izraza.
-      </p>
-
-      <nav aria-label="Kategorije objava" className="mt-8 flex flex-wrap gap-2">
-        <Link
-          href="/savjeti"
-          className={`rounded-full border px-4 py-2 text-[15px] font-medium transition-colors duration-150 ${
-            !kategorija
-              ? 'border-brand-600 bg-brand-600 text-white'
-              : 'border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50'
-          }`}
-        >
-          Sve objave
-        </Link>
-        {KATEGORIJE.map((k) => (
+    <>
+      <ZaglavljeStranice
+        mrvice={[{ naziv: 'Savjeti' }]}
+        nadnaslov="Razumljivo o sluhu"
+        naslov="Savjeti i novosti"
+        uvod="Razumljivi tekstovi o sluhu, aparatima i svemu što Vas zanima — bez komplikovanih izraza."
+      >
+        <nav aria-label="Kategorije objava" className="flex flex-wrap gap-2">
           <Link
-            key={k.value}
-            href={`/savjeti?kategorija=${k.value}`}
-            className={`rounded-full border px-4 py-2 text-[15px] font-medium transition-colors duration-150 ${
-              kategorija === k.value
+            href="/savjeti"
+            className={`rounded-full border px-4 py-2 text-[14.5px] font-semibold shadow-sm transition-colors duration-150 ${
+              !kategorija
                 ? 'border-brand-600 bg-brand-600 text-white'
                 : 'border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50'
             }`}
           >
-            {k.label}
+            Sve objave
           </Link>
-        ))}
-      </nav>
+          {KATEGORIJE.map((k) => (
+            <Link
+              key={k.value}
+              href={`/savjeti?kategorija=${k.value}`}
+              className={`rounded-full border px-4 py-2 text-[14.5px] font-semibold shadow-sm transition-colors duration-150 ${
+                kategorija === k.value
+                  ? 'border-brand-600 bg-brand-600 text-white'
+                  : 'border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50'
+              }`}
+            >
+              {k.label}
+            </Link>
+          ))}
+        </nav>
+      </ZaglavljeStranice>
 
-      <OtkrijGrupu className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="kontejner pb-16 md:pb-24">
+      <OtkrijGrupu className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {objave.map((o) => (
           <OtkrijStavku key={o.id}>
-            <article className="group relative flex h-full flex-col overflow-hidden rounded-[16px] border border-neutral-200 bg-white shadow-sm transition-[box-shadow,transform] duration-250 hover:-translate-y-1 hover:shadow-lg">
+            <article className="povrsina povrsina-hover group relative flex h-full flex-col overflow-hidden">
               {o.naslovnaSlika && typeof o.naslovnaSlika === 'object' ? (
                 <div className="relative aspect-[16/9] overflow-hidden">
                   <SlikaMedija
@@ -113,10 +115,11 @@ export default async function SavjetiStranica({
       </OtkrijGrupu>
 
       {objave.length === 0 && (
-        <p className="mt-12 rounded-[16px] bg-neutral-50 p-12 text-center text-neutral-600">
+        <p className="povrsina mt-12 p-12 text-center text-neutral-600">
           U ovoj kategoriji još nema objava.
         </p>
       )}
-    </div>
+      </div>
+    </>
   )
 }
