@@ -58,7 +58,7 @@ export function PromoBaner({ tekst, link }: { tekst: string; link: string }) {
               type="button"
               onClick={zatvori}
               aria-label="Zatvorite obavještenje"
-              className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-full transition-colors duration-150 hover:bg-brand-100"
+              className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full transition-colors duration-150 hover:bg-brand-100"
             >
               <X className="size-4" aria-hidden />
             </button>

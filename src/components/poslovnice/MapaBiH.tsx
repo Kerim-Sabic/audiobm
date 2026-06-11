@@ -62,6 +62,8 @@ export function MapaBiH({ lokacije }: { lokacije: PinLokacija[] }) {
                   onFocus={() => setAktivan(l.slug)}
                   onBlur={() => setAktivan(null)}
                 >
+                  {/* nevidljiva veća dodirna površina (mobilni ekrani) */}
+                  <circle cx={x} cy={y - 14} r="52" fill="transparent" />
                   {/* puls prsten oko aktivnog pina */}
                   {jeAktivan && (
                     <circle cx={x} cy={y} r="22" fill="none" stroke="#ED1C24" strokeWidth="2" className="prsten-puls" />

@@ -10,7 +10,12 @@ import {
   type GreskeObrasca,
 } from '@/lib/validacija'
 import { provjeriOgranicenje, provjeriTurnstile } from '@/lib/zastita'
-import { provjeriRezultatTesta, sazmiRezultat } from '@/lib/test-sluha'
+import {
+  ocijeniKategoriju,
+  ocijeniPouzdanost,
+  provjeriRezultatTesta,
+  sazmiRezultat,
+} from '@/lib/test-sluha'
 
 export type StanjeTestObrasca = {
   status: 'pocetno' | 'uspjeh' | 'greska'
@@ -67,6 +72,9 @@ export async function posaljiTestSluha(
   if (g3) greske.email = g3
   const g4 = provjeriSaglasnost(formData.get('saglasnost'))
   if (g4) greske.saglasnost = g4
+  if (poslovnicaId && (!/^\d+$/.test(poslovnicaId) || Number(poslovnicaId) <= 0)) {
+    greske.poslovnica = 'Odabrana poslovnica nije ispravna.'
+  }
   if (Object.keys(greske).length > 0) {
     return { status: 'greska', poruka: 'Molimo ispravite označena polja.', greske }
   }
@@ -86,9 +94,38 @@ export async function posaljiTestSluha(
     return { status: 'greska', poruka: 'Rezultat testa nije ispravan. Molimo ponovite test.' }
   }
 
-  // 6) spremanje u inbox — e-mail obavještenje šalje hook kolekcije Upiti
+  // 6) server je autoritet: kategorija i pouzdanost se RAČUNAJU IZNOVA iz
+  //    provjerenih pragova/upitnika/zastavica — klijentskim vrijednostima se ne vjeruje
+  const sviPragovi = [...Object.values(rezultat.pragovi.desno), ...Object.values(rezultat.pragovi.lijevo)]
+  const { pouzdanost, nivo } = ocijeniPouzdanost({
+    laznePotvrde: rezultat.laznePotvrde,
+    nedosljedneFrekvencije: rezultat.nedosljedneFrekvencije,
+    mikrofonProvjera: rezultat.mikrofonProvjera,
+    sveNull: sviPragovi.length > 0 && sviPragovi.every((p) => p === null),
+    ponavljanja: rezultat.ponavljanja,
+  })
+  rezultat = {
+    ...rezultat,
+    kategorija: ocijeniKategoriju(rezultat),
+    pouzdanost,
+    pouzdanostNivo: nivo,
+  }
+
+  const payload = await dajPayload()
+
+  // 7) poslovnica mora postojati — nepostojeća se tiho izostavlja
+  let provjerenaPoslovnica: number | undefined
+  if (poslovnicaId) {
+    try {
+      const p = await payload.findByID({ collection: 'poslovnice', id: Number(poslovnicaId), depth: 0 })
+      if (p) provjerenaPoslovnica = Number(poslovnicaId)
+    } catch {
+      provjerenaPoslovnica = undefined
+    }
+  }
+
+  // 8) spremanje u inbox — e-mail obavještenje šalje hook kolekcije Upiti
   try {
-    const payload = await dajPayload()
     await payload.create({
       collection: 'upiti',
       data: {
@@ -97,7 +134,7 @@ export async function posaljiTestSluha(
         ime,
         telefon,
         ...(email ? { email } : {}),
-        ...(poslovnicaId ? { poslovnica: Number(poslovnicaId) } : {}),
+        ...(provjerenaPoslovnica ? { poslovnica: provjerenaPoslovnica } : {}),
         poruka: sazmiRezultat(rezultat),
         rezultatTesta: rezultat,
         izvorStranica: '/online-test-sluha',

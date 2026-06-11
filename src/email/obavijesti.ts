@@ -1,4 +1,5 @@
 import type { Payload } from 'payload'
+import { ZASTAVICE } from '../lib/test-sluha'
 
 const NAZIVI_VRSTA: Record<string, string> = {
   zakazivanje: 'Zakazivanje besplatne provjere sluha',
@@ -88,7 +89,18 @@ export async function posaljiObavijestOUpitu(payload: Payload, upit: Record<stri
         ${red(
           'Pouzdanost screeninga',
           upit.rezultatTesta && typeof upit.rezultatTesta === 'object'
-            ? (upit.rezultatTesta as Record<string, unknown>).pouzdanostNivo
+            ? `${(upit.rezultatTesta as Record<string, unknown>).pouzdanost}/100 (${(upit.rezultatTesta as Record<string, unknown>).pouzdanostNivo})`
+            : undefined,
+        )}
+        ${red(
+          '⚑ CRVENE ZASTAVICE',
+          upit.rezultatTesta &&
+            typeof upit.rezultatTesta === 'object' &&
+            Array.isArray((upit.rezultatTesta as Record<string, unknown>).zastavice) &&
+            ((upit.rezultatTesta as Record<string, unknown>).zastavice as string[]).length > 0
+            ? ((upit.rezultatTesta as Record<string, unknown>).zastavice as string[])
+                .map((z) => ZASTAVICE.find((x) => x.id === z)?.oznaka ?? z)
+                .join('; ')
             : undefined,
         )}
       </table>

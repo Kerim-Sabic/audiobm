@@ -9,6 +9,22 @@ const VRSTE: Record<string, string> = {
   podrska: 'Opšta podrška',
   kupovina: 'Kupovina proizvoda',
   'povratni-poziv': 'Povratni poziv',
+  'online-test-sluha': 'Online test sluha',
+}
+
+const KATEGORIJE_TESTA_ADMIN: Record<string, { oznaka: string; pozadina: string; boja: string }> = {
+  'bez-znakova': { oznaka: 'Bez jasnih znakova', pozadina: '#dcfce7', boja: '#166534' },
+  moguca: { oznaka: 'Moguća poteškoća', pozadina: '#fef3c7', boja: '#92400e' },
+  preporuka: { oznaka: 'Preporučena provjera', pozadina: '#fde4e5', boja: '#901318' },
+  hitno: { oznaka: 'Hitna konsultacija', pozadina: '#ED1C24', boja: '#ffffff' },
+}
+
+const mznacka: React.CSSProperties = {
+  fontSize: '11px',
+  fontWeight: 700,
+  borderRadius: '99px',
+  padding: '3px 9px',
+  whiteSpace: 'nowrap',
 }
 
 const kartica: React.CSSProperties = {
@@ -44,7 +60,7 @@ export async function KontrolnaTabla({ initPageResult }: AdminViewServerProps) {
   const sedmicaUnazad = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
   const danas = new Date().toISOString()
 
-  const [noviUpiti, sviOtvoreni, akcije] = await Promise.all([
+  const [noviUpiti, sviOtvoreni, akcije, testovi7dana, zadnjiTestovi] = await Promise.all([
     payload.find({
       collection: 'upiti',
       where: { createdAt: { greater_than: sedmicaUnazad } },
@@ -58,6 +74,20 @@ export async function KontrolnaTabla({ initPageResult }: AdminViewServerProps) {
       where: { and: [{ vrijediOd: { less_than_equal: danas } }, { vrijediDo: { greater_than_equal: danas } }] },
       limit: 10,
       draft: false,
+    }),
+    payload.find({
+      collection: 'upiti',
+      where: {
+        and: [{ vrsta: { equals: 'online-test-sluha' } }, { createdAt: { greater_than: sedmicaUnazad } }],
+      },
+      limit: 0,
+    }),
+    payload.find({
+      collection: 'upiti',
+      where: { vrsta: { equals: 'online-test-sluha' } },
+      limit: 5,
+      depth: 0,
+      sort: '-createdAt',
     }),
   ])
 
@@ -122,7 +152,73 @@ export async function KontrolnaTabla({ initPageResult }: AdminViewServerProps) {
             <div style={{ fontSize: '42px', fontWeight: 800, lineHeight: 1 }}>{akcije.totalDocs}</div>
             <div style={{ marginTop: '8px', color: 'var(--theme-elevation-600)' }}>aktivnih akcija</div>
           </div>
+          <div style={kartica}>
+            <div style={{ fontSize: '42px', fontWeight: 800, lineHeight: 1 }}>{testovi7dana.totalDocs}</div>
+            <div style={{ marginTop: '8px', color: 'var(--theme-elevation-600)' }}>
+              online testova sluha (7 dana)
+            </div>
+          </div>
         </div>
+
+        {/* online testovi sluha — najnoviji rezultati sa oznakama */}
+        {zadnjiTestovi.docs.length > 0 && (
+          <div style={{ ...kartica, marginBottom: '28px' }}>
+            <h2 style={{ fontSize: '17px', marginBottom: '16px' }}>Najnoviji online testovi sluha</h2>
+            {zadnjiTestovi.docs.map((u) => {
+              const r = u.rezultatTesta as Record<string, unknown> | null | undefined
+              const kat = r ? KATEGORIJE_TESTA_ADMIN[r.kategorija as string] : undefined
+              const zastavice = Array.isArray(r?.zastavice) ? (r.zastavice as string[]) : []
+              const pouzdanost = typeof r?.pouzdanost === 'number' ? (r.pouzdanost as number) : null
+              return (
+                <a
+                  key={u.id}
+                  href={`/admin/collections/upiti/${u.id}`}
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '10px',
+                    padding: '11px 14px',
+                    borderRadius: '10px',
+                    marginBottom: '7px',
+                    background: 'var(--theme-elevation-0)',
+                    border: '1px solid var(--theme-elevation-100)',
+                    textDecoration: 'none',
+                    color: 'inherit',
+                  }}
+                >
+                  <span>
+                    <strong style={{ fontSize: '14px' }}>{u.ime as string}</strong>{' '}
+                    <span style={{ fontSize: '13px', color: 'var(--theme-elevation-500)' }}>
+                      — {new Date(u.createdAt as string).toLocaleDateString('bs-BA')} · {u.telefon as string}
+                    </span>
+                  </span>
+                  <span style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {kat && (
+                      <span style={{ ...mznacka, background: kat.pozadina, color: kat.boja }}>{kat.oznaka}</span>
+                    )}
+                    {pouzdanost !== null && (
+                      <span
+                        style={{
+                          ...mznacka,
+                          background: 'var(--theme-elevation-50)',
+                          border: '1px solid var(--theme-elevation-150)',
+                          color: 'var(--theme-elevation-700)',
+                        }}
+                      >
+                        {pouzdanost}/100
+                      </span>
+                    )}
+                    {zastavice.length > 0 && (
+                      <span style={{ ...mznacka, background: '#ED1C24', color: '#fff' }}>⚑ zastavice</span>
+                    )}
+                  </span>
+                </a>
+              )
+            })}
+          </div>
+        )}
 
         <div
           style={{

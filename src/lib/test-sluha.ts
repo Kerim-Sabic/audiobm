@@ -128,6 +128,9 @@ export const UPITNIK = {
 export type UpitnikKljuc = keyof typeof UPITNIK
 export type UpitnikOdgovori = Partial<Record<UpitnikKljuc, string>>
 
+/** Sva pitanja upitnika su obavezna — i na klijentu i na serveru. */
+export const OBAVEZNA_PITANJA = Object.keys(UPITNIK) as UpitnikKljuc[]
+
 /** Strukturirani rezultat koji se sprema u CMS (bez ličnih podataka). */
 export type RezultatTesta = {
   kategorija: KategorijaTesta
@@ -139,6 +142,8 @@ export type RezultatTesta = {
   zastavice: string[]
   laznePotvrde: number
   nedosljedneFrekvencije: number
+  /** ukupan broj ponovljenih tonova („Ponovi ton") tokom cijelog testa */
+  ponavljanja: number
   mikrofonProvjera: 'tiho' | 'bucno' | 'preskoceno'
   trajanjeSekundi: number
 }
@@ -194,11 +199,13 @@ export function ocijeniPouzdanost({
   nedosljedneFrekvencije,
   mikrofonProvjera,
   sveNull,
+  ponavljanja = 0,
 }: {
   laznePotvrde: number
   nedosljedneFrekvencije: number
   mikrofonProvjera: RezultatTesta['mikrofonProvjera']
   sveNull: boolean
+  ponavljanja?: number
 }): { pouzdanost: number; nivo: PouzdanostNivo } {
   let p = 100
   p -= Math.min(laznePotvrde, 2) * 20
@@ -206,6 +213,8 @@ export function ocijeniPouzdanost({
   p -= mikrofonProvjera === 'preskoceno' ? 5 : mikrofonProvjera === 'bucno' ? 15 : 0
   // ako „ne čuje" baš ništa ni na maksimumu — najvjerovatnije slušalice nisu u redu
   p -= sveNull ? 25 : 0
+  // mnogo ponavljanja tonova → blago smanjenje (nesigurni uslovi slušanja)
+  p -= ponavljanja >= 10 ? 10 : ponavljanja >= 5 ? 5 : 0
   p = Math.max(15, Math.min(100, p))
   return { pouzdanost: p, nivo: p >= 80 ? 'visoka' : p >= 50 ? 'srednja' : 'niska' }
 }
@@ -243,12 +252,13 @@ export function provjeriRezultatTesta(ulaz: unknown): RezultatTesta | null {
   const lijevo = citajPragove(pragoviRaw?.lijevo)
   if (!desno || !lijevo) return null
 
+  // upitnik mora biti POTPUN — svaki odgovor mora biti jedan od ponuđenih
   const upitnik: UpitnikOdgovori = {}
-  if (r.upitnik && typeof r.upitnik === 'object') {
-    for (const kljuc of Object.keys(UPITNIK) as UpitnikKljuc[]) {
-      const v = (r.upitnik as Record<string, unknown>)[kljuc]
-      if (typeof v === 'string' && UPITNIK[kljuc].odgovori.some((o) => o.v === v)) upitnik[kljuc] = v
-    }
+  if (!r.upitnik || typeof r.upitnik !== 'object') return null
+  for (const kljuc of OBAVEZNA_PITANJA) {
+    const v = (r.upitnik as Record<string, unknown>)[kljuc]
+    if (typeof v !== 'string' || !UPITNIK[kljuc].odgovori.some((o) => o.v === v)) return null
+    upitnik[kljuc] = v
   }
 
   const dozvoljeneZastavice = ZASTAVICE.map((z) => z.id as string)
@@ -270,6 +280,7 @@ export function provjeriRezultatTesta(ulaz: unknown): RezultatTesta | null {
     zastavice,
     laznePotvrde: Math.max(0, Math.min(10, Number(r.laznePotvrde) || 0)),
     nedosljedneFrekvencije: Math.max(0, Math.min(10, Number(r.nedosljedneFrekvencije) || 0)),
+    ponavljanja: Math.max(0, Math.min(40, Math.round(Number(r.ponavljanja) || 0))),
     mikrofonProvjera,
     trajanjeSekundi: Math.max(0, Math.min(3600, Math.round(Number(r.trajanjeSekundi) || 0))),
   }

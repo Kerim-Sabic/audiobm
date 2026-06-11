@@ -23,7 +23,25 @@ const izvozCsv = async (req: PayloadRequest): Promise<Response> => {
     depth: 1,
     sort: '-createdAt',
   })
-  const zaglavlje = ['Datum', 'Vrsta', 'Poslovnica', 'Ime', 'Telefon', 'E-mail', 'Poruka', 'Proizvod', 'Status']
+  const zaglavlje = [
+    'Datum',
+    'Vrsta',
+    'Poslovnica',
+    'Ime',
+    'Telefon',
+    'E-mail',
+    'Poruka',
+    'Proizvod',
+    'Status',
+    'Rezultat testa',
+    'Pouzdanost testa',
+  ]
+  const KATEGORIJE_CSV: Record<string, string> = {
+    'bez-znakova': 'Bez jasnih znakova',
+    moguca: 'Moguća poteškoća',
+    preporuka: 'Preporučena provjera',
+    hitno: 'Hitna konsultacija',
+  }
   const red = (u: Record<string, any>) =>
     [
       new Date(u.createdAt).toLocaleString('bs-BA'),
@@ -35,6 +53,8 @@ const izvozCsv = async (req: PayloadRequest): Promise<Response> => {
       (u.poruka ?? '').replaceAll('\n', ' '),
       typeof u.proizvod === 'object' ? u.proizvod?.naziv ?? '' : '',
       u.status ?? '',
+      u.rezultatTesta?.kategorija ? (KATEGORIJE_CSV[u.rezultatTesta.kategorija] ?? u.rezultatTesta.kategorija) : '',
+      u.rezultatTesta?.pouzdanost != null ? `${u.rezultatTesta.pouzdanost}/100 (${u.rezultatTesta.pouzdanostNivo ?? ''})` : '',
     ]
       .map((c) => `"${String(c).replaceAll('"', '""')}"`)
       .join(';')
@@ -114,6 +134,15 @@ export const Upiti: CollectionConfig = {
       relationTo: 'korisnici',
       admin: { position: 'sidebar' },
     },
+    {
+      // čitljiv pregled rezultata online testa — prvo što osoblje vidi
+      name: 'rezultatPregled',
+      type: 'ui',
+      admin: {
+        condition: (data) => data?.vrsta === 'online-test-sluha',
+        components: { Field: '/components/admin/RezultatTestaPolje#RezultatTestaPolje' },
+      },
+    },
     { name: 'ime', label: 'Ime i prezime', type: 'text', required: true },
     {
       name: 'telefon',
@@ -142,7 +171,7 @@ export const Upiti: CollectionConfig = {
     },
     {
       name: 'rezultatTesta',
-      label: 'Rezultat online testa sluha',
+      label: 'Rezultat online testa sluha (sirovi podaci)',
       type: 'json',
       admin: {
         readOnly: true,

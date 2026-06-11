@@ -413,8 +413,14 @@
   offset-rotate: 0deg;
   animation: putovanje-zvuka 2.6s linear infinite;
 }
+/* Generička putujuća tačka — offset-path se zadaje inline stilom */
+.putujuca-tacka {
+  offset-rotate: 0deg;
+  animation: putovanje-zvuka 2.4s linear infinite;
+}
 @media (prefers-reduced-motion: reduce) {
-  .zvucna-tacka {
+  .zvucna-tacka,
+  .putujuca-tacka {
     display: none;
   }
 }

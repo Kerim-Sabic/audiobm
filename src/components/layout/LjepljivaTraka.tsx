@@ -51,8 +51,9 @@ export function LjepljivaTraka({ telefon }: { telefon?: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [putanja])
 
-  // na stranici zakazivanja ne dupliramo CTA
-  if (putanja === '/zakazivanje') return null
+  // na stranici zakazivanja ne dupliramo CTA;
+  // tokom online testa sluha traka bi prekrivala kontrole testa (fokusirani način)
+  if (putanja === '/zakazivanje' || putanja === '/online-test-sluha') return null
 
   return (
     <AnimatePresence>

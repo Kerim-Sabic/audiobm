@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   AlertTriangle,
   Loader2,
+  RotateCcw,
 } from 'lucide-react'
 import { Dugme } from '@/components/ui/Dugme'
 import { zabiljezi } from '@/lib/analytics'
@@ -68,6 +69,10 @@ type StanjeMotora = {
   prezId: number
   /** odgovor se prima samo dok prezentacija traje (od početka tona do odgovora) */
   aktivna: boolean
+  /** broj ponavljanja TEKUĆEG tona (najviše 2) */
+  ponavljanjaTrial: number
+  /** ukupna ponavljanja kroz cijeli test (ulazi u pouzdanost) */
+  ponavljanjaUkupno: number
   gotovo: boolean
 }
 
@@ -85,6 +90,8 @@ const svjezeStanje = (): StanjeMotora => ({
   trenutniCatch: false,
   prezId: 0,
   aktivna: false,
+  ponavljanjaTrial: 0,
+  ponavljanjaUkupno: 0,
   gotovo: false,
 })
 
@@ -122,6 +129,7 @@ export function TestSluha({ poslovnice }: { poslovnice: { id: number; grad: stri
   const [zavrsenihFrekvencija, setZavrsenihFrekvencija] = useState(0)
   const [pauzaUha, setPauzaUha] = useState(false)
   const [najava, setNajava] = useState('')
+  const [ponavljanjaUTrialu, setPonavljanjaUTrialu] = useState(0)
   const pocetakTesta = useRef<number>(0)
 
   const [rezultat, setRezultat] = useState<RezultatTesta | null>(null)
@@ -201,6 +209,7 @@ export function TestSluha({ poslovnice }: { poslovnice: { id: number; grad: stri
       nedosljedneFrekvencije: s.nedosljedne,
       mikrofonProvjera,
       sveNull,
+      ponavljanja: s.ponavljanjaUkupno,
     })
     const r: RezultatTesta = {
       kategorija: ocijeniKategoriju({ pragovi: s.pragovi, upitnik: odgovori, zastavice }),
@@ -211,6 +220,7 @@ export function TestSluha({ poslovnice }: { poslovnice: { id: number; grad: stri
       zastavice,
       laznePotvrde: s.laznePotvrde,
       nedosljedneFrekvencije: s.nedosljedne,
+      ponavljanja: s.ponavljanjaUkupno,
       mikrofonProvjera,
       trajanjeSekundi: Math.round((Date.now() - pocetakTesta.current) / 1000),
     }
@@ -236,6 +246,8 @@ export function TestSluha({ poslovnice }: { poslovnice: { id: number; grad: stri
 
     const id = ++s.prezId
     s.aktivna = true
+    s.ponavljanjaTrial = 0
+    setPonavljanjaUTrialu(0)
     const { uho, frekvencija } = REDOSLIJED[s.indeks]
     setBrojTona((b) => b + 1)
     setNajava(`Ton broj ${s.brojPokusaja + 1}. Da li čujete ton?`)
@@ -243,6 +255,27 @@ export function TestSluha({ poslovnice }: { poslovnice: { id: number; grad: stri
     await m.pustiTon({ frekvencija, dbfs: s.nivo, kanal: uho, tisina: jeCatch })
     if (st.current.prezId === id) setSvira(false)
   }, [])
+
+  /**
+   * „Ponovi ton" — pušta ISTI ton (isto uho, frekvencija, nivo, isti catch
+   * status) bez pomjeranja algoritma. Najviše 2 ponavljanja po tonu.
+   */
+  const ponoviTon = useCallback(async () => {
+    const s = st.current
+    if (korak !== 'test' || s.gotovo || pauzaUha || !s.aktivna || svira) return
+    if (s.ponavljanjaTrial >= 2) return
+    const m = dajMotor()
+    if (!(await m.pokreni())) return
+    s.ponavljanjaTrial++
+    s.ponavljanjaUkupno++
+    setPonavljanjaUTrialu(s.ponavljanjaTrial)
+    const id = ++s.prezId // poništava staru promise-kontinuaciju; trial ostaje aktivan
+    const { uho, frekvencija } = REDOSLIJED[s.indeks]
+    setNajava('Ponavljamo isti ton.')
+    setSvira(true)
+    await m.pustiTon({ frekvencija, dbfs: s.nivo, kanal: uho, tisina: s.trenutniCatch })
+    if (st.current.prezId === id) setSvira(false)
+  }, [korak, pauzaUha, svira])
 
   const planirajSljedecu = useCallback(() => {
     if (tajmer.current) clearTimeout(tajmer.current)
@@ -330,16 +363,17 @@ export function TestSluha({ poslovnice }: { poslovnice: { id: number; grad: stri
     planirajSljedecu()
   }
 
-  // tastatura: 1 = čujem, 2 = ne čujem
+  // tastatura: 1 = čujem, 2 = ne čujem, R = ponovi ton
   useEffect(() => {
     if (korak !== 'test') return
     const naTipku = (e: KeyboardEvent) => {
       if (e.key === '1') odgovoriNaTon(true)
       else if (e.key === '2') odgovoriNaTon(false)
+      else if (e.key === 'r' || e.key === 'R') void ponoviTon()
     }
     window.addEventListener('keydown', naTipku)
     return () => window.removeEventListener('keydown', naTipku)
-  }, [korak, odgovoriNaTon])
+  }, [korak, odgovoriNaTon, ponoviTon])
 
   const ponovi = () => {
     st.current = svjezeStanje()
@@ -349,6 +383,7 @@ export function TestSluha({ poslovnice }: { poslovnice: { id: number; grad: stri
     setNistaOdNavedenog(false)
     setZavrsenihFrekvencija(0)
     setBrojTona(0)
+    setPonavljanjaUTrialu(0)
     setKorak('uvod')
   }
 
@@ -357,7 +392,8 @@ export function TestSluha({ poslovnice }: { poslovnice: { id: number; grad: stri
   const progresTesta = useMemo(() => {
     const ukupno = REDOSLIJED.length * PROCJENA_PO_FREKVENCIJI
     const unutar = Math.min(st.current.brojPokusaja, PROCJENA_PO_FREKVENCIJI)
-    return Math.min(98, Math.round(((zavrsenihFrekvencija * PROCJENA_PO_FREKVENCIJI + unutar) / ukupno) * 100))
+    // donja granica 8% — aktivna faza se vidi kao započeta i prije prvog odgovora
+    return Math.min(98, Math.max(8, Math.round(((zavrsenihFrekvencija * PROCJENA_PO_FREKVENCIJI + unutar) / ukupno) * 100)))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zavrsenihFrekvencija, brojTona])
 
@@ -762,7 +798,8 @@ export function TestSluha({ poslovnice }: { poslovnice: { id: number; grad: stri
               </p>
               <p className="text-small mt-3 text-neutral-500">
                 Tastatura: <kbd className="rounded border border-neutral-300 bg-neutral-100 px-1.5 font-sans">1</kbd> = Čujem,{' '}
-                <kbd className="rounded border border-neutral-300 bg-neutral-100 px-1.5 font-sans">2</kbd> = Ne čujem
+                <kbd className="rounded border border-neutral-300 bg-neutral-100 px-1.5 font-sans">2</kbd> = Ne čujem,{' '}
+                <kbd className="rounded border border-neutral-300 bg-neutral-100 px-1.5 font-sans">R</kbd> = Ponovi ton
               </p>
               <Dugme velicina="veliko" className="mt-7" onClick={() => void pocniTest()}>
                 <Volume2 className="size-5" aria-hidden /> Počnite slušanje
@@ -828,8 +865,28 @@ export function TestSluha({ poslovnice }: { poslovnice: { id: number; grad: stri
                 </button>
               </div>
 
-              <p className="text-small mt-5 text-neutral-500">
-                Odgovorite i dok ton svira. Tastatura: 1 = Čujem · 2 = Ne čujem
+              <div className="mx-auto mt-3.5 max-w-md">
+                <button
+                  type="button"
+                  onClick={() => void ponoviTon()}
+                  disabled={svira || ponavljanjaUTrialu >= 2}
+                  className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-neutral-300 bg-white text-[15.5px] font-semibold text-neutral-700 shadow-sm transition-[border-color,color,opacity] duration-150 hover:border-neutral-400 hover:text-neutral-900 disabled:pointer-events-none disabled:opacity-45"
+                >
+                  <RotateCcw className="size-4.5" aria-hidden />
+                  Ponovi ton
+                  {ponavljanjaUTrialu > 0 && ponavljanjaUTrialu < 2 && (
+                    <span className="text-neutral-400">(još {2 - ponavljanjaUTrialu})</span>
+                  )}
+                </button>
+                <p className="text-small mt-2 text-neutral-500">
+                  {ponavljanjaUTrialu >= 2
+                    ? 'Iskorištena su oba ponavljanja za ovaj ton — odgovorite po osjećaju.'
+                    : 'Možete ponoviti ton ako niste sigurni.'}
+                </p>
+              </div>
+
+              <p className="text-small mt-4 text-neutral-500">
+                Odgovorite i dok ton svira. Tastatura: 1 = Čujem · 2 = Ne čujem · R = Ponovi ton
               </p>
               <p className="text-small mt-1 text-neutral-400">
                 Napredak: {Math.min(zavrsenihFrekvencija, REDOSLIJED.length)} od {REDOSLIJED.length} tonova završeno
