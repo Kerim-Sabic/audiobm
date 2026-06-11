@@ -16,7 +16,7 @@ export const Mediji: CollectionConfig = {
     delete: jeUrednik,
   },
   upload: {
-    staticDir: 'media',
+    staticDir: 'public/media',
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/svg+xml'],
     adminThumbnail: 'mala',
     focalPoint: true,

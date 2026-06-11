@@ -6,10 +6,11 @@ import type { Mediji } from '@/payload-types'
  * putanju da ih next/image optimizator prihvati bez remotePatterns liste.
  */
 function relativnaPutanja(url: string): string {
-  if (!url.startsWith('http')) return url
+  const normalizuj = (putanja: string) => putanja.replace(/^\/api\/mediji\/file\//, '/media/')
+  if (!url.startsWith('http')) return normalizuj(url)
   try {
     const u = new URL(url)
-    return u.pathname + u.search
+    return normalizuj(u.pathname + u.search)
   } catch {
     return url
   }
