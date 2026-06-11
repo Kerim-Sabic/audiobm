@@ -12,25 +12,18 @@ export const metadata: Metadata = metaStranice({
   putanja: '/zakazivanje',
 })
 
-export default async function ZakazivanjeStranica({
-  searchParams,
-}: {
-  searchParams: Promise<{ poslovnica?: string }>
-}) {
-  const [poslovnice, params] = await Promise.all([dajPoslovnice(), searchParams])
+export default async function ZakazivanjeStranica() {
+  const poslovnice = await dajPoslovnice()
 
   const lokacije = poslovnice.map((p) => ({
     id: p.id as number,
+    slug: p.slug,
     naziv: p.naziv,
     grad: p.grad,
     adresa: stvarno(p.adresa) ?? '',
     telefon: stvarno(p.telefoni?.[0]?.broj) ?? undefined,
     novaPoslovnica: Boolean(p.novaPoslovnica),
   }))
-
-  const predodabrana = params.poslovnica
-    ? poslovnice.find((p) => p.slug === params.poslovnica)?.id
-    : undefined
 
   return (
     <div className="relative overflow-hidden">
@@ -60,7 +53,7 @@ export default async function ZakazivanjeStranica({
           </ul>
 
           <div className="povrsina !rounded-[28px] p-6 !shadow-[var(--shadow-lift-lg)] md:p-10">
-            <ZakazivanjeKoraci lokacije={lokacije} predodabranaLokacija={predodabrana as number | undefined} />
+            <ZakazivanjeKoraci lokacije={lokacije} />
           </div>
         </div>
       </div>

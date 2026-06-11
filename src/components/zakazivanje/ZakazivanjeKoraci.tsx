@@ -12,6 +12,7 @@ import { zabiljezi } from '@/lib/analytics'
 
 export type LokacijaIzbor = {
   id: number
+  slug: string
   naziv: string
   grad: string
   adresa: string
@@ -39,6 +40,17 @@ export function ZakazivanjeKoraci({
   )
   const [stanje, akcija, salje] = useActionState(posaljiUpit, pocetno)
   const pokrenuto = useRef(false)
+  const predodabranoPrimijenjeno = useRef(false)
+
+  useEffect(() => {
+    if (predodabranaLokacija || predodabranoPrimijenjeno.current || typeof window === 'undefined') return
+    const slug = new URLSearchParams(window.location.search).get('poslovnica')
+    const izabrana = slug ? lokacije.find((l) => l.slug === slug) : null
+    if (!izabrana) return
+    predodabranoPrimijenjeno.current = true
+    setLokacija(izabrana)
+    setKorak(2)
+  }, [lokacije, predodabranaLokacija])
 
   useEffect(() => {
     if (stanje.status === 'uspjeh') {
