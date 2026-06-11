@@ -1,0 +1,45 @@
+# Netlify deployment configuration for Audio BM BiH
+
+[build]
+command = "pnpm install && pnpm build"
+publish = ".next"
+functions = ".netlify/functions"
+node_bundler = "pnpm"
+
+[build.environment]
+NODE_VERSION = "22"
+NEXT_PUBLIC_SERVER_URL = "https://audiobm.ba"
+
+# Redirect all non-file routes to Next.js for client-side routing
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+force = false
+
+# Cache static assets
+[[headers]]
+for = "/_next/static/*"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+for = "/_next/image*"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+# API routes
+[[headers]]
+for = "/api/*"
+[headers.values]
+Cache-Control = "no-cache, no-store, must-revalidate"
+
+# Disable X-Powered-By header for security
+[[headers]]
+for = "/*"
+[headers.values]
+X-Powered-By = ""
+X-Frame-Options = "SAMEORIGIN"
+X-Content-Type-Options = "nosniff"
+X-XSS-Protection = "1; mode=block"
+Referrer-Policy = "strict-origin-when-cross-origin"
