@@ -8,7 +8,6 @@ screenshots/
 *.tsbuildinfo
 next-env.d.ts
 /media/
-/public/media/
 .vercel
 
 # Local Netlify folder
