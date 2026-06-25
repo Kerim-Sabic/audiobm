@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { Clock, Users } from 'lucide-react'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { dajPayload, dajUsluge } from '@/lib/podaci'
-import { metaStranice } from '@/lib/seo'
+import { metaStranice, uslugaJsonLd } from '@/lib/seo'
 import { ZaglavljeStranice } from '@/components/ui/ZaglavljeStranice'
 import { DugmeLink } from '@/components/ui/Dugme'
 import { Otkrij, OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
@@ -43,6 +43,14 @@ export default async function UslugaStranica({ params }: { params: Promise<{ slu
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            uslugaJsonLd({ naziv: usluga.naziv, slug: usluga.slug, kratkiOpis: usluga.kratkiOpis }),
+          ),
+        }}
+      />
       <ZaglavljeStranice
         mrvice={[{ naziv: 'Usluge', putanja: '/usluge' }, { naziv: usluga.naziv }]}
         nadnaslov="Usluga"

@@ -2,6 +2,7 @@ import type { AdminViewServerProps } from 'payload'
 import { Gutter } from '@payloadcms/ui'
 import React from 'react'
 import { BREND } from '../../lib/brend'
+import { kanalLeada } from '../../lib/atribucija'
 
 const VRSTE: Record<string, string> = {
   zakazivanje: 'Zakazivanje provjere sluha',
@@ -99,6 +100,13 @@ export async function KontrolnaTabla({ initPageResult }: AdminViewServerProps) {
     poLokaciji.set(naziv, (poLokaciji.get(naziv) ?? 0) + 1)
   }
   const maxLok = Math.max(1, ...poLokaciji.values())
+
+  const poKanalu = new Map<string, number>()
+  for (const u of noviUpiti.docs) {
+    const k = kanalLeada({ izvorCuo: u.izvorCuo, utmIzvor: u.utmIzvor, referer: u.referer })
+    poKanalu.set(k, (poKanalu.get(k) ?? 0) + 1)
+  }
+  const maxKanal = Math.max(1, ...poKanalu.values())
 
   return (
     <Gutter>
@@ -313,11 +321,35 @@ export async function KontrolnaTabla({ initPageResult }: AdminViewServerProps) {
         </div>
 
         <div style={kartica}>
-          <h2 style={{ fontSize: '17px', marginBottom: '12px' }}>Posjećenost stranica</h2>
-          <p style={{ color: 'var(--theme-elevation-500)', margin: 0 }}>
-            [PLACEHOLDER: Statistika posjećenosti se prikazuje nakon povezivanja Plausible analitike —
-            Podešavanja → Društvene mreže i analitika.]
+          <h2 style={{ fontSize: '17px', marginBottom: '4px' }}>Upiti po kanalu (7 dana)</h2>
+          <p style={{ color: 'var(--theme-elevation-500)', marginTop: 0, marginBottom: '16px', fontSize: '13px' }}>
+            Odakle dolaze leadovi — osnova za obračun provizije. Detaljan izvoz: dugme „CSV izvoz upita".
           </p>
+          {poKanalu.size === 0 && (
+            <p style={{ color: 'var(--theme-elevation-500)' }}>Još nema upita ove sedmice.</p>
+          )}
+          {[...poKanalu.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .map(([naziv, broj]) => (
+              <div key={naziv} style={{ marginBottom: '12px' }}>
+                <div
+                  style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '5px' }}
+                >
+                  <span>{naziv}</span>
+                  <strong>{broj}</strong>
+                </div>
+                <div style={{ background: 'var(--theme-elevation-100)', borderRadius: '5px', height: '9px' }}>
+                  <div
+                    style={{
+                      width: `${(broj / maxKanal) * 100}%`,
+                      background: 'linear-gradient(90deg, #F03C43, #ED1C24)',
+                      borderRadius: '5px',
+                      height: '9px',
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
         </div>
       </div>
     </Gutter>

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Clock, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
-import { dajPayload, dajPoslovnice, dajPoslovnicu } from '@/lib/podaci'
+import { dajPayload, dajPoslovnice, dajPoslovnicu, dajOcjenu } from '@/lib/podaci'
 import { metaStranice, poslovnicaJsonLd } from '@/lib/seo'
 import { stvarno } from '@/lib/tekst'
 import { Mrvice } from '@/components/ui/Mrvice'
@@ -46,7 +46,7 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
   if (!poslovnica) notFound()
 
   const payload = await dajPayload()
-  const [tim, recenzije] = await Promise.all([
+  const [tim, recenzije, ocjena] = await Promise.all([
     payload.find({
       collection: 'tim',
       where: { and: [{ poslovnica: { equals: poslovnica.id } }, { aktivan: { equals: true } }] },
@@ -60,6 +60,7 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
       limit: 4,
       depth: 0,
     }),
+    dajOcjenu(poslovnica.id),
   ])
 
   const telefon = stvarno(poslovnica.telefoni?.[0]?.broj)
@@ -75,7 +76,7 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(poslovnicaJsonLd(poslovnica)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(poslovnicaJsonLd(poslovnica, ocjena)) }}
       />
       <header className="relative overflow-hidden border-b border-neutral-200/70 bg-neutral-50">
         <div className="mreza-audiogram absolute inset-0" aria-hidden />
@@ -126,7 +127,12 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
             {/* fotografija poslovnice — prikazuje se samo ako postoji */}
             {imaFotografiju && (
               <div className="relative aspect-[16/9] overflow-hidden rounded-[24px] shadow-[var(--shadow-lift)]">
-                <SlikaMedija medij={fotografija} fill sizes="(min-width: 1024px) 640px, 100vw" />
+                <SlikaMedija
+                  medij={fotografija}
+                  altRezerva={`Audio BM ${poslovnica.grad} — poslovnica`}
+                  fill
+                  sizes="(min-width: 1024px) 640px, 100vw"
+                />
               </div>
             )}
 

@@ -16,6 +16,7 @@ import { posaljiTestSluha, type StanjeTestObrasca } from '@/app/actions/posaljiT
 import { Dugme, DugmeLink } from '@/components/ui/Dugme'
 import { PoljeUnos, PoljeIzbor, PoljeSaglasnost } from '@/components/ui/Polje'
 import { Honeypot, Turnstile } from '@/components/ui/Turnstile'
+import { AtribucijaPolja } from '@/components/ui/AtribucijaPolja'
 import { zabiljezi } from '@/lib/analytics'
 import {
   FREKVENCIJE,
@@ -278,6 +279,7 @@ export function RezultatPrikaz({
                 </option>
               ))}
             </PoljeIzbor>
+            <AtribucijaPolja />
             <PoljeSaglasnost name="saglasnost" greska={stanje.greske?.saglasnost} />
             <Turnstile />
             {stanje.status === 'greska' && stanje.poruka && !stanje.greske && (

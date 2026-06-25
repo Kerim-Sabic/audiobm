@@ -1,4 +1,4 @@
-import { getPayload } from 'payload'
+import { getPayload, type Where } from 'payload'
 import config from '@payload-config'
 import { cache } from 'react'
 import { ocisti } from '@/lib/tekst'
@@ -86,6 +86,18 @@ export const dajRecenzije = cache(async (samoIstaknute = false) => {
     depth: 1,
   })
   return docs
+})
+
+/** Agregatna ocjena iz odobrenih recenzija (globalno ili za jednu poslovnicu) — za AggregateRating schemu. */
+export const dajOcjenu = cache(async (poslovnicaId?: number) => {
+  const payload = await dajPayload()
+  const where: Where = poslovnicaId
+    ? { and: [{ odobreno: { equals: true } }, { poslovnica: { equals: poslovnicaId } }] }
+    : { odobreno: { equals: true } }
+  const { docs } = await payload.find({ collection: 'recenzije', where, limit: 500, depth: 0 })
+  if (docs.length === 0) return { broj: 0, prosjek: 0 }
+  const zbir = docs.reduce((s, r) => s + (typeof r.ocjena === 'number' ? r.ocjena : 5), 0)
+  return { broj: docs.length, prosjek: zbir / docs.length }
 })
 
 export const dajPitanja = cache(async () => {

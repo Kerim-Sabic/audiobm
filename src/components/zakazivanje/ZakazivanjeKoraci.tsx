@@ -7,6 +7,7 @@ import { posaljiUpit, type StanjeObrasca } from '@/app/actions/posaljiUpit'
 import { Dugme } from '@/components/ui/Dugme'
 import { PoljeUnos, PoljeTekst, PoljeSaglasnost } from '@/components/ui/Polje'
 import { Honeypot, Turnstile } from '@/components/ui/Turnstile'
+import { AtribucijaPolja } from '@/components/ui/AtribucijaPolja'
 import { TelefonLink } from '@/components/ui/TelefonLink'
 import { zabiljezi } from '@/lib/analytics'
 
@@ -194,6 +195,7 @@ export function ZakazivanjeKoraci({
                 greska={stanje.greske?.poruka}
                 placeholder="Ako želite, ukratko opišite Vaš problem sa sluhom."
               />
+              <AtribucijaPolja pitaj />
               <PoljeSaglasnost name="saglasnost" greska={stanje.greske?.saglasnost} />
               <Turnstile />
 

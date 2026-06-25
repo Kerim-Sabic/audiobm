@@ -27,6 +27,7 @@ export function SlikaMedija({
   fill = false,
   prioritet = false,
   quality = 75,
+  altRezerva = '',
 }: {
   medij: Mediji | number | null | undefined
   sizes?: string
@@ -34,6 +35,8 @@ export function SlikaMedija({
   fill?: boolean
   prioritet?: boolean
   quality?: number
+  /** Opisni alt kad medij u CMS-u nema svoj — da nijedna slika ne ostane bez alt teksta. */
+  altRezerva?: string
 }) {
   if (!medij || typeof medij === 'number' || !medij.url) {
     // bez vidljivog placeholder teksta — tiha neutralna površina sa ikonom
@@ -54,7 +57,7 @@ export function SlikaMedija({
 
   const zajednicko = {
     src: relativnaPutanja(medij.url),
-    alt: medij.alt ?? '',
+    alt: medij.alt && medij.alt.trim() ? medij.alt : altRezerva,
     sizes,
     quality,
     priority: prioritet,

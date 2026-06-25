@@ -5,8 +5,9 @@ import { MotionProvider } from '@/components/motion/MotionProvider'
 import { Zaglavlje } from '@/components/layout/Zaglavlje'
 import { Podnozje } from '@/components/layout/Podnozje'
 import { LjepljivaTraka } from '@/components/layout/LjepljivaTraka'
-import { dajPodesavanja } from '@/lib/podaci'
-import { OSNOVNI_URL, organizacijaJsonLd } from '@/lib/seo'
+import { AtribucijaZapis } from '@/components/ui/AtribucijaZapis'
+import { dajPodesavanja, dajOcjenu } from '@/lib/podaci'
+import { OSNOVNI_URL, organizacijaJsonLd, webSiteJsonLd } from '@/lib/seo'
 import { BREND } from '@/lib/brend'
 import './globals.css'
 
@@ -40,7 +41,7 @@ export const viewport: Viewport = {
 }
 
 export default async function KorijenskiRaspored({ children }: { children: React.ReactNode }) {
-  const podesavanja = await dajPodesavanja()
+  const [podesavanja, ocjena] = await Promise.all([dajPodesavanja(), dajOcjenu()])
 
   // Zvanični profili za Organization „sameAs" — pomaže Google/AI da poveže entitet.
   const sameAs = [podesavanja.facebook, podesavanja.instagram, podesavanja.youtube].filter(
@@ -54,7 +55,11 @@ export default async function KorijenskiRaspored({ children }: { children: React
       <body className="flex min-h-screen flex-col">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizacijaJsonLd(sameAs)) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizacijaJsonLd({ sameAs, ocjena })) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd()) }}
         />
         {podesavanja.plausibleDomena && (
           <Script
@@ -64,6 +69,7 @@ export default async function KorijenskiRaspored({ children }: { children: React
             strategy="afterInteractive"
           />
         )}
+        <AtribucijaZapis />
         <MotionProvider>
           <Zaglavlje />
           <main id="sadrzaj" className="flex-1">

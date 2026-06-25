@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { ShieldCheck, CalendarCheck } from 'lucide-react'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { dajPayload } from '@/lib/podaci'
-import { metaStranice } from '@/lib/seo'
+import { metaStranice, proizvodJsonLd, OSNOVNI_URL } from '@/lib/seo'
 import { stvarno } from '@/lib/tekst'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { DugmeLink } from '@/components/ui/Dugme'
@@ -55,9 +55,31 @@ export default async function ModelStranica({ params }: { params: Promise<{ slug
   const slike = (proizvod.slike as (Mediji | number)[] | undefined) ?? []
   const tip = proizvod.tipAparata ? TIPOVI_APARATA[proizvod.tipAparata as keyof typeof TIPOVI_APARATA] : null
   const napomena = stvarno(proizvod.cijenaNapomena)
+  const prvaSlika = typeof slike[0] === 'object' ? slike[0] : null
+  const slikaUrl = prvaSlika?.url
+    ? prvaSlika.url.startsWith('http')
+      ? prvaSlika.url
+      : `${OSNOVNI_URL}${prvaSlika.url}`
+    : undefined
 
   return (
     <div className="kontejner py-8 md:py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            proizvodJsonLd({
+              naziv: proizvod.naziv,
+              slug: proizvod.slug,
+              kategorija: proizvod.kategorija,
+              brend: proizvod.brend,
+              kratkiOpis: proizvod.kratkiOpis,
+              cijena: proizvod.cijena,
+              slika: slikaUrl,
+            }),
+          ),
+        }}
+      />
       <Mrvice
         stavke={[
           { naziv: 'Slušni aparati', putanja: '/slusni-aparati' },
@@ -74,6 +96,7 @@ export default async function ModelStranica({ params }: { params: Promise<{ slug
             <div className="mreza-audiogram absolute inset-0" aria-hidden />
             <SlikaMedija
               medij={typeof slike[0] === 'object' ? slike[0] : null}
+              altRezerva={`${proizvod.naziv} — slušni aparat${tip ? ` (${tip.naziv})` : ''}`}
               sizes="(min-width: 1024px) 560px, 100vw"
               prioritet
               className="relative max-h-full w-auto object-contain drop-shadow-xl"

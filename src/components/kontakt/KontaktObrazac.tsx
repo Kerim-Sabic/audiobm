@@ -6,6 +6,7 @@ import { posaljiUpit, type StanjeObrasca } from '@/app/actions/posaljiUpit'
 import { Dugme } from '@/components/ui/Dugme'
 import { PoljeUnos, PoljeTekst, PoljeIzbor, PoljeSaglasnost } from '@/components/ui/Polje'
 import { Honeypot, Turnstile } from '@/components/ui/Turnstile'
+import { AtribucijaPolja } from '@/components/ui/AtribucijaPolja'
 import { zabiljezi } from '@/lib/analytics'
 
 const pocetno: StanjeObrasca = { status: 'pocetno' }
@@ -97,6 +98,7 @@ export function KontaktObrazac({
         greska={stanje.greske?.poruka}
         rows={5}
       />
+      <AtribucijaPolja pitaj />
       <PoljeSaglasnost name="saglasnost" greska={stanje.greske?.saglasnost} />
       <Turnstile />
 

@@ -11,6 +11,7 @@ import {
   type GreskeObrasca,
 } from '@/lib/validacija'
 import { provjeriOgranicenje, provjeriTurnstile } from '@/lib/zastita'
+import { KAKO_CULI } from '@/lib/atribucija'
 
 export type StanjeObrasca = {
   status: 'pocetno' | 'uspjeh' | 'greska'
@@ -72,6 +73,19 @@ export async function posaljiUpit(_prethodno: StanjeObrasca, formData: FormData)
   const izvorStranica = String(formData.get('izvorStranica') ?? '').trim()
   const poslovnicaId = poslovnicaRaw ? pozitivanId(poslovnicaRaw) : null
   const proizvodId = proizvodRaw ? pozitivanId(proizvodRaw) : null
+
+  // atribucija (zaštita provizije): ljudski odgovor + first-touch UTM/referrer
+  const polje = (k: string, max = 300) => String(formData.get(k) ?? '').trim().slice(0, max)
+  const odabraniIzvor = KAKO_CULI.find((o) => o.value === polje('izvorCuo', 40))
+  const atribucija = {
+    ...(odabraniIzvor ? { izvorCuo: odabraniIzvor.value } : {}),
+    ...(polje('utmIzvor') ? { utmIzvor: polje('utmIzvor') } : {}),
+    ...(polje('utmMedij') ? { utmMedij: polje('utmMedij') } : {}),
+    ...(polje('utmKampanja') ? { utmKampanja: polje('utmKampanja') } : {}),
+    ...(polje('utmSadrzaj') ? { utmSadrzaj: polje('utmSadrzaj') } : {}),
+    ...(polje('referer', 500) ? { referer: polje('referer', 500) } : {}),
+    ...(polje('landingStranica') ? { landingStranica: polje('landingStranica') } : {}),
+  }
 
   const greske: GreskeObrasca = {}
   const g1 = provjeriIme(ime)
@@ -140,6 +154,7 @@ export async function posaljiUpit(_prethodno: StanjeObrasca, formData: FormData)
         ...(poslovnicaId != null ? { poslovnica: poslovnicaId } : {}),
         ...(proizvodId != null ? { proizvod: proizvodId } : {}),
         ...(izvorStranica ? { izvorStranica } : {}),
+        ...atribucija,
         saglasnost: true,
       },
       overrideAccess: true,

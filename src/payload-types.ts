@@ -171,6 +171,16 @@ export interface Upiti {
   proizvod?: (number | null) | Proizvodi;
   izvorStranica?: string | null;
   /**
+   * Odgovor korisnika na obrascu („Kako ste čuli za nas?").
+   */
+  izvorCuo?: ('instagram' | 'facebook' | 'google' | 'preporuka' | 'bilbord' | 'postojeci' | 'ostalo') | null;
+  utmIzvor?: string | null;
+  utmMedij?: string | null;
+  utmKampanja?: string | null;
+  utmSadrzaj?: string | null;
+  referer?: string | null;
+  landingStranica?: string | null;
+  /**
    * Strukturirani rezultat informativnog online screeninga (kategorija, pouzdanost, relativni pragovi po uhu i frekvenciji, upitnik). Ne predstavlja medicinsku dijagnozu.
    */
   rezultatTesta?:
@@ -876,6 +886,13 @@ export interface UpitiSelect<T extends boolean = true> {
   preferiraniTermin?: T;
   proizvod?: T;
   izvorStranica?: T;
+  izvorCuo?: T;
+  utmIzvor?: T;
+  utmMedij?: T;
+  utmKampanja?: T;
+  utmSadrzaj?: T;
+  referer?: T;
+  landingStranica?: T;
   rezultatTesta?: T;
   saglasnost?: T;
   biljeske?:
