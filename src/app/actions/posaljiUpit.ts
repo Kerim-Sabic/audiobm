@@ -21,6 +21,12 @@ export type StanjeObrasca = {
 const VRSTE = ['zakazivanje', 'doktor', 'poslovnica', 'podrska', 'kupovina', 'povratni-poziv'] as const
 type Vrsta = (typeof VRSTE)[number]
 
+const pozitivanId = (vrijednost: string) => {
+  if (!/^\d+$/.test(vrijednost)) return null
+  const id = Number(vrijednost)
+  return id > 0 ? id : null
+}
+
 /**
  * Jedinstvena serverska akcija za sve obrasce — upit završava u CMS inboxu,
  * e-mail obavještenje šalje hook kolekcije Upiti.
@@ -61,9 +67,11 @@ export async function posaljiUpit(_prethodno: StanjeObrasca, formData: FormData)
   const email = String(formData.get('email') ?? '').trim()
   const poruka = String(formData.get('poruka') ?? '').trim()
   const preferiraniTermin = String(formData.get('preferiraniTermin') ?? '').trim()
-  const poslovnicaId = String(formData.get('poslovnica') ?? '').trim()
-  const proizvodId = String(formData.get('proizvod') ?? '').trim()
+  const poslovnicaRaw = String(formData.get('poslovnica') ?? '').trim()
+  const proizvodRaw = String(formData.get('proizvod') ?? '').trim()
   const izvorStranica = String(formData.get('izvorStranica') ?? '').trim()
+  const poslovnicaId = poslovnicaRaw ? pozitivanId(poslovnicaRaw) : null
+  const proizvodId = proizvodRaw ? pozitivanId(proizvodRaw) : null
 
   const greske: GreskeObrasca = {}
   const g1 = provjeriIme(ime)
@@ -76,8 +84,15 @@ export async function posaljiUpit(_prethodno: StanjeObrasca, formData: FormData)
   if (g4) greske.poruka = g4
   const g5 = provjeriSaglasnost(formData.get('saglasnost'))
   if (g5) greske.saglasnost = g5
-  if (vrsta === 'zakazivanje' && !poslovnicaId) {
+  if (poslovnicaRaw && poslovnicaId == null) {
+    greske.poslovnica = 'Odabrana poslovnica nije ispravna.'
+  }
+  if (vrsta === 'zakazivanje' && poslovnicaId == null) {
     greske.poslovnica = 'Molimo odaberite poslovnicu u koju želite doći.'
+  }
+
+  if (proizvodRaw && proizvodId == null) {
+    greske.proizvod = 'Odabrani proizvod nije ispravan.'
   }
 
   if (Object.keys(greske).length > 0) {
@@ -87,6 +102,31 @@ export async function posaljiUpit(_prethodno: StanjeObrasca, formData: FormData)
   // 5) spremanje u inbox
   try {
     const payload = await dajPayload()
+
+    if (poslovnicaId != null) {
+      try {
+        await payload.findByID({ collection: 'poslovnice', id: poslovnicaId, depth: 0 })
+      } catch {
+        return {
+          status: 'greska',
+          poruka: 'Molimo ispravite označena polja.',
+          greske: { poslovnica: 'Odabrana poslovnica nije dostupna.' },
+        }
+      }
+    }
+
+    if (proizvodId != null) {
+      try {
+        await payload.findByID({ collection: 'proizvodi', id: proizvodId, depth: 0 })
+      } catch {
+        return {
+          status: 'greska',
+          poruka: 'Molimo ispravite označena polja.',
+          greske: { proizvod: 'Odabrani proizvod nije dostupan.' },
+        }
+      }
+    }
+
     await payload.create({
       collection: 'upiti',
       data: {
@@ -97,8 +137,8 @@ export async function posaljiUpit(_prethodno: StanjeObrasca, formData: FormData)
         ...(email ? { email } : {}),
         ...(poruka ? { poruka } : {}),
         ...(preferiraniTermin ? { preferiraniTermin } : {}),
-        ...(poslovnicaId ? { poslovnica: Number(poslovnicaId) } : {}),
-        ...(proizvodId ? { proizvod: Number(proizvodId) } : {}),
+        ...(poslovnicaId != null ? { poslovnica: poslovnicaId } : {}),
+        ...(proizvodId != null ? { proizvod: proizvodId } : {}),
         ...(izvorStranica ? { izvorStranica } : {}),
         saglasnost: true,
       },

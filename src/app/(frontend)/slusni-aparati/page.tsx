@@ -36,7 +36,7 @@ export default async function SlusniAparatiStranica() {
         naslov="Slušni aparati"
         uvod={
           <>
-            Audio BM već više od 30 godina sarađuje sa svjetski poznatim brendovima — švajcarskim{' '}
+            Uz Audio BM već više od 30 godina sarađujemo sa svjetski poznatim brendovima — švajcarskim{' '}
             <strong className="font-semibold text-neutral-800">Bernafonom</strong> i kanadskim{' '}
             <strong className="font-semibold text-neutral-800">Unitronom</strong>. Naši akustičari će
             Vam pomoći da odaberete aparat prilagođen Vašem sluhu, navikama i budžetu.

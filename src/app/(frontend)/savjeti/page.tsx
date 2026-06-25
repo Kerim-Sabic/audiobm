@@ -10,7 +10,7 @@ import type { Mediji } from '@/payload-types'
 
 export const metadata: Metadata = metaStranice({
   naslov: 'Savjeti i novosti o sluhu',
-  opis: 'Praktični savjeti o sluhu i slušnim aparatima, novosti iz Audio BM poslovnica i vijesti iz Sarajeva.',
+  opis: 'Praktični savjeti o sluhu i slušnim aparatima, novosti iz naših poslovnica i vijesti iz Sarajeva.',
   putanja: '/savjeti',
 })
 

@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ kat: stri
   const info = KATEGORIJE[kat as Kategorija]
   if (!info) return {}
   return metaStranice({
-    naslov: `${info.naziv} — Audio BM ponuda`,
+    naslov: `${info.naziv} — ponuda Svijet Sluha`,
     opis: info.opis,
     putanja: `/proizvodi/kategorija/${kat}`,
   })

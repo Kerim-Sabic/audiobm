@@ -11,7 +11,7 @@ import type { Mediji } from '@/payload-types'
 
 export const metadata: Metadata = metaStranice({
   naslov: 'Akcije i popusti',
-  opis: 'Aktuelne akcije na slušne aparate, baterije i pribor u Audio BM poslovnicama širom BiH.',
+  opis: 'Aktuelne akcije na slušne aparate, baterije i pribor u našim poslovnicama širom BiH.',
   putanja: '/akcije',
 })
 

@@ -8,7 +8,7 @@ import { Brojac } from '@/components/motion/Brojac'
 
 export const metadata: Metadata = metaStranice({
   naslov: 'O nama — više od 30 godina brige o sluhu',
-  opis: 'Audio BM priča: od prvog dana do šest poslovnica u BiH. Misija, vrijednosti i brendovi sa kojima sarađujemo.',
+  opis: 'Svijet Sluha — u saradnji s Audio BM. Od prvog dana do šest poslovnica u BiH: misija, vrijednosti i brendovi sa kojima sarađujemo.',
   putanja: '/o-nama',
 })
 
@@ -19,7 +19,7 @@ export default function ONamaStranica() {
         mrvice={[{ naziv: 'O nama' }]}
         nadnaslov="Naša priča"
         naslov="Više od 30 godina slušamo — Vas"
-        uvod="Audio BM je porodica stručnjaka posvećenih jednom cilju: da ljudi u Bosni i Hercegovini čuju bolje i žive punije. Od prvog audiograma do svakodnevnog održavanja aparata — uz naše korisnike smo godinama, ne samo na dan kupovine."
+        uvod="Svijet Sluha je centar za zdravlje sluha koji, u saradnji s Audio BM-om — audiološkom kućom s više od 30 godina iskustva — brine da ljudi u Bosni i Hercegovini čuju bolje i žive punije. Od prvog audiograma do svakodnevnog održavanja aparata, uz naše korisnike smo godinama, ne samo na dan kupovine."
       />
 
       <div className="kontejner pb-16 md:pb-24">

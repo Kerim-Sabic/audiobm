@@ -48,7 +48,7 @@ import type { Mediji } from '@/payload-types'
 export async function generateMetadata(): Promise<Metadata> {
   const podesavanja = await dajPodesavanja()
   return metaStranice({
-    naslov: podesavanja.seoNaslov ?? 'Audio BM — Slušni aparati i besplatna provjera sluha',
+    naslov: podesavanja.seoNaslov ?? 'Svijet Sluha — slušni aparati i besplatna provjera sluha',
     opis:
       podesavanja.seoOpis ??
       'Više od 30 godina povjerenja. Besplatna provjera sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju i Brčkom.',

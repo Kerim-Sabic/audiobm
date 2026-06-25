@@ -138,7 +138,7 @@ export function PoljeSaglasnost({
           {...rest}
         />
         <span className="text-small text-neutral-700">
-          Saglasan/saglasna sam da Audio BM koristi moje podatke isključivo radi odgovora na upit, u
+          Saglasan/saglasna sam da Svijet Sluha i Audio BM koriste moje podatke isključivo radi odgovora na upit, u
           skladu sa{' '}
           <a href="/politika-privatnosti" target="_blank" className="text-brand-700 underline underline-offset-2">
             politikom privatnosti

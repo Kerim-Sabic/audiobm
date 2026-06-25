@@ -1,7 +1,11 @@
 import type { Payload } from 'payload'
-import { ZASTAVICE } from '../lib/test-sluha'
+import type { Poslovnice, Upiti } from '../payload-types'
+import { ZASTAVICE, type KategorijaTesta } from '../lib/test-sluha'
+import { BREND } from '../lib/brend'
 
-const NAZIVI_VRSTA: Record<string, string> = {
+type VrstaUpita = Upiti['vrsta']
+
+const NAZIVI_VRSTA = {
   zakazivanje: 'Zakazivanje besplatne provjere sluha',
   doktor: 'Pitanje za doktora',
   poslovnica: 'Poruka za poslovnicu',
@@ -9,57 +13,107 @@ const NAZIVI_VRSTA: Record<string, string> = {
   kupovina: 'Kupovina proizvoda',
   'povratni-poziv': 'Zahtjev za povratni poziv',
   'online-test-sluha': 'Online test sluha (screening)',
-}
+} as const satisfies Record<VrstaUpita, string>
 
-const NAZIVI_KATEGORIJA: Record<string, string> = {
+const NAZIVI_KATEGORIJA = {
   'bez-znakova': 'Nema jasnih znakova poteškoće',
   moguca: 'Moguća poteškoća sa sluhom',
   preporuka: 'Preporučuje se profesionalna provjera',
   hitno: 'Potrebna brza konsultacija (crvene zastavice)',
+} as const satisfies Record<KategorijaTesta, string>
+
+const HTML_ZAMJENE: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
 }
 
-const esc = (s: unknown) =>
-  String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string)
+const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => HTML_ZAMJENE[c] ?? c)
+
+const jeObjekt = (vrijednost: unknown): vrijednost is Record<string, unknown> =>
+  typeof vrijednost === 'object' && vrijednost !== null && !Array.isArray(vrijednost)
+
+const jePoslovnica = (vrijednost: Upiti['poslovnica']): vrijednost is Poslovnice =>
+  jeObjekt(vrijednost) && typeof vrijednost.id === 'number'
+
+const dajPoslovnicaId = (upit: Upiti) => {
+  if (typeof upit.poslovnica === 'number') return upit.poslovnica
+  if (jePoslovnica(upit.poslovnica)) return upit.poslovnica.id
+  return undefined
+}
+
+const dajRezultat = (upit: Upiti) => (jeObjekt(upit.rezultatTesta) ? upit.rezultatTesta : undefined)
+
+const dajNazivKategorije = (rezultat?: Record<string, unknown>) => {
+  switch (rezultat?.kategorija) {
+    case 'bez-znakova':
+      return NAZIVI_KATEGORIJA['bez-znakova']
+    case 'moguca':
+      return NAZIVI_KATEGORIJA.moguca
+    case 'preporuka':
+      return NAZIVI_KATEGORIJA.preporuka
+    case 'hitno':
+      return NAZIVI_KATEGORIJA.hitno
+    default:
+      return undefined
+  }
+}
+
+const dajPouzdanost = (rezultat?: Record<string, unknown>) => {
+  if (typeof rezultat?.pouzdanost !== 'number' || typeof rezultat.pouzdanostNivo !== 'string') return undefined
+  return `${rezultat.pouzdanost}/100 (${rezultat.pouzdanostNivo})`
+}
+
+const dajZastavice = (rezultat?: Record<string, unknown>) => {
+  if (!Array.isArray(rezultat?.zastavice)) return undefined
+
+  const oznake = rezultat.zastavice
+    .filter((zastavica): zastavica is string => typeof zastavica === 'string')
+    .map((zastavica) => ZASTAVICE.find((z) => z.id === zastavica)?.oznaka ?? zastavica)
+
+  return oznake.length > 0 ? oznake.join('; ') : undefined
+}
 
 /**
  * Šalje e-mail obavještenje o novom upitu primaocu određenom
- * vrstom upita i poslovnicom (Podešavanja → Obavještenja o upitima).
+ * vrstom upita i poslovnicom (Podešavanja -> Obavještenja o upitima).
  */
-export async function posaljiObavijestOUpitu(payload: Payload, upit: Record<string, any>): Promise<void> {
+export async function posaljiObavijestOUpitu(payload: Payload, upit: Upiti): Promise<void> {
   const podesavanja = await payload.findGlobal({ slug: 'podesavanja' })
 
-  // 1) poseban primalac za ovu vrstu upita
-  let primalac: string | undefined = (podesavanja.primaoci as { vrsta: string; email: string }[] | undefined)?.find(
-    (p) => p.vrsta === upit.vrsta,
-  )?.email
+  let primalac = podesavanja.primaoci?.find((p) => p.vrsta === upit.vrsta)?.email
 
-  // 2) upiti vezani za poslovnicu idu na e-mail poslovnice
-  if (!primalac && upit.poslovnica) {
-    const poslovnicaId = typeof upit.poslovnica === 'object' ? upit.poslovnica.id : upit.poslovnica
-    try {
-      const poslovnica = await payload.findByID({ collection: 'poslovnice', id: poslovnicaId, depth: 0 })
-      primalac = (poslovnica.emaili as { email: string }[] | undefined)?.[0]?.email
-    } catch {
-      /* poslovnica možda obrisana */
+  if (!primalac) {
+    const poslovnicaId = dajPoslovnicaId(upit)
+
+    if (poslovnicaId) {
+      try {
+        const poslovnica = await payload.findByID({ collection: 'poslovnice', id: poslovnicaId, depth: 0 })
+        primalac = poslovnica.emaili?.[0]?.email
+      } catch {
+        /* poslovnica možda obrisana */
+      }
     }
   }
 
-  // 3) glavni e-mail za upite
-  primalac = primalac || (podesavanja.emailZaUpite as string | undefined) || undefined
+  primalac = primalac || podesavanja.emailZaUpite || undefined
 
   if (!primalac) {
-    payload.logger.warn('Upit zaprimljen, ali nijedan e-mail primalac nije podešen (Podešavanja → Obavještenja).')
+    payload.logger.warn('Upit zaprimljen, ali nijedan e-mail primalac nije podešen (Podešavanja -> Obavještenja).')
     return
   }
 
-  const vrsta = NAZIVI_VRSTA[upit.vrsta as string] ?? upit.vrsta
-  const poslovnicaNaziv = typeof upit.poslovnica === 'object' ? upit.poslovnica?.naziv : undefined
+  const vrsta = NAZIVI_VRSTA[upit.vrsta]
+  const poslovnicaNaziv = jePoslovnica(upit.poslovnica) ? upit.poslovnica.naziv : undefined
   const adminUrl = `${process.env.NEXT_PUBLIC_SERVER_URL ?? ''}/admin/collections/upiti/${upit.id}`
+  const rezultat = dajRezultat(upit)
 
   const red = (oznaka: string, vrijednost?: unknown) =>
-    vrijednost
-      ? `<tr><td style="padding:6px 12px;color:#6b6360;font-size:14px">${oznaka}</td><td style="padding:6px 12px;font-size:15px;font-weight:600;color:#1c1917">${esc(vrijednost)}</td></tr>`
-      : ''
+    vrijednost == null || vrijednost === ''
+      ? ''
+      : `<tr><td style="padding:6px 12px;color:#6b6360;font-size:14px">${esc(oznaka)}</td><td style="padding:6px 12px;font-size:15px;font-weight:600;color:#1c1917">${esc(vrijednost)}</td></tr>`
 
   await payload.sendEmail({
     to: primalac,
@@ -68,7 +122,7 @@ export async function posaljiObavijestOUpitu(payload: Payload, upit: Record<stri
 <!doctype html><html lang="bs"><body style="margin:0;background:#f7f5f4;font-family:Arial,Helvetica,sans-serif;padding:24px">
   <table role="presentation" style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;border-collapse:collapse;width:100%">
     <tr><td style="background:#ED1C24;padding:16px 24px">
-      <span style="color:#ffffff;font-size:18px;font-weight:700">Audio BM — novi upit</span>
+      <span style="color:#ffffff;font-size:18px;font-weight:700">${BREND.naziv} — novi upit</span>
     </td></tr>
     <tr><td style="padding:24px">
       <p style="margin:0 0 16px;font-size:16px;color:#1c1917">Zaprimljen je novi upit sa web stranice:</p>
@@ -80,32 +134,12 @@ export async function posaljiObavijestOUpitu(payload: Payload, upit: Record<stri
         ${red('E-mail', upit.email)}
         ${red('Preferirani termin', upit.preferiraniTermin)}
         ${red('Poruka', upit.poruka)}
-        ${red(
-          'Rezultat screeninga',
-          upit.rezultatTesta && typeof upit.rezultatTesta === 'object'
-            ? NAZIVI_KATEGORIJA[(upit.rezultatTesta as Record<string, unknown>).kategorija as string]
-            : undefined,
-        )}
-        ${red(
-          'Pouzdanost screeninga',
-          upit.rezultatTesta && typeof upit.rezultatTesta === 'object'
-            ? `${(upit.rezultatTesta as Record<string, unknown>).pouzdanost}/100 (${(upit.rezultatTesta as Record<string, unknown>).pouzdanostNivo})`
-            : undefined,
-        )}
-        ${red(
-          '⚑ CRVENE ZASTAVICE',
-          upit.rezultatTesta &&
-            typeof upit.rezultatTesta === 'object' &&
-            Array.isArray((upit.rezultatTesta as Record<string, unknown>).zastavice) &&
-            ((upit.rezultatTesta as Record<string, unknown>).zastavice as string[]).length > 0
-            ? ((upit.rezultatTesta as Record<string, unknown>).zastavice as string[])
-                .map((z) => ZASTAVICE.find((x) => x.id === z)?.oznaka ?? z)
-                .join('; ')
-            : undefined,
-        )}
+        ${red('Rezultat screeninga', dajNazivKategorije(rezultat))}
+        ${red('Pouzdanost screeninga', dajPouzdanost(rezultat))}
+        ${red('CRVENE ZASTAVICE', dajZastavice(rezultat))}
       </table>
       <p style="margin:20px 0 0">
-        <a href="${adminUrl}" style="display:inline-block;background:#ED1C24;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:8px;font-size:15px;font-weight:600">Otvorite upit u administraciji</a>
+        <a href="${esc(adminUrl)}" style="display:inline-block;background:#ED1C24;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:8px;font-size:15px;font-weight:600">Otvorite upit u administraciji</a>
       </p>
       <p style="margin:16px 0 0;font-size:13px;color:#6b6360">Molimo kontaktirajte korisnika isti radni dan.</p>
     </td></tr>

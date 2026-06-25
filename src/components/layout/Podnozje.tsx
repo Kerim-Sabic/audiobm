@@ -1,8 +1,9 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, MapPin } from 'lucide-react'
 import { dajNavigaciju, dajPodesavanja, dajPoslovnice } from '@/lib/podaci'
 import { stvarno } from '@/lib/tekst'
+import { BREND } from '@/lib/brend'
+import { Logotip } from '@/components/ui/Logotip'
 import { TelefonLink } from '@/components/ui/TelefonLink'
 
 // Lucide više ne sadrži brend-ikone — jednostavne inline SVG zamjene
@@ -100,13 +101,7 @@ export async function Podnozje() {
       <div className="kontejner py-14 md:py-20">
         <div className="grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-[1.1fr_1.5fr_0.8fr]">
           <div>
-            <Image
-              src="/brand/logo-bijeli.png"
-              alt="Audio BM"
-              width={160}
-              height={33}
-              className="h-8 w-auto"
-            />
+            <Logotip varijanta="svijetlo" tagline />
             <p className="mt-5 max-w-xs text-[15px] leading-relaxed text-neutral-400">
               Više od 30 godina brinemo o sluhu — slušni aparati, besplatne provjere sluha i stručno
               savjetovanje u šest gradova Bosne i Hercegovine.
@@ -130,7 +125,7 @@ export async function Podnozje() {
                   href={podesavanja.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Audio BM na Facebooku"
+                  aria-label={`${BREND.naziv} na Facebooku`}
                   className="grid size-11 place-items-center rounded-full border border-white/10 bg-white/5 transition-colors duration-150 hover:bg-white/15"
                 >
                   <Facebook className="size-5" aria-hidden />
@@ -141,7 +136,7 @@ export async function Podnozje() {
                   href={podesavanja.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Audio BM na Instagramu"
+                  aria-label={`${BREND.naziv} na Instagramu`}
                   className="grid size-11 place-items-center rounded-full border border-white/10 bg-white/5 transition-colors duration-150 hover:bg-white/15"
                 >
                   <Instagram className="size-5" aria-hidden />
@@ -152,7 +147,7 @@ export async function Podnozje() {
                   href={podesavanja.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Audio BM na YouTube-u"
+                  aria-label={`${BREND.naziv} na YouTube-u`}
                   className="grid size-11 place-items-center rounded-full border border-white/10 bg-white/5 transition-colors duration-150 hover:bg-white/15"
                 >
                   <Youtube className="size-5" aria-hidden />
@@ -244,7 +239,9 @@ export async function Podnozje() {
         </div>
 
         <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-7 text-[14px] text-neutral-500 sm:flex-row">
-          <p>© {new Date().getFullYear()} Audio BM. Sva prava zadržana.</p>
+          <p>
+            © {new Date().getFullYear()} {BREND.naziv} · {BREND.potpis}. Sva prava zadržana.
+          </p>
           <div className="flex gap-6">
             <Link href="/politika-privatnosti" className="transition-colors duration-150 hover:text-white">
               Politika privatnosti

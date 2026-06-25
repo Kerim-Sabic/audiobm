@@ -9,7 +9,7 @@ import type { Mediji, Poslovnice } from '@/payload-types'
 
 export const metadata: Metadata = metaStranice({
   naslov: 'Naš tim — stručnjaci za sluh',
-  opis: 'Upoznajte akustičare i stručnjake Audio BM tima u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju i Brčkom.',
+  opis: 'Upoznajte akustičare i stručnjake našeg tima u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju i Brčkom.',
   putanja: '/tim',
 })
 
@@ -27,7 +27,7 @@ export default async function TimStranica() {
     <>
       <ZaglavljeStranice
         mrvice={[{ naziv: 'Naš tim' }]}
-        nadnaslov="Ljudi iza Audio BM"
+        nadnaslov="Ljudi iza Svijet Sluha"
         naslov="Naš tim"
         uvod="Ljudi koji će se pobrinuti za Vaš sluh — stručni, strpljivi i uvijek na Vašoj strani."
       />

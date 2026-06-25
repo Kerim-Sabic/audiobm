@@ -4,7 +4,7 @@ import { Mrvice } from '@/components/ui/Mrvice'
 
 export const metadata: Metadata = metaStranice({
   naslov: 'Politika privatnosti',
-  opis: 'Kako Audio BM prikuplja, koristi i štiti Vaše lične podatke.',
+  opis: 'Kako Svijet Sluha prikuplja, koristi i štiti Vaše lične podatke.',
   putanja: '/politika-privatnosti',
 })
 
@@ -16,7 +16,7 @@ export default function PolitikaPrivatnosti() {
         {/* NAPOMENA ZA UREDNIKA: nacrt — prije objave obavezno pregledati sa pravnikom */}
         <h1 className="text-h1 mb-2">Politika privatnosti</h1>
         <p className="mt-6">
-          Audio BM (u daljem tekstu: „mi") poštuje Vašu privatnost i obrađuje lične podatke u skladu
+          Svijet Sluha, u saradnji s Audio BM (u daljem tekstu: „mi"), poštuje Vašu privatnost i obrađuje lične podatke u skladu
           sa propisima o zaštiti ličnih podataka koji se primjenjuju u Bosni i Hercegovini.
         </p>
 

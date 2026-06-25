@@ -24,7 +24,7 @@ export type StanjeTestObrasca = {
 }
 
 /**
- * Slanje rezultata online testa sluha Audio BM timu.
+ * Slanje rezultata online testa sluha našem timu.
  * Ista zaštita kao i ostali obrasci: honeypot, ograničenje po IP-u, Turnstile.
  * Rezultat se strogo validira (provjeriRezultatTesta) — proizvoljан JSON se odbija.
  */

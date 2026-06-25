@@ -1,8 +1,9 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { Headphones, MapPin, Phone } from 'lucide-react'
 import { dajNavigaciju, dajPodesavanja, dajPoslovnice } from '@/lib/podaci'
 import { stvarno } from '@/lib/tekst'
+import { BREND } from '@/lib/brend'
+import { Logotip } from '@/components/ui/Logotip'
 import { TelefonLink } from '@/components/ui/TelefonLink'
 import { telHref } from '@/lib/telefon'
 import { DugmeLink } from '@/components/ui/Dugme'
@@ -66,16 +67,12 @@ export async function Zaglavlje() {
 
       {/* glavni pojas */}
       <div className="kontejner flex h-16 items-center justify-between gap-4 md:h-[72px] lg:gap-8">
-        <Link href="/" className="flex shrink-0 items-center" aria-label="Audio BM — početna stranica">
-          {/* prostor oko logotipa ≥ visina slova A (pravilo čistog prostora) */}
-          <Image
-            src="/brand/logo-600.png"
-            alt="Audio BM"
-            width={168}
-            height={35}
-            priority
-            className="h-7 w-auto md:h-8"
-          />
+        <Link
+          href="/"
+          className="flex shrink-0 items-center"
+          aria-label={`${BREND.naziv} ${BREND.potpis} — početna stranica`}
+        >
+          <Logotip />
         </Link>
 
         <nav aria-label="Glavna navigacija" className="hidden min-w-0 lg:block">
