@@ -159,9 +159,9 @@ export async function Podnozje() {
 
           {/* Poslovnice — svaka sa SVOJIM telefonom; placeholder podaci se preskaču */}
           <nav aria-label="Poslovnice">
-            <h2 className="text-[13px] font-bold tracking-[0.16em] text-neutral-500 uppercase">
+            <p className="text-[13px] font-bold tracking-[0.16em] text-neutral-500 uppercase">
               Naše poslovnice
-            </h2>
+            </p>
             <ul className="mt-5 grid gap-x-10 gap-y-5 sm:grid-cols-2">
               {poslovnice.map((p) => {
                 const adresa = stvarno(p.adresa)
@@ -200,9 +200,9 @@ export async function Podnozje() {
           <div className="space-y-9">
             {(navigacija.podnozje ?? []).map((kolona) => (
               <nav key={kolona.id ?? kolona.naslov} aria-label={kolona.naslov}>
-                <h2 className="text-[13px] font-bold tracking-[0.16em] text-neutral-500 uppercase">
+                <p className="text-[13px] font-bold tracking-[0.16em] text-neutral-500 uppercase">
                   {kolona.naslov}
-                </h2>
+                </p>
                 <ul className="mt-5 space-y-2.5">
                   {(kolona.linkovi ?? []).map((l) => (
                     <li key={l.id ?? l.putanja}>
@@ -218,9 +218,9 @@ export async function Podnozje() {
               </nav>
             ))}
             <nav aria-label="Audio BM u regionu">
-              <h2 className="text-[13px] font-bold tracking-[0.16em] text-neutral-500 uppercase">
+              <p className="text-[13px] font-bold tracking-[0.16em] text-neutral-500 uppercase">
                 Audio BM u regionu
-              </h2>
+              </p>
               <ul className="mt-5 space-y-2.5">
                 {REGIJA.map((r) => (
                   <li key={r.url}>

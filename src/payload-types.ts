@@ -1390,6 +1390,9 @@ export interface Podesavanja {
   telefonGlavni?: string | null;
   emailGlavni?: string | null;
   seoNaslov?: string | null;
+  /**
+   * Preporučeno 150–220 znakova (sa razmacima) za najbolji prikaz u pretrazi.
+   */
   seoOpis?: string | null;
   ogSlika?: (number | null) | Mediji;
   /**
@@ -1417,6 +1420,10 @@ export interface Podesavanja {
    * npr. „svijetsluha.com" — ostavite prazno dok se analitika ne podesi.
    */
   plausibleDomena?: string | null;
+  /**
+   * Opcionalno. Ako koristite samo Plausible, ostavite prazno. Napomena: GA koristi kolačiće — uz njega je potreban pristanak (cookie baner).
+   */
+  gaMeasurementId?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1513,6 +1520,7 @@ export interface PodesavanjaSelect<T extends boolean = true> {
   instagram?: T;
   youtube?: T;
   plausibleDomena?: T;
+  gaMeasurementId?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

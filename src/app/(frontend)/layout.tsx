@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description:
       podesavanja.seoOpis ??
-      'Svijet Sluha u saradnji s Audio BM. Besplatna provjera sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju i Brčkom.',
+      'Svijet Sluha — besplatna provjera sluha i slušni aparati vodećih svjetskih brendova, uz više od 30 godina povjerenja. Posjetite nas u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju ili Brčkom.',
     icons: {
       icon: [
         { url: '/brand/favicon.svg', type: 'image/svg+xml' },
@@ -68,6 +68,17 @@ export default async function KorijenskiRaspored({ children }: { children: React
             src="https://plausible.io/js/script.js"
             strategy="afterInteractive"
           />
+        )}
+        {podesavanja.gaMeasurementId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${podesavanja.gaMeasurementId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4" strategy="afterInteractive">
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${podesavanja.gaMeasurementId}')`}
+            </Script>
+          </>
         )}
         <AtribucijaZapis />
         <MotionProvider>

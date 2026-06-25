@@ -47,9 +47,10 @@ export const Podesavanja: GlobalConfig = {
               name: 'seoOpis',
               label: 'Podrazumijevani SEO opis',
               type: 'textarea',
-              maxLength: 155,
+              maxLength: 220,
+              admin: { description: 'Preporučeno 150–220 znakova (sa razmacima) za najbolji prikaz u pretrazi.' },
               defaultValue:
-                'Svijet Sluha u saradnji s Audio BM. Besplatna provjera sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju i Brčkom.',
+                'Svijet Sluha — besplatna provjera sluha i slušni aparati vodećih svjetskih brendova, uz više od 30 godina povjerenja. Posjetite nas u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju ili Brčkom.',
             },
             { name: 'ogSlika', label: 'Podrazumijevana slika za dijeljenje', type: 'upload', relationTo: 'mediji' },
           ],
@@ -99,6 +100,15 @@ export const Podesavanja: GlobalConfig = {
               label: 'Plausible domena (analitika)',
               type: 'text',
               admin: { description: 'npr. „svijetsluha.com" — ostavite prazno dok se analitika ne podesi.' },
+            },
+            {
+              name: 'gaMeasurementId',
+              label: 'Google Analytics ID (npr. G-XXXXXXXXXX)',
+              type: 'text',
+              admin: {
+                description:
+                  'Opcionalno. Ako koristite samo Plausible, ostavite prazno. Napomena: GA koristi kolačiće — uz njega je potreban pristanak (cookie baner).',
+              },
             },
           ],
         },
