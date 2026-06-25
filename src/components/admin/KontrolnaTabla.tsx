@@ -1,6 +1,7 @@
 import type { AdminViewServerProps } from 'payload'
 import { Gutter } from '@payloadcms/ui'
 import React from 'react'
+import { BREND } from '../../lib/brend'
 
 const VRSTE: Record<string, string> = {
   zakazivanje: 'Zakazivanje provjere sluha',
@@ -106,7 +107,7 @@ export async function KontrolnaTabla({ initPageResult }: AdminViewServerProps) {
           Dobro došli, {(initPageResult.req.user?.ime as string) ?? ''}
         </h1>
         <p style={{ color: 'var(--theme-elevation-500)', marginBottom: '20px' }}>
-          Pregled rada web stranice Audio BM
+          Pregled rada web stranice {BREND.naziv}
         </p>
 
         {/* brze radnje — najčešći zadaci na jedan klik */}

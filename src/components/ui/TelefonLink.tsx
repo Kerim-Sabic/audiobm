@@ -45,7 +45,7 @@ export function WhatsAppLink({
   children?: React.ReactNode
 }) {
   const cifre = broj.replace(/\D/g, '')
-  const tekst = encodeURIComponent(poruka ?? 'Poštovani, javljam se sa web stranice Audio BM. ')
+  const tekst = encodeURIComponent(poruka ?? 'Poštovani, javljam se sa web stranice Svijet Sluha. ')
   return (
     <a
       href={`https://wa.me/${cifre}?text=${tekst}`}

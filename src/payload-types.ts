@@ -1381,7 +1381,14 @@ export interface Podesavanja {
   emailZaUpite?: string | null;
   primaoci?:
     | {
-        vrsta: 'zakazivanje' | 'doktor' | 'poslovnica' | 'podrska' | 'kupovina' | 'povratni-poziv';
+        vrsta:
+          | 'zakazivanje'
+          | 'doktor'
+          | 'poslovnica'
+          | 'podrska'
+          | 'kupovina'
+          | 'povratni-poziv'
+          | 'online-test-sluha';
         email: string;
         id?: string | null;
       }[]
@@ -1390,7 +1397,7 @@ export interface Podesavanja {
   instagram?: string | null;
   youtube?: string | null;
   /**
-   * npr. „audiobm.ba" — ostavite prazno dok se analitika ne podesi.
+   * npr. „svijetsluha.com" — ostavite prazno dok se analitika ne podesi.
    */
   plausibleDomena?: string | null;
   updatedAt?: string | null;

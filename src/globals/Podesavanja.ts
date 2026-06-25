@@ -23,7 +23,7 @@ export const Podesavanja: GlobalConfig = {
         {
           label: 'Opšte',
           fields: [
-            { name: 'nazivSajta', label: 'Naziv stranice', type: 'text', defaultValue: 'Audio BM', required: true },
+            { name: 'nazivSajta', label: 'Naziv stranice', type: 'text', defaultValue: 'Svijet Sluha', required: true },
             {
               name: 'telefonGlavni',
               label: 'Glavni telefon (zaglavlje stranice)',
@@ -41,7 +41,7 @@ export const Podesavanja: GlobalConfig = {
               label: 'Podrazumijevani SEO naslov',
               type: 'text',
               maxLength: 60,
-              defaultValue: 'Audio BM — Slušni aparati i besplatna provjera sluha',
+              defaultValue: 'Svijet Sluha — slušni aparati i provjera sluha',
             },
             {
               name: 'seoOpis',
@@ -49,7 +49,7 @@ export const Podesavanja: GlobalConfig = {
               type: 'textarea',
               maxLength: 155,
               defaultValue:
-                'Više od 30 godina povjerenja. Besplatna provjera sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju i Brčkom.',
+                'Svijet Sluha u saradnji s Audio BM. Besplatna provjera sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju i Brčkom.',
             },
             { name: 'ogSlika', label: 'Podrazumijevana slika za dijeljenje', type: 'upload', relationTo: 'mediji' },
           ],
@@ -80,6 +80,7 @@ export const Podesavanja: GlobalConfig = {
                     { label: 'Opšta podrška', value: 'podrska' },
                     { label: 'Kupovina proizvoda', value: 'kupovina' },
                     { label: 'Zahtjev za povratni poziv', value: 'povratni-poziv' },
+                    { label: 'Online test sluha (screening)', value: 'online-test-sluha' },
                   ],
                 },
                 { name: 'email', label: 'E-mail primaoca', type: 'email', required: true },
@@ -97,7 +98,7 @@ export const Podesavanja: GlobalConfig = {
               name: 'plausibleDomena',
               label: 'Plausible domena (analitika)',
               type: 'text',
-              admin: { description: 'npr. „audiobm.ba" — ostavite prazno dok se analitika ne podesi.' },
+              admin: { description: 'npr. „svijetsluha.com" — ostavite prazno dok se analitika ne podesi.' },
             },
           ],
         },

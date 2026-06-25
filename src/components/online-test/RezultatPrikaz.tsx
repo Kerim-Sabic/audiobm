@@ -136,7 +136,7 @@ function GrafRezultata({ pragovi }: { pragovi: RezultatTesta['pragovi'] }) {
   )
 }
 
-/** Rezultat + slanje rezultata Audio BM timu. */
+/** Rezultat + slanje rezultata našem timu. */
 export function RezultatPrikaz({
   rezultat,
   poslovnice,
@@ -220,7 +220,7 @@ export function RezultatPrikaz({
             aria-expanded={prikaziObrazac}
           >
             <Send className="size-4.5" aria-hidden />
-            Pošaljite rezultat Audio BM timu
+            Pošaljite rezultat našem timu
           </Dugme>
         )}
         <button

@@ -7,6 +7,7 @@ import { Podnozje } from '@/components/layout/Podnozje'
 import { LjepljivaTraka } from '@/components/layout/LjepljivaTraka'
 import { dajPodesavanja } from '@/lib/podaci'
 import { OSNOVNI_URL, organizacijaJsonLd } from '@/lib/seo'
+import { BREND } from '@/lib/brend'
 import './globals.css'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -14,12 +15,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(OSNOVNI_URL),
     title: {
-      default: podesavanja.seoNaslov ?? 'Audio BM — Slušni aparati i besplatna provjera sluha',
-      template: '%s — Audio BM',
+      default: podesavanja.seoNaslov ?? `${BREND.naziv} — slušni aparati i besplatna provjera sluha`,
+      template: `%s — ${BREND.naziv}`,
     },
     description:
       podesavanja.seoOpis ??
-      'Više od 30 godina povjerenja. Besplatna provjera sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju i Brčkom.',
+      'Svijet Sluha u saradnji s Audio BM. Besplatna provjera sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju i Brčkom.',
     icons: {
       icon: [
         { url: '/brand/favicon.svg', type: 'image/svg+xml' },
@@ -41,6 +42,11 @@ export const viewport: Viewport = {
 export default async function KorijenskiRaspored({ children }: { children: React.ReactNode }) {
   const podesavanja = await dajPodesavanja()
 
+  // Zvanični profili za Organization „sameAs" — pomaže Google/AI da poveže entitet.
+  const sameAs = [podesavanja.facebook, podesavanja.instagram, podesavanja.youtube].filter(
+    (v): v is string => typeof v === 'string' && v.length > 0,
+  )
+
   // data-scroll-behavior: Next privremeno gasi CSS smooth-scroll pri promjeni
   // rute, pa nova stranica počinje od vrha bez „dovlačenja" preko cijele dužine
   return (
@@ -48,7 +54,7 @@ export default async function KorijenskiRaspored({ children }: { children: React
       <body className="flex min-h-screen flex-col">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizacijaJsonLd()) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizacijaJsonLd(sameAs)) }}
         />
         {podesavanja.plausibleDomena && (
           <Script

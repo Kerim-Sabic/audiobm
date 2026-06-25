@@ -4,7 +4,7 @@ import { Mrvice } from '@/components/ui/Mrvice'
 
 export const metadata: Metadata = metaStranice({
   naslov: 'Uslovi korištenja',
-  opis: 'Uslovi korištenja web stranice Audio BM.',
+  opis: 'Uslovi korištenja web stranice Svijet Sluha.',
   putanja: '/uslovi-koristenja',
 })
 
@@ -19,7 +19,8 @@ export default function UsloviKoristenja() {
 
         <h2>Opšte odredbe</h2>
         <p>
-          Korištenjem web stranice audiobm.ba prihvatate ove uslove. Stranicom upravlja Audio BM.
+          Korištenjem web stranice svijetsluha.com prihvatate ove uslove. Web stranicu Svijet Sluha
+          vodimo u saradnji s Audio BM-om.
         </p>
 
         <h2>Informativni karakter sadržaja</h2>
@@ -37,7 +38,7 @@ export default function UsloviKoristenja() {
 
         <h2>Intelektualno vlasništvo</h2>
         <p>
-          Logotip, tekstovi i fotografije na ovoj stranici vlasništvo su Audio BM-a ili partnera i
+          Logotip, tekstovi i fotografije na ovoj stranici vlasništvo su Svijet Sluha i Audio BM-a ili partnera i
           ne smiju se koristiti bez dozvole.
         </p>
 

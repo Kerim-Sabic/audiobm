@@ -23,42 +23,53 @@ import { Upiti } from './collections/Upiti'
 import { Podesavanja } from './globals/Podesavanja'
 import { Navigacija } from './globals/Navigacija'
 import { Pocetna } from './globals/Pocetna'
+import {
+  dajCsrfUrl,
+  dajDatabaseUrl,
+  dajPayloadSecret,
+  dajS3Okruzenje,
+  dajServerUrl,
+  dajSmtpOkruzenje,
+} from './lib/okruzenje'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Produkcija: EU Postgres (Neon/Supabase). Lokalni razvoj: SQLite datoteka.
-const db = process.env.DATABASE_URL?.startsWith('postgres')
-  ? postgresAdapter({ pool: { connectionString: process.env.DATABASE_URL } })
-  : sqliteAdapter({ client: { url: process.env.DATABASE_URL || 'file:./audiobm.db' } })
+const databaseUrl = dajDatabaseUrl()
+const db = databaseUrl.startsWith('postgres')
+  ? postgresAdapter({ pool: { connectionString: databaseUrl } })
+  : sqliteAdapter({ client: { url: databaseUrl } })
 
 // E-pošta: SMTP iz okruženja; bez SMTP-a poruke se samo evidentiraju u konzoli (razvoj).
-const email = process.env.SMTP_HOST
+const smtp = dajSmtpOkruzenje()
+const email = smtp
   ? nodemailerAdapter({
-      defaultFromAddress: process.env.EMAIL_FROM?.match(/<(.+)>/)?.[1] ?? 'info@audiobm.ba',
-      defaultFromName: 'Audio BM',
+      defaultFromAddress: smtp.fromAddress,
+      defaultFromName: smtp.fromName,
       transportOptions: {
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT ?? 587),
-        secure: Number(process.env.SMTP_PORT ?? 587) === 465,
-        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+        host: smtp.host,
+        port: smtp.port,
+        secure: smtp.secure,
+        auth: { user: smtp.user, pass: smtp.pass },
       },
     })
   : undefined
 
 // Produkcija na serverless platformama (Netlify/Vercel): slike idu u S3/R2
 // jer se lokalne datoteke ne čuvaju između poziva funkcija.
-const plugins = process.env.S3_BUCKET
+const s3 = dajS3Okruzenje()
+const plugins = s3
   ? [
       s3Storage({
         collections: { mediji: true },
-        bucket: process.env.S3_BUCKET,
+        bucket: s3.bucket,
         config: {
-          region: process.env.S3_REGION ?? 'auto',
+          region: s3.region,
           credentials: {
-            accessKeyId: process.env.S3_ACCESS_KEY_ID ?? '',
-            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '',
+            accessKeyId: s3.accessKeyId,
+            secretAccessKey: s3.secretAccessKey,
           },
-          ...(process.env.S3_ENDPOINT ? { endpoint: process.env.S3_ENDPOINT } : {}),
+          ...(s3.endpoint ? { endpoint: s3.endpoint } : {}),
         },
       }),
     ]
@@ -103,12 +114,12 @@ export default buildConfig({
     },
   },
   email,
-  secret: process.env.PAYLOAD_SECRET ?? '',
+  secret: dajPayloadSecret(),
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   db,
   sharp,
   graphQL: { disable: true },
   upload: { limits: { fileSize: 12_000_000 } },
-  serverURL: process.env.NEXT_PUBLIC_SERVER_URL,
-  csrf: [process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000'],
+  serverURL: dajServerUrl(),
+  csrf: [dajCsrfUrl()],
 })

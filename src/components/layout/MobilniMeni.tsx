@@ -17,12 +17,12 @@ import {
   Home,
   Headphones,
 } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { usePathname } from 'next/navigation'
 import { telHref } from '@/components/ui/TelefonLink'
+import { Logotip } from '@/components/ui/Logotip'
 import { zabiljezi } from '@/lib/analytics'
 
 const EASE = [0.22, 1, 0.36, 1] as const
@@ -114,7 +114,7 @@ export function MobilniMeni({
             >
               {/* zaglavlje ladice */}
               <div className="flex h-16 shrink-0 items-center justify-between border-b border-neutral-100 px-5">
-                <Image src="/brand/logo-600.png" alt="Audio BM" width={134} height={28} className="h-6 w-auto" />
+                <Logotip />
                 <button
                   type="button"
                   onClick={() => setOtvoren(false)}

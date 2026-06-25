@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { stvarno, ocisti } from '@/lib/tekst'
+import { BREND, nazivPoslovnice } from '@/lib/brend'
 
-export const OSNOVNI_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? 'https://audiobm.ba'
+export const OSNOVNI_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? BREND.domena
 
 /** Gradi Metadata za stranicu: jedinstven naslov ≤60, opis ≤155, OG/Twitter, canonical, hreflang. */
 export function metaStranice({
@@ -22,24 +23,18 @@ export function metaStranice({
   return {
     title: naslov,
     description: opis,
-    alternates: {
-      canonical: url,
-      languages: {
-        'bs-BA': url,
-        'sr-RS': 'https://audiobm.rs',
-        'sl-SI': 'https://audiobm.si',
-        'sr-ME': 'https://audiobm.me',
-        'mk-MK': 'https://audiobm.mk',
-      },
-    },
+    // Jedna domena, jedan jezik (bs-BA) — bez cross-domain hreflang-a.
+    alternates: { canonical: url },
     openGraph: {
       title: naslov,
       description: opis,
       url,
-      siteName: 'Audio BM',
+      siteName: BREND.naziv,
       locale: 'bs_BA',
       type: 'website',
-      images: [{ url: slika, width: 1200, height: 630, alt: 'Audio BM — slušni aparati i provjera sluha' }],
+      images: [
+        { url: slika, width: 1200, height: 630, alt: `${BREND.naziv} — slušni aparati i provjera sluha` },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
@@ -51,17 +46,32 @@ export function metaStranice({
   }
 }
 
-/** Organization JSON-LD — na svim stranicama. */
-export function organizacijaJsonLd() {
+/**
+ * Organization JSON-LD — na svim stranicama.
+ *
+ * Modelira odnos: „Svijet Sluha" (web brend) ↔ „Audio BM" (audiološka kuća,
+ * provajder s 30+ god. iskustva). Tako Google i AI asistenti razumiju ko stoji
+ * iza sajta i nasljeđuju Audio BM autoritet.
+ *
+ * `sameAs` — proslijediti zvanične profile (Facebook, Instagram, YouTube,
+ * Google Business Profile) iz Podešavanja kad budu uneseni.
+ */
+export function organizacijaJsonLd(sameAs: string[] = []) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Audio BM',
+    name: BREND.naziv,
     url: OSNOVNI_URL,
     logo: `${OSNOVNI_URL}/brand/logo.png`,
     description:
-      'Slušni aparati, besplatne provjere sluha i audiološke usluge — više od 30 godina iskustva u Bosni i Hercegovini.',
-    sameAs: ['https://audiobm.rs', 'https://audiobm.si', 'https://audiobm.me', 'https://audiobm.mk'],
+      'Slušni aparati, besplatne provjere sluha i audiološke usluge — u saradnji s Audio BM, audiološkom kućom s više od 30 godina iskustva u Bosni i Hercegovini.',
+    brand: { '@type': 'Brand', name: BREND.naziv },
+    parentOrganization: {
+      '@type': 'Organization',
+      name: BREND.provajderLegalni,
+      foundingDate: String(BREND.provajderOd),
+    },
+    ...(sameAs.length ? { sameAs } : {}),
   }
 }
 
@@ -98,7 +108,7 @@ export function poslovnicaJsonLd(p: PoslovnicaZaShemu) {
     '@context': 'https://schema.org',
     '@type': ['MedicalBusiness', 'LocalBusiness'],
     '@id': `${OSNOVNI_URL}/poslovnice/${p.slug}`,
-    name: `Audio BM ${p.grad}`,
+    name: nazivPoslovnice(p.grad),
     url: `${OSNOVNI_URL}/poslovnice/${p.slug}`,
     image: `${OSNOVNI_URL}/brand/og-podrazumijevana.png`,
     ...(telefon ? { telephone: telefon } : {}),
@@ -124,7 +134,7 @@ export function poslovnicaJsonLd(p: PoslovnicaZaShemu) {
             })),
         }
       : {}),
-    parentOrganization: { '@type': 'Organization', name: 'Audio BM' },
+    parentOrganization: { '@type': 'Organization', name: BREND.provajderLegalni },
   }
 }
 
@@ -159,7 +169,7 @@ export function clanakJsonLd(o: {
     ...(o.slika ? { image: o.slika } : {}),
     publisher: {
       '@type': 'Organization',
-      name: 'Audio BM',
+      name: BREND.naziv,
       logo: { '@type': 'ImageObject', url: `${OSNOVNI_URL}/brand/logo.png` },
     },
   }

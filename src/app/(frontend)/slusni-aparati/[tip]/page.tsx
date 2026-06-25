@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ tip: stri
   if (!info) return {}
   return metaStranice({
     naslov: `${info.naziv} — modeli i savjetovanje`,
-    opis: `${info.kratko} Pogledajte modele i zakažite besplatno savjetovanje u Audio BM poslovnicama.`,
+    opis: `${info.kratko} Pogledajte modele i zakažite besplatno savjetovanje u našim poslovnicama.`,
     putanja: `/slusni-aparati/${tip}`,
   })
 }

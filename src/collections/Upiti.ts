@@ -1,6 +1,7 @@
 import type { CollectionConfig, PayloadRequest } from 'payload'
 import { jePrijavljen, jeVlasnik, upitiPristup } from '../access/uloge'
 import { posaljiObavijestOUpitu } from '../email/obavijesti'
+import type { Upiti as UpitDokument } from '../payload-types'
 
 export const VRSTE_UPITA = [
   { label: 'Zakazivanje besplatne provjere sluha', value: 'zakazivanje' },
@@ -11,6 +12,51 @@ export const VRSTE_UPITA = [
   { label: 'Zahtjev za povratni poziv', value: 'povratni-poziv' },
   { label: 'Online test sluha (screening)', value: 'online-test-sluha' },
 ] as const
+
+const KATEGORIJE_CSV: Record<string, string> = {
+  'bez-znakova': 'Bez jasnih znakova',
+  moguca: 'Moguća poteškoća',
+  preporuka: 'Preporučena provjera',
+  hitno: 'Hitna konsultacija',
+}
+
+const nazivVrste = (vrsta: UpitDokument['vrsta']) => VRSTE_UPITA.find((v) => v.value === vrsta)?.label ?? vrsta
+
+const nazivPoslovnice = (vrijednost: UpitDokument['poslovnica']) =>
+  typeof vrijednost === 'object' && vrijednost ? vrijednost.naziv : ''
+
+const nazivProizvoda = (vrijednost: UpitDokument['proizvod']) =>
+  typeof vrijednost === 'object' && vrijednost ? vrijednost.naziv : ''
+
+const rezultatObjekt = (upit: UpitDokument) =>
+  typeof upit.rezultatTesta === 'object' && upit.rezultatTesta !== null && !Array.isArray(upit.rezultatTesta)
+    ? upit.rezultatTesta
+    : undefined
+
+const redCsv = (upit: UpitDokument) => {
+  const rezultat = rezultatObjekt(upit)
+  const kategorija = typeof rezultat?.kategorija === 'string' ? rezultat.kategorija : ''
+  const pouzdanost =
+    typeof rezultat?.pouzdanost === 'number'
+      ? `${rezultat.pouzdanost}/100 (${typeof rezultat.pouzdanostNivo === 'string' ? rezultat.pouzdanostNivo : ''})`
+      : ''
+
+  return [
+    new Date(upit.createdAt).toLocaleString('bs-BA'),
+    nazivVrste(upit.vrsta),
+    nazivPoslovnice(upit.poslovnica),
+    upit.ime,
+    upit.telefon,
+    upit.email ?? '',
+    (upit.poruka ?? '').replaceAll('\n', ' '),
+    nazivProizvoda(upit.proizvod),
+    upit.status,
+    kategorija ? (KATEGORIJE_CSV[kategorija] ?? kategorija) : '',
+    pouzdanost,
+  ]
+    .map((c) => `"${String(c).replaceAll('"', '""')}"`)
+    .join(';')
+}
 
 /** CSV izvoz svih upita (samo vlasnik i urednik). */
 const izvozCsv = async (req: PayloadRequest): Promise<Response> => {
@@ -36,29 +82,7 @@ const izvozCsv = async (req: PayloadRequest): Promise<Response> => {
     'Rezultat testa',
     'Pouzdanost testa',
   ]
-  const KATEGORIJE_CSV: Record<string, string> = {
-    'bez-znakova': 'Bez jasnih znakova',
-    moguca: 'Moguća poteškoća',
-    preporuka: 'Preporučena provjera',
-    hitno: 'Hitna konsultacija',
-  }
-  const red = (u: Record<string, any>) =>
-    [
-      new Date(u.createdAt).toLocaleString('bs-BA'),
-      VRSTE_UPITA.find((v) => v.value === u.vrsta)?.label ?? u.vrsta,
-      typeof u.poslovnica === 'object' ? u.poslovnica?.naziv ?? '' : '',
-      u.ime ?? '',
-      u.telefon ?? '',
-      u.email ?? '',
-      (u.poruka ?? '').replaceAll('\n', ' '),
-      typeof u.proizvod === 'object' ? u.proizvod?.naziv ?? '' : '',
-      u.status ?? '',
-      u.rezultatTesta?.kategorija ? (KATEGORIJE_CSV[u.rezultatTesta.kategorija] ?? u.rezultatTesta.kategorija) : '',
-      u.rezultatTesta?.pouzdanost != null ? `${u.rezultatTesta.pouzdanost}/100 (${u.rezultatTesta.pouzdanostNivo ?? ''})` : '',
-    ]
-      .map((c) => `"${String(c).replaceAll('"', '""')}"`)
-      .join(';')
-  const csv = '﻿' + [zaglavlje.join(';'), ...docs.map(red)].join('\r\n')
+  const csv = '﻿' + [zaglavlje.join(';'), ...docs.map(redCsv)].join('\r\n')
   return new Response(csv, {
     headers: {
       'Content-Type': 'text/csv; charset=utf-8',

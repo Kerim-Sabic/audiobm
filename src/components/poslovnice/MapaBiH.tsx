@@ -24,7 +24,7 @@ export function MapaBiH({ lokacije }: { lokacije: PinLokacija[] }) {
       <svg
         viewBox={`0 0 ${BIH_W} ${BIH_H}`}
         role="img"
-        aria-label="Mapa Bosne i Hercegovine sa označenim Audio BM poslovnicama"
+        aria-label="Mapa Bosne i Hercegovine sa označenim poslovnicama"
         className="w-full"
       >
         <defs>

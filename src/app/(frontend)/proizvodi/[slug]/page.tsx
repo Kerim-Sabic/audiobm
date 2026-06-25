@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!p) return {}
   return metaStranice({
     naslov: p.seo?.naslov ?? p.naziv,
-    opis: p.seo?.opis ?? p.kratkiOpis ?? `${p.naziv} — dostupno u Audio BM poslovnicama.`,
+    opis: p.seo?.opis ?? p.kratkiOpis ?? `${p.naziv} — dostupno u našim poslovnicama.`,
     putanja: `/proizvodi/${slug}`,
   })
 }
