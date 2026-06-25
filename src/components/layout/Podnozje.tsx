@@ -86,7 +86,7 @@ export async function Podnozje() {
               href="/zakazivanje"
               className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-brand-600 px-8 py-3.5 text-[17px] font-semibold text-white shadow-[var(--shadow-cta)] transition-[background-color,transform,box-shadow] duration-150 hover:-translate-y-px hover:bg-brand-700 hover:shadow-[var(--shadow-cta-hover)]"
             >
-              Zakažite termin <ArrowRight className="size-5" aria-hidden />
+              Zakažite besplatan termin <ArrowRight className="size-5" aria-hidden />
             </Link>
             {telefon && (
               <TelefonLink

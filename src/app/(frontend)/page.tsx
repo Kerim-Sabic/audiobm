@@ -194,16 +194,15 @@ export default async function Pocetna() {
                 const brojTel = stvarno(p.telefoni?.[0]?.broj)
                 return (
                   <OtkrijStavku key={p.id}>
-                    <Link
-                      href={`/poslovnice/${p.slug}`}
-                      className="group flex items-center gap-4 py-3.5 transition-colors duration-150 hover:bg-white/70"
-                    >
+                    <div className="group relative flex items-center gap-4 py-3.5 transition-colors duration-150 hover:bg-white/70">
                       <span className="grid size-10 shrink-0 place-items-center rounded-full border border-neutral-200 bg-white text-brand-600 shadow-sm transition-colors duration-250 group-hover:bg-brand-600 group-hover:text-white">
                         <MapPin className="size-4.5" aria-hidden />
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center gap-2 font-bold text-neutral-900">
-                          {p.grad}
+                          <Link href={`/poslovnice/${p.slug}`} className="after:absolute after:inset-0">
+                            {p.grad}
+                          </Link>
                           {p.novaPoslovnica && (
                             <span className="rounded-full bg-brand-600 px-2 py-0.5 text-[10.5px] font-bold tracking-wide text-white uppercase">
                               Novo
@@ -219,7 +218,7 @@ export default async function Pocetna() {
                         className="size-4.5 shrink-0 text-neutral-300 transition-[color,transform] duration-150 group-hover:translate-x-1 group-hover:text-brand-600"
                         aria-hidden
                       />
-                    </Link>
+                    </div>
                   </OtkrijStavku>
                 )
               })}
@@ -262,9 +261,8 @@ export default async function Pocetna() {
               {tipovi.map(({ tip, info, primjer }, i) => {
                 const slika = (primjer?.slike as (Mediji | number)[] | undefined)?.[0]
                 return (
-                  <Link
+                  <div
                     key={tip}
-                    href={`/slusni-aparati/${tip}`}
                     className="group relative flex flex-col p-7 transition-colors duration-250 hover:bg-neutral-50/70 lg:p-9"
                   >
                     <span className="text-[13px] font-extrabold tracking-[0.2em] text-neutral-300" aria-hidden>
@@ -282,7 +280,11 @@ export default async function Pocetna() {
                         <Ear className="size-16 text-neutral-200" strokeWidth={1.25} aria-hidden />
                       )}
                     </div>
-                    <h3 className="text-h3">{info.naziv}</h3>
+                    <h3 className="text-h3">
+                      <Link href={`/slusni-aparati/${tip}`} className="after:absolute after:inset-0">
+                        {info.naziv}
+                      </Link>
+                    </h3>
                     <p className="mt-2 flex-1 text-neutral-600">{info.kratko}</p>
                     <span className="mt-5 inline-flex items-center gap-2.5 font-semibold text-brand-700">
                       <span className="grid size-8 place-items-center rounded-full bg-brand-50 transition-colors duration-150 group-hover:bg-brand-600 group-hover:text-white">
@@ -290,7 +292,7 @@ export default async function Pocetna() {
                       </span>
                       Saznajte više
                     </span>
-                  </Link>
+                  </div>
                 )
               })}
             </div>
@@ -336,10 +338,7 @@ export default async function Pocetna() {
               const Ikona = IKONE_USLUGA[u.ikona ?? 'ear'] ?? Ear
               return (
                 <OtkrijStavku key={u.id}>
-                  <Link
-                    href={`/usluge/${u.slug}`}
-                    className="group flex items-start gap-5 border-b border-neutral-200/80 py-6 first:pt-0 lg:gap-6"
-                  >
+                  <div className="group relative flex items-start gap-5 border-b border-neutral-200/80 py-6 first:pt-0 lg:gap-6">
                     <span className="hidden pt-1 text-[13px] font-extrabold tracking-[0.18em] text-neutral-300 sm:block" aria-hidden>
                       {String(i + 1).padStart(2, '0')}
                     </span>
@@ -348,7 +347,9 @@ export default async function Pocetna() {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-[19px] font-bold text-neutral-900 transition-colors duration-150 group-hover:text-brand-700">
-                        {u.naziv}
+                        <Link href={`/usluge/${u.slug}`} className="after:absolute after:inset-0">
+                          {u.naziv}
+                        </Link>
                       </span>
                       <span className="mt-1 block text-neutral-600">{u.kratkiOpis}</span>
                     </span>
@@ -356,7 +357,7 @@ export default async function Pocetna() {
                       className="mt-2 size-5 shrink-0 text-neutral-300 transition-[color,transform] duration-150 group-hover:translate-x-1 group-hover:text-brand-600"
                       aria-hidden
                     />
-                  </Link>
+                  </div>
                 </OtkrijStavku>
               )
             })}
@@ -734,6 +735,18 @@ export default async function Pocetna() {
           </div>
         </section>
       </HeroUlaz>
+
+      {/* ——— Uvodni sažetak (AEO „answer-first" + ključne riječi u tekstu) ——— */}
+      <section className="border-b border-neutral-200/60 bg-white">
+        <div className="kontejner py-9 md:py-11">
+          <p className="mx-auto max-w-3xl text-center text-[17px] leading-relaxed text-neutral-600 md:text-[19px]">
+            U <strong className="font-semibold text-neutral-800">Svijet Sluha</strong> nudimo besplatnu
+            provjeru sluha i vrhunske slušne aparate vodećih svjetskih brendova — uz više od 30 godina
+            povjerenja i stručan tim u šest gradova širom Bosne i Hercegovine. Provjera sluha je
+            bezbolna, traje 30–45 minuta i ne obavezuje na kupovinu.
+          </p>
+        </div>
+      </section>
 
       {/* ——— Online test sluha — istaknuta traka odmah ispod hero sekcije ——— */}
       <section className="sekcija !py-14 md:!py-20" aria-labelledby="online-test-naslov">
