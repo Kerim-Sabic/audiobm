@@ -2,7 +2,13 @@ import type { Metadata } from 'next'
 import { stvarno, ocisti } from '@/lib/tekst'
 import { BREND, nazivPoslovnice } from '@/lib/brend'
 
-export const OSNOVNI_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? BREND.domena
+// SEO kanonski izvor: u PRODUKCIJI uvijek produkcijska domena (svijetsluha.com)
+// — ne smije zavisiti od (pogrešno postavljene) NEXT_PUBLIC_SERVER_URL na buildu,
+// inače canonical/OG/sitemap pokazuju na netlify.app i ruše SEO. U razvoju dopuštamo override.
+export const OSNOVNI_URL =
+  process.env.NODE_ENV === 'production'
+    ? BREND.domena
+    : process.env.NEXT_PUBLIC_SERVER_URL ?? BREND.domena
 
 /** Gradi Metadata za stranicu: jedinstven naslov ≤60, opis ≤155, OG/Twitter, canonical, hreflang. */
 export function metaStranice({

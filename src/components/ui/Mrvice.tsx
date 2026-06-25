@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
-import { BREND } from '@/lib/brend'
+import { OSNOVNI_URL } from '@/lib/seo'
 
 export type Mrvica = { naziv: string; putanja?: string }
 
 /** Mrvice (breadcrumbs) sa BreadcrumbList JSON-LD shemom. */
 export function Mrvice({ stavke }: { stavke: Mrvica[] }) {
-  const osnova = process.env.NEXT_PUBLIC_SERVER_URL ?? BREND.domena
+  const osnova = OSNOVNI_URL
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',

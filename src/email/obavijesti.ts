@@ -107,7 +107,7 @@ export async function posaljiObavijestOUpitu(payload: Payload, upit: Upiti): Pro
 
   const vrsta = NAZIVI_VRSTA[upit.vrsta]
   const poslovnicaNaziv = jePoslovnica(upit.poslovnica) ? upit.poslovnica.naziv : undefined
-  const adminUrl = `${process.env.NEXT_PUBLIC_SERVER_URL ?? ''}/admin/collections/upiti/${upit.id}`
+  const adminUrl = `${BREND.domena}/admin/collections/upiti/${upit.id}`
   const rezultat = dajRezultat(upit)
 
   const red = (oznaka: string, vrijednost?: unknown) =>
