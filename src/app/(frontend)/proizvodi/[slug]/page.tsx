@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { Store } from 'lucide-react'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { dajPayload, dajPodesavanja } from '@/lib/podaci'
-import { metaStranice } from '@/lib/seo'
+import { metaStranice, proizvodJsonLd, OSNOVNI_URL } from '@/lib/seo'
 import { stvarno } from '@/lib/tekst'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { SlikaMedija } from '@/components/ui/SlikaMedija'
@@ -57,9 +57,31 @@ export default async function ProizvodStranica({ params }: { params: Promise<{ s
   const imaCijenu = proizvod.nacin === 'maloprodaja' && proizvod.cijena != null && proizvod.cijena > 0
   const napomena = stvarno(proizvod.cijenaNapomena)
   const telefon = stvarno(podesavanja.telefonGlavni)
+  const prvaSlika = typeof slike[0] === 'object' ? slike[0] : null
+  const slikaUrl = prvaSlika?.url
+    ? prvaSlika.url.startsWith('http')
+      ? prvaSlika.url
+      : `${OSNOVNI_URL}${prvaSlika.url}`
+    : undefined
 
   return (
     <div className="kontejner py-8 md:py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            proizvodJsonLd({
+              naziv: proizvod.naziv,
+              slug: proizvod.slug,
+              kategorija: proizvod.kategorija,
+              brend: proizvod.brend,
+              kratkiOpis: proizvod.kratkiOpis,
+              cijena: imaCijenu ? proizvod.cijena : undefined,
+              slika: slikaUrl,
+            }),
+          ),
+        }}
+      />
       <Mrvice
         stavke={[
           { naziv: 'Proizvodi', putanja: '/proizvodi' },
@@ -75,6 +97,7 @@ export default async function ProizvodStranica({ params }: { params: Promise<{ s
           <div className="mreza-audiogram absolute inset-0" aria-hidden />
           <SlikaMedija
             medij={typeof slike[0] === 'object' ? slike[0] : null}
+            altRezerva={proizvod.brend ? `${proizvod.naziv} — ${proizvod.brend}` : proizvod.naziv}
             sizes="(min-width: 1024px) 560px, 100vw"
             prioritet
             className="relative max-h-full w-auto object-contain drop-shadow-xl"

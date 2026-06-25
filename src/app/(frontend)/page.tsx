@@ -274,6 +274,7 @@ export default async function Pocetna() {
                       {slika && typeof slika === 'object' ? (
                         <SlikaMedija
                           medij={slika}
+                          altRezerva={`${info.naziv} — slušni aparat`}
                           sizes="(min-width: 768px) 320px, 80vw"
                           className="max-h-full w-auto object-contain drop-shadow-lg transition-transform duration-250 group-hover:scale-[1.07]"
                         />
@@ -526,7 +527,12 @@ export default async function Pocetna() {
               </div>
               {istaknutaAkcija.slika && typeof istaknutaAkcija.slika === 'object' && (
                 <div className="relative min-h-[240px] md:w-2/5">
-                  <SlikaMedija medij={istaknutaAkcija.slika} fill sizes="(min-width: 768px) 480px, 100vw" />
+                  <SlikaMedija
+                    medij={istaknutaAkcija.slika}
+                    altRezerva={istaknutaAkcija.naslov}
+                    fill
+                    sizes="(min-width: 768px) 480px, 100vw"
+                  />
                 </div>
               )}
             </div>

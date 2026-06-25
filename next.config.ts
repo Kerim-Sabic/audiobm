@@ -67,6 +67,8 @@ function legacyRedirects() {
 }
 
 const nextConfig: NextConfig = {
+  // Ne odaje tehnologiju (uklanja „X-Powered-By: Next.js" zaglavlje).
+  poweredByHeader: false,
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [360, 480, 640, 768, 1080, 1440, 1920],

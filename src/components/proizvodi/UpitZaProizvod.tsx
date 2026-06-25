@@ -6,6 +6,7 @@ import { posaljiUpit, type StanjeObrasca } from '@/app/actions/posaljiUpit'
 import { Dugme } from '@/components/ui/Dugme'
 import { PoljeUnos, PoljeTekst, PoljeSaglasnost } from '@/components/ui/Polje'
 import { Honeypot, Turnstile } from '@/components/ui/Turnstile'
+import { AtribucijaPolja } from '@/components/ui/AtribucijaPolja'
 import { zabiljezi } from '@/lib/analytics'
 
 const pocetno: StanjeObrasca = { status: 'pocetno' }
@@ -65,6 +66,7 @@ export function UpitZaProizvod({
         greska={stanje.greske?.poruka}
         placeholder="npr. Zanima me dostupnost i način preuzimanja."
       />
+      <AtribucijaPolja pitaj />
       <PoljeSaglasnost name="saglasnost" greska={stanje.greske?.saglasnost} />
       <Turnstile />
       {stanje.status === 'greska' && stanje.poruka && (

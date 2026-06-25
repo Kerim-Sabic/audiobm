@@ -56,10 +56,14 @@ export function metaStranice({
  * `sameAs` — proslijediti zvanične profile (Facebook, Instagram, YouTube,
  * Google Business Profile) iz Podešavanja kad budu uneseni.
  */
-export function organizacijaJsonLd(sameAs: string[] = []) {
+export function organizacijaJsonLd({
+  sameAs = [],
+  ocjena,
+}: { sameAs?: string[]; ocjena?: { broj: number; prosjek: number } } = {}) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
+    '@id': `${OSNOVNI_URL}/#organizacija`,
     name: BREND.naziv,
     url: OSNOVNI_URL,
     logo: `${OSNOVNI_URL}/brand/logo.png`,
@@ -72,6 +76,104 @@ export function organizacijaJsonLd(sameAs: string[] = []) {
       foundingDate: String(BREND.provajderOd),
     },
     ...(sameAs.length ? { sameAs } : {}),
+    ...(ocjena && ocjena.broj > 0 ? { aggregateRating: agregatnaOcjena(ocjena) } : {}),
+  }
+}
+
+/** AggregateRating čvor iz stvarnih odobrenih recenzija. */
+function agregatnaOcjena(ocjena: { broj: number; prosjek: number }) {
+  return {
+    '@type': 'AggregateRating',
+    ratingValue: ocjena.prosjek.toFixed(1),
+    reviewCount: ocjena.broj,
+    bestRating: 5,
+    worstRating: 1,
+  }
+}
+
+/** WebSite čvor — povezuje sajt s Organization entitetom (graf). */
+export function webSiteJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${OSNOVNI_URL}/#sajt`,
+    url: OSNOVNI_URL,
+    name: BREND.naziv,
+    inLanguage: 'bs-BA',
+    publisher: { '@id': `${OSNOVNI_URL}/#organizacija` },
+  }
+}
+
+/** Service JSON-LD za stranicu usluge. */
+export function uslugaJsonLd(u: { naziv: string; slug: string; kratkiOpis: string }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    '@id': `${OSNOVNI_URL}/usluge/${u.slug}#usluga`,
+    name: u.naziv,
+    description: u.kratkiOpis,
+    serviceType: u.naziv,
+    url: `${OSNOVNI_URL}/usluge/${u.slug}`,
+    provider: { '@type': 'Organization', '@id': `${OSNOVNI_URL}/#organizacija`, name: BREND.naziv },
+    areaServed: { '@type': 'Country', name: 'Bosna i Hercegovina' },
+  }
+}
+
+/** Product (+ Offer kad ima cijene) JSON-LD za proizvod/model aparata. */
+export function proizvodJsonLd(p: {
+  naziv: string
+  slug: string
+  kategorija: string
+  brend?: string | null
+  kratkiOpis?: string | null
+  cijena?: number | null
+  slika?: string
+}) {
+  const putanja = p.kategorija === 'slusni-aparati' ? `/slusni-aparati/modeli/${p.slug}` : `/proizvodi/${p.slug}`
+  const url = `${OSNOVNI_URL}${putanja}`
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: p.naziv,
+    url,
+    ...(p.kratkiOpis ? { description: p.kratkiOpis } : {}),
+    ...(p.brend ? { brand: { '@type': 'Brand', name: p.brend } } : {}),
+    ...(p.slika ? { image: p.slika } : {}),
+    ...(typeof p.cijena === 'number' && p.cijena > 0
+      ? {
+          offers: {
+            '@type': 'Offer',
+            url,
+            price: p.cijena,
+            priceCurrency: 'BAM',
+            availability: 'https://schema.org/InStock',
+            seller: { '@type': 'Organization', '@id': `${OSNOVNI_URL}/#organizacija`, name: BREND.naziv },
+          },
+        }
+      : {}),
+  }
+}
+
+/** ItemList of Person — tim stručnjaka (E-E-A-T signal). */
+export function timJsonLd(
+  clanovi: { ime: string; titula?: string | null; biografija?: string | null; jezici?: { jezik: string }[] | null }[],
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: clanovi.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'Person',
+        name: c.ime,
+        ...(c.titula ? { jobTitle: c.titula } : {}),
+        ...(c.biografija ? { description: c.biografija } : {}),
+        worksFor: { '@type': 'Organization', '@id': `${OSNOVNI_URL}/#organizacija`, name: BREND.naziv },
+        knowsAbout: ['audiologija', 'slušni aparati', 'provjera sluha'],
+        ...(c.jezici?.length ? { knowsLanguage: c.jezici.map((j) => j.jezik) } : {}),
+      },
+    })),
   }
 }
 
@@ -100,14 +202,15 @@ const DAN_SHEMA: Record<string, string> = {
 
 /** MedicalBusiness/LocalBusiness JSON-LD po poslovnici, sa geo i radnim vremenom.
  *  Placeholder podaci (adresa/telefon koji još nisu uneseni) se izostavljaju. */
-export function poslovnicaJsonLd(p: PoslovnicaZaShemu) {
+export function poslovnicaJsonLd(p: PoslovnicaZaShemu, ocjena?: { broj: number; prosjek: number }) {
   const telefon = stvarno(p.telefoni?.[0]?.broj)
   const email = stvarno(p.emaili?.[0]?.email)
   const adresa = stvarno(p.adresa)
   return {
     '@context': 'https://schema.org',
-    '@type': ['MedicalBusiness', 'LocalBusiness'],
-    '@id': `${OSNOVNI_URL}/poslovnice/${p.slug}`,
+    '@type': ['MedicalClinic', 'LocalBusiness'],
+    '@id': `${OSNOVNI_URL}/poslovnice/${p.slug}#klinika`,
+    description: `Audiološki centar ${nazivPoslovnice(p.grad)} — besplatna provjera sluha, slušni aparati, baterije i servis.`,
     name: nazivPoslovnice(p.grad),
     url: `${OSNOVNI_URL}/poslovnice/${p.slug}`,
     image: `${OSNOVNI_URL}/brand/og-podrazumijevana.png`,
@@ -134,7 +237,8 @@ export function poslovnicaJsonLd(p: PoslovnicaZaShemu) {
             })),
         }
       : {}),
-    parentOrganization: { '@type': 'Organization', name: BREND.provajderLegalni },
+    parentOrganization: { '@type': 'Organization', '@id': `${OSNOVNI_URL}/#organizacija`, name: BREND.provajderLegalni },
+    ...(ocjena && ocjena.broj > 0 ? { aggregateRating: agregatnaOcjena(ocjena) } : {}),
   }
 }
 

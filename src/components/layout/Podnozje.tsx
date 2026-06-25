@@ -4,6 +4,7 @@ import { dajNavigaciju, dajPodesavanja, dajPoslovnice } from '@/lib/podaci'
 import { stvarno } from '@/lib/tekst'
 import { BREND } from '@/lib/brend'
 import { Logotip } from '@/components/ui/Logotip'
+import { DijeliStranicu } from '@/components/ui/DijeliStranicu'
 import { TelefonLink } from '@/components/ui/TelefonLink'
 
 // Lucide više ne sadrži brend-ikone — jednostavne inline SVG zamjene
@@ -238,7 +239,10 @@ export async function Podnozje() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-7 text-[14px] text-neutral-500 sm:flex-row">
+        <div className="mt-14 flex justify-center border-t border-white/10 pt-8">
+          <DijeliStranicu />
+        </div>
+        <div className="mt-8 flex flex-col items-start justify-between gap-4 text-[14px] text-neutral-500 sm:flex-row">
           <p>
             © {new Date().getFullYear()} {BREND.naziv} · {BREND.potpis}. Sva prava zadržana.
           </p>

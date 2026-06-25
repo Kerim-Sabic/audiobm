@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Languages, MapPin, UserRound } from 'lucide-react'
 import { dajPayload } from '@/lib/podaci'
-import { metaStranice } from '@/lib/seo'
+import { metaStranice, timJsonLd } from '@/lib/seo'
 import { ZaglavljeStranice } from '@/components/ui/ZaglavljeStranice'
 import { SlikaMedija } from '@/components/ui/SlikaMedija'
 import { OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
@@ -25,6 +25,18 @@ export default async function TimStranica() {
 
   return (
     <>
+      {tim.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(
+              timJsonLd(
+                tim.map((c) => ({ ime: c.ime, titula: c.titula, biografija: c.biografija, jezici: c.jezici })),
+              ),
+            ),
+          }}
+        />
+      )}
       <ZaglavljeStranice
         mrvice={[{ naziv: 'Naš tim' }]}
         nadnaslov="Ljudi iza Svijet Sluha"

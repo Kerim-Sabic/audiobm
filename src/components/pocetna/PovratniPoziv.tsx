@@ -5,6 +5,7 @@ import { posaljiUpit, type StanjeObrasca } from '@/app/actions/posaljiUpit'
 import { Dugme } from '@/components/ui/Dugme'
 import { PoljeUnos, PoljeSaglasnost } from '@/components/ui/Polje'
 import { Honeypot, Turnstile } from '@/components/ui/Turnstile'
+import { AtribucijaPolja } from '@/components/ui/AtribucijaPolja'
 import { zabiljezi } from '@/lib/analytics'
 import { CheckCircle2 } from 'lucide-react'
 import { useEffect } from 'react'
@@ -56,6 +57,7 @@ export function PovratniPoziv({ izvor = 'pocetna' }: { izvor?: string }) {
           Nazovite me
         </Dugme>
       </div>
+      <AtribucijaPolja />
       <PoljeSaglasnost name="saglasnost" greska={stanje.greske?.saglasnost} />
       <Turnstile />
       {stanje.status === 'greska' && stanje.poruka && !stanje.greske && (

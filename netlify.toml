@@ -1,4 +1,4 @@
-# Netlify konfiguracija — Audio BM (Next.js 16 + Payload CMS 3)
+# Netlify konfiguracija — Svijet Sluha (Next.js 16 + Payload CMS 3)
 #
 # Rutiranjem (uključujući osvježavanje i direktne linkove) upravlja Netlify
 # OpenNext adapter za Next.js — NE dodavati "/* -> /index.html"
@@ -29,6 +29,14 @@
   for = "/brand/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Kanonski host: www → apex (bez www), trajno 301 — sprječava duplikat sadržaja
+# i objedinjuje SEO „snagu" na jedan host. Mijenjati domenu ako apex ima www kao primarni.
+[[redirects]]
+  from = "https://www.svijetsluha.com/*"
+  to = "https://svijetsluha.com/:splat"
+  status = 301
+  force = true
 
 # Sigurnosna zaglavlja
 [[headers]]

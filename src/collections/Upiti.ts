@@ -1,6 +1,7 @@
 import type { CollectionConfig, PayloadRequest } from 'payload'
 import { jePrijavljen, jeVlasnik, upitiPristup } from '../access/uloge'
 import { posaljiObavijestOUpitu } from '../email/obavijesti'
+import { KAKO_CULI, kanalLeada, labelKakoCuo } from '../lib/atribucija'
 import type { Upiti as UpitDokument } from '../payload-types'
 
 export const VRSTE_UPITA = [
@@ -53,6 +54,12 @@ const redCsv = (upit: UpitDokument) => {
     upit.status,
     kategorija ? (KATEGORIJE_CSV[kategorija] ?? kategorija) : '',
     pouzdanost,
+    kanalLeada(upit),
+    labelKakoCuo(upit.izvorCuo),
+    upit.utmIzvor ?? '',
+    upit.utmMedij ?? '',
+    upit.utmKampanja ?? '',
+    upit.referer ?? '',
   ]
     .map((c) => `"${String(c).replaceAll('"', '""')}"`)
     .join(';')
@@ -81,6 +88,12 @@ const izvozCsv = async (req: PayloadRequest): Promise<Response> => {
     'Status',
     'Rezultat testa',
     'Pouzdanost testa',
+    'Kanal',
+    'Kako čuo',
+    'UTM izvor',
+    'UTM medij',
+    'UTM kampanja',
+    'Referrer',
   ]
   const csv = '﻿' + [zaglavlje.join(';'), ...docs.map(redCsv)].join('\r\n')
   return new Response(csv, {
@@ -192,6 +205,29 @@ export const Upiti: CollectionConfig = {
       label: 'Stranica sa koje je upit poslan',
       type: 'text',
       admin: { readOnly: true },
+    },
+    {
+      type: 'collapsible',
+      label: 'Atribucija (odakle je lead)',
+      admin: {
+        initCollapsed: true,
+        description: 'Izvor leada — osnova za praćenje kanala i obračun provizije.',
+      },
+      fields: [
+        {
+          name: 'izvorCuo',
+          label: 'Kako je korisnik čuo za nas',
+          type: 'select',
+          options: KAKO_CULI.map((o) => ({ label: o.label, value: o.value })),
+          admin: { description: 'Odgovor korisnika na obrascu („Kako ste čuli za nas?").' },
+        },
+        { name: 'utmIzvor', label: 'UTM izvor (utm_source)', type: 'text', admin: { readOnly: true } },
+        { name: 'utmMedij', label: 'UTM medij (utm_medium)', type: 'text', admin: { readOnly: true } },
+        { name: 'utmKampanja', label: 'UTM kampanja (utm_campaign)', type: 'text', admin: { readOnly: true } },
+        { name: 'utmSadrzaj', label: 'UTM sadržaj (utm_content)', type: 'text', admin: { readOnly: true } },
+        { name: 'referer', label: 'Referrer (odakle je došao)', type: 'text', admin: { readOnly: true } },
+        { name: 'landingStranica', label: 'Ulazna stranica (first-touch)', type: 'text', admin: { readOnly: true } },
+      ],
     },
     {
       name: 'rezultatTesta',
