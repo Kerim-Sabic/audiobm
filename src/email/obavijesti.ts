@@ -2,6 +2,7 @@ import type { Payload } from 'payload'
 import type { Poslovnice, Upiti } from '../payload-types'
 import { ZASTAVICE, type KategorijaTesta } from '../lib/test-sluha'
 import { BREND } from '../lib/brend'
+import { dajSmtpOkruzenje } from '../lib/okruzenje'
 
 type VrstaUpita = Upiti['vrsta']
 
@@ -98,7 +99,14 @@ export async function posaljiObavijestOUpitu(payload: Payload, upit: Upiti): Pro
     }
   }
 
-  primalac = primalac || podesavanja.emailZaUpite || undefined
+  // Konačni fallback: ako primalac nije podešen, šalji na „from" adresu (tvoj e-mail).
+  let smtpFrom: string | undefined
+  try {
+    smtpFrom = dajSmtpOkruzenje()?.fromAddress
+  } catch {
+    /* nepotpun SMTP — ignoriši */
+  }
+  primalac = primalac || podesavanja.emailZaUpite || smtpFrom
 
   if (!primalac) {
     payload.logger.warn('Upit zaprimljen, ali nijedan e-mail primalac nije podešen (Podešavanja -> Obavještenja).')

@@ -62,7 +62,8 @@ export const Podesavanja: GlobalConfig = {
               name: 'emailZaUpite',
               label: 'Glavni e-mail za sve upite',
               type: 'email',
-              admin: { description: 'Na ovu adresu stižu obavještenja ako nije podešen poseban primalac.' },
+              defaultValue: 'svijetsluha@gmail.com',
+              admin: { description: 'Na ovu adresu stižu obavještenja o svakom upitu/zakazivanju (ako nije podešen poseban primalac).' },
             },
             {
               name: 'primaoci',
