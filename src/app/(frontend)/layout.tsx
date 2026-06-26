@@ -7,7 +7,7 @@ import { Podnozje } from '@/components/layout/Podnozje'
 import { LjepljivaTraka } from '@/components/layout/LjepljivaTraka'
 import { AtribucijaZapis } from '@/components/ui/AtribucijaZapis'
 import { dajPodesavanja, dajOcjenu } from '@/lib/podaci'
-import { OSNOVNI_URL, organizacijaJsonLd, webSiteJsonLd } from '@/lib/seo'
+import { OSNOVNI_URL, organizacijaJsonLd, webSiteJsonLd, brendNaslov, brendOpis } from '@/lib/seo'
 import { BREND } from '@/lib/brend'
 import './globals.css'
 
@@ -16,12 +16,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(OSNOVNI_URL),
     title: {
-      default: podesavanja.seoNaslov ?? `${BREND.naziv} — slušni aparati i besplatna provjera sluha`,
+      default: brendNaslov(podesavanja.seoNaslov),
       template: `%s — ${BREND.naziv}`,
     },
-    description:
-      podesavanja.seoOpis ??
-      'Svijet Sluha — besplatna provjera sluha i slušni aparati vodećih svjetskih brendova, uz više od 30 godina povjerenja. Posjetite nas u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju ili Brčkom.',
+    description: brendOpis(podesavanja.seoOpis),
     icons: {
       icon: [
         { url: '/brand/favicon.svg', type: 'image/svg+xml' },

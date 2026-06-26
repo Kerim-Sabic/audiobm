@@ -28,7 +28,7 @@ import {
   dajUsluge,
 } from '@/lib/podaci'
 import { stvarno, ocisti } from '@/lib/tekst'
-import { metaStranice, pitanjaJsonLd } from '@/lib/seo'
+import { metaStranice, pitanjaJsonLd, brendNaslov, brendOpis } from '@/lib/seo'
 import { HeroUlaz } from '@/components/pocetna/HeroUlaz'
 import { PovratniPoziv } from '@/components/pocetna/PovratniPoziv'
 import { Audiogram } from '@/components/pocetna/Audiogram'
@@ -48,10 +48,8 @@ import type { Mediji } from '@/payload-types'
 export async function generateMetadata(): Promise<Metadata> {
   const podesavanja = await dajPodesavanja()
   return metaStranice({
-    naslov: podesavanja.seoNaslov ?? 'Svijet Sluha — slušni aparati i besplatna provjera sluha',
-    opis:
-      podesavanja.seoOpis ??
-      'Više od 30 godina povjerenja. Besplatna provjera sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju i Brčkom.',
+    naslov: brendNaslov(podesavanja.seoNaslov),
+    opis: brendOpis(podesavanja.seoOpis),
     putanja: '',
   })
 }

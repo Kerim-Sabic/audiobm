@@ -10,6 +10,21 @@ export const OSNOVNI_URL =
     ? BREND.domena
     : process.env.NEXT_PUBLIC_SERVER_URL ?? BREND.domena
 
+/** Naslov početne MORA sadržavati brend (za rangiranje na „Svijet Sluha"); ako je CMS
+ *  vrijednost zastarjela (npr. „Audio BM"), koristi se ispravan brendirani naslov. */
+export function brendNaslov(cmsNaslov?: string | null) {
+  return cmsNaslov && cmsNaslov.includes(BREND.naziv)
+    ? cmsNaslov
+    : `${BREND.naziv} — slušni aparati i besplatna provjera sluha`
+}
+
+/** Meta opis početne: brendiran i dovoljne dužine (≈150–220), čak i ako je CMS zastario. */
+export function brendOpis(cmsOpis?: string | null) {
+  return cmsOpis && cmsOpis.includes(BREND.naziv) && cmsOpis.length >= 140
+    ? cmsOpis
+    : 'Svijet Sluha — besplatna provjera sluha i slušni aparati vodećih svjetskih brendova, uz više od 30 godina povjerenja. Posjetite nas u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju ili Brčkom.'
+}
+
 /** Gradi Metadata za stranicu: jedinstven naslov ≤60, opis ≤155, OG/Twitter, canonical, hreflang. */
 export function metaStranice({
   naslov,
