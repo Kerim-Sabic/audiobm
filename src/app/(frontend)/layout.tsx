@@ -20,10 +20,16 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s — ${BREND.naziv}`,
     },
     description: brendOpis(podesavanja.seoOpis),
-    // Samo novi „Svijet Sluha" SVG znak — stari Audio BM PNG-ovi se NE referenciraju
-    // da Google/preglednici ne bi prikazali staru ikonu. (PNG-ove regenerisati iz novog loga.)
+    // Novi „Svijet Sluha" znak: SVG + PNG ikone (generisane iz SVG-a, scripts/generisi-ikone.mjs).
+    // Google često preferira PNG (48px višekratnik) za favicon u pretrazi.
     icons: {
-      icon: [{ url: '/brand/favicon.svg', type: 'image/svg+xml' }],
+      icon: [
+        { url: '/brand/favicon.svg', type: 'image/svg+xml' },
+        { url: '/brand/icon-96.png', sizes: '96x96', type: 'image/png' },
+        { url: '/brand/icon-48.png', sizes: '48x48', type: 'image/png' },
+        { url: '/brand/icon-32.png', sizes: '32x32', type: 'image/png' },
+      ],
+      apple: [{ url: '/brand/icon-180.png', sizes: '180x180' }],
     },
     manifest: '/manifest.webmanifest',
   }
