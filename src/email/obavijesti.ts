@@ -84,31 +84,35 @@ const dajZastavice = (rezultat?: Record<string, unknown>) => {
 export async function posaljiObavijestOUpitu(payload: Payload, upit: Upiti): Promise<void> {
   const podesavanja = await payload.findGlobal({ slug: 'podesavanja' })
 
-  let primalac = podesavanja.primaoci?.find((p) => p.vrsta === upit.vrsta)?.email
-
-  if (!primalac) {
+  // Poseban primalac po vrsti upita ili izabranoj poslovnici (dodatno).
+  let poseban = podesavanja.primaoci?.find((p) => p.vrsta === upit.vrsta)?.email
+  if (!poseban) {
     const poslovnicaId = dajPoslovnicaId(upit)
-
     if (poslovnicaId) {
       try {
         const poslovnica = await payload.findByID({ collection: 'poslovnice', id: poslovnicaId, depth: 0 })
-        primalac = poslovnica.emaili?.[0]?.email
+        poseban = poslovnica.emaili?.[0]?.email
       } catch {
         /* poslovnica možda obrisana */
       }
     }
   }
 
-  // Konačni fallback: ako primalac nije podešen, šalji na „from" adresu (tvoj e-mail).
+  // „from" adresa (EMAIL_FROM, npr. svijetsluha@gmail.com) UVIJEK dobija obavještenje —
+  // garancija da svaki upit/zakazivanje stigne, bez obzira na ostala podešavanja.
   let smtpFrom: string | undefined
   try {
     smtpFrom = dajSmtpOkruzenje()?.fromAddress
   } catch {
-    /* nepotpun SMTP — ignoriši */
+    /* nepotpun SMTP */
   }
-  primalac = primalac || podesavanja.emailZaUpite || smtpFrom
 
-  if (!primalac) {
+  // Lista primalaca: garantovani „from" + glavni e-mail + (opciono) poseban — bez duplikata.
+  const primaoci = Array.from(
+    new Set([smtpFrom, podesavanja.emailZaUpite, poseban].filter((e): e is string => Boolean(e))),
+  )
+
+  if (primaoci.length === 0) {
     payload.logger.warn('Upit zaprimljen, ali nijedan e-mail primalac nije podešen (Podešavanja -> Obavještenja).')
     return
   }
@@ -124,7 +128,7 @@ export async function posaljiObavijestOUpitu(payload: Payload, upit: Upiti): Pro
       : `<tr><td style="padding:6px 12px;color:#6b6360;font-size:14px">${esc(oznaka)}</td><td style="padding:6px 12px;font-size:15px;font-weight:600;color:#1c1917">${esc(vrijednost)}</td></tr>`
 
   await payload.sendEmail({
-    to: primalac,
+    to: primaoci,
     subject: `Novi upit: ${vrsta}${poslovnicaNaziv ? ` — ${poslovnicaNaziv}` : ''}`,
     html: `
 <!doctype html><html lang="bs"><body style="margin:0;background:#f7f5f4;font-family:Arial,Helvetica,sans-serif;padding:24px">
