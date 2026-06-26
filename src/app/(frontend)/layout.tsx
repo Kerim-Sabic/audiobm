@@ -42,8 +42,15 @@ export default async function KorijenskiRaspored({ children }: { children: React
   const [podesavanja, ocjena] = await Promise.all([dajPodesavanja(), dajOcjenu()])
 
   // Zvanični profili za Organization „sameAs" — pomaže Google/AI da poveže entitet.
-  const sameAs = [podesavanja.facebook, podesavanja.instagram, podesavanja.youtube].filter(
-    (v): v is string => typeof v === 'string' && v.length > 0,
+  // Padaju na poznate (BREND) profile ako u CMS-u još nisu uneseni.
+  const sameAs = Array.from(
+    new Set(
+      [
+        podesavanja.facebook ?? BREND.drustvene.facebook,
+        podesavanja.instagram ?? BREND.drustvene.instagram,
+        podesavanja.youtube,
+      ].filter((v): v is string => typeof v === 'string' && v.length > 0),
+    ),
   )
 
   // data-scroll-behavior: Next privremeno gasi CSS smooth-scroll pri promjeni

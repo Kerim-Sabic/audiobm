@@ -29,6 +29,11 @@ export const BREND = {
   /** Ime + adresa za „from" polje e-mail obavještenja. */
   emailNaziv: 'Svijet Sluha',
   emailAdresa: 'info@svijetsluha.com',
+  /** Zvanični društveni profili — za Organization „sameAs" (povezuje entitet za Google/AI). */
+  drustvene: {
+    facebook: 'https://www.facebook.com/profile.php?id=61591268077413',
+    instagram: 'https://www.instagram.com/svijetsluha',
+  },
 } as const
 
 /** „Svijet Sluha — u saradnji s Audio BM" — pun naziv s kontekstom. */
