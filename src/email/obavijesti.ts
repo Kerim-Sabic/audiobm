@@ -39,12 +39,6 @@ const jeObjekt = (vrijednost: unknown): vrijednost is Record<string, unknown> =>
 const jePoslovnica = (vrijednost: Upiti['poslovnica']): vrijednost is Poslovnice =>
   jeObjekt(vrijednost) && typeof vrijednost.id === 'number'
 
-const dajPoslovnicaId = (upit: Upiti) => {
-  if (typeof upit.poslovnica === 'number') return upit.poslovnica
-  if (jePoslovnica(upit.poslovnica)) return upit.poslovnica.id
-  return undefined
-}
-
 const dajRezultat = (upit: Upiti) => (jeObjekt(upit.rezultatTesta) ? upit.rezultatTesta : undefined)
 
 const dajNazivKategorije = (rezultat?: Record<string, unknown>) => {
@@ -84,35 +78,18 @@ const dajZastavice = (rezultat?: Record<string, unknown>) => {
 export async function posaljiObavijestOUpitu(payload: Payload, upit: Upiti): Promise<void> {
   const podesavanja = await payload.findGlobal({ slug: 'podesavanja' })
 
-  // Poseban primalac po vrsti upita ili izabranoj poslovnici (dodatno).
-  let poseban = podesavanja.primaoci?.find((p) => p.vrsta === upit.vrsta)?.email
-  if (!poseban) {
-    const poslovnicaId = dajPoslovnicaId(upit)
-    if (poslovnicaId) {
-      try {
-        const poslovnica = await payload.findByID({ collection: 'poslovnice', id: poslovnicaId, depth: 0 })
-        poseban = poslovnica.emaili?.[0]?.email
-      } catch {
-        /* poslovnica možda obrisana */
-      }
-    }
-  }
-
-  // „from" adresa (EMAIL_FROM, npr. svijetsluha@gmail.com) UVIJEK dobija obavještenje —
-  // garancija da svaki upit/zakazivanje stigne, bez obzira na ostala podešavanja.
+  // ISKLJUČIVO jedan primalac: „from" adresa (EMAIL_FROM = svijetsluha@gmail.com) —
+  // ista ona koja radi u testu. Bez grananja po poslovnici (stari @audiobm.ba e-mailovi
+  // su presretali obavještenja, a nepostojeća adresa zna oboriti cijelo slanje).
   let smtpFrom: string | undefined
   try {
     smtpFrom = dajSmtpOkruzenje()?.fromAddress
   } catch {
     /* nepotpun SMTP */
   }
+  const primalac = smtpFrom || podesavanja.emailZaUpite
 
-  // Lista primalaca: garantovani „from" + glavni e-mail + (opciono) poseban — bez duplikata.
-  const primaoci = Array.from(
-    new Set([smtpFrom, podesavanja.emailZaUpite, poseban].filter((e): e is string => Boolean(e))),
-  )
-
-  if (primaoci.length === 0) {
+  if (!primalac) {
     payload.logger.warn('Upit zaprimljen, ali nijedan e-mail primalac nije podešen (Podešavanja -> Obavještenja).')
     return
   }
@@ -128,7 +105,7 @@ export async function posaljiObavijestOUpitu(payload: Payload, upit: Upiti): Pro
       : `<tr><td style="padding:6px 12px;color:#6b6360;font-size:14px">${esc(oznaka)}</td><td style="padding:6px 12px;font-size:15px;font-weight:600;color:#1c1917">${esc(vrijednost)}</td></tr>`
 
   await payload.sendEmail({
-    to: primaoci,
+    to: primalac,
     subject: `Novi upit: ${vrsta}${poslovnicaNaziv ? ` — ${poslovnicaNaziv}` : ''}`,
     html: `
 <!doctype html><html lang="bs"><body style="margin:0;background:#f7f5f4;font-family:Arial,Helvetica,sans-serif;padding:24px">
