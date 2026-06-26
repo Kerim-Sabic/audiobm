@@ -31,7 +31,7 @@ export const BREND = {
   emailAdresa: 'info@svijetsluha.com',
   /** Zvanični društveni profili — za Organization „sameAs" (povezuje entitet za Google/AI). */
   drustvene: {
-    facebook: 'https://www.facebook.com/profile.php?id=61591268077413',
+    facebook: 'https://www.facebook.com/svijetsluha',
     instagram: 'https://www.instagram.com/svijetsluha',
   },
 } as const
