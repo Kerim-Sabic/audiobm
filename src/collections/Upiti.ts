@@ -1,6 +1,7 @@
 import type { CollectionConfig, PayloadRequest } from 'payload'
 import { jePrijavljen, jeVlasnik, upitiPristup } from '../access/uloge'
 import { posaljiObavijestOUpitu } from '../email/obavijesti'
+import { dajSmtpOkruzenje } from '../lib/okruzenje'
 import { KAKO_CULI, kanalLeada, labelKakoCuo } from '../lib/atribucija'
 import type { Upiti as UpitDokument } from '../payload-types'
 
@@ -104,6 +105,56 @@ const izvozCsv = async (req: PayloadRequest): Promise<Response> => {
   })
 }
 
+/** Dijagnostika SMTP-a (samo vlasnik): /api/upiti/test-email — šalje test mail i vraća rezultat. */
+const testEmail = async (req: PayloadRequest): Promise<Response> => {
+  if (!req.user || req.user.uloga !== 'vlasnik') {
+    return Response.json({ greska: 'Samo vlasnik moze pokrenuti test.' }, { status: 403 })
+  }
+
+  let smtpAktivan = false
+  let smtpGreska: string | null = null
+  try {
+    smtpAktivan = Boolean(dajSmtpOkruzenje())
+  } catch (e) {
+    smtpGreska = e instanceof Error ? e.message : String(e)
+  }
+
+  const stanje = {
+    SMTP_HOST: process.env.SMTP_HOST ?? '(NIJE postavljen)',
+    SMTP_USER: process.env.SMTP_USER ? 'postavljen ✓' : '(NIJE postavljen)',
+    SMTP_PASS: process.env.SMTP_PASS ? `postavljen (${process.env.SMTP_PASS.length} znakova)` : '(NIJE postavljen)',
+    EMAIL_FROM: process.env.EMAIL_FROM ?? '(NIJE postavljen)',
+    smtpAktivan,
+    ...(smtpGreska ? { smtpGreska } : {}),
+  }
+
+  if (!smtpAktivan) {
+    return Response.json({
+      ...stanje,
+      rezultat:
+        'SMTP NIJE aktivan. Provjeri da su SMTP_HOST/PORT/USER/PASS postavljeni i da si uradio REDEPLOY nakon dodavanja varijabli.',
+    })
+  }
+
+  try {
+    await req.payload.sendEmail({
+      to: 'svijetsluha@gmail.com',
+      subject: 'Test — Svijet Sluha SMTP radi 🎉',
+      html: '<p>Ako vidiš ovaj e-mail, SMTP je ispravno povezan. — Svijet Sluha</p>',
+    })
+    return Response.json({
+      ...stanje,
+      rezultat: 'Test e-mail je POSLAN. Provjeri inbox i Spam za svijetsluha@gmail.com.',
+    })
+  } catch (e) {
+    return Response.json({
+      ...stanje,
+      rezultat: 'GRESKA pri slanju — pogledaj „detalji" ispod.',
+      detalji: e instanceof Error ? e.message : String(e),
+    })
+  }
+}
+
 export const Upiti: CollectionConfig = {
   slug: 'upiti',
   labels: { singular: 'Upit', plural: 'Upiti' },
@@ -115,7 +166,10 @@ export const Upiti: CollectionConfig = {
       'Svi upiti sa stranice na jednom mjestu. CSV izvoz: /api/upiti/izvoz (otvoriti u novom tabu dok ste prijavljeni).',
     listSearchableFields: ['ime', 'telefon', 'email', 'poruka'],
   },
-  endpoints: [{ path: '/izvoz', method: 'get', handler: izvozCsv }],
+  endpoints: [
+    { path: '/izvoz', method: 'get', handler: izvozCsv },
+    { path: '/test-email', method: 'get', handler: testEmail },
+  ],
   access: {
     read: upitiPristup,
     create: jePrijavljen, // javni obrasci idu kroz serversku akciju (lokalni API), ne kroz javni REST
