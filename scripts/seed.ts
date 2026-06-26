@@ -24,16 +24,19 @@ const log = (m: string) => payload.logger.info(`[seed] ${m}`)
 // ————————————————— 1. Vlasnički korisnik —————————————————
 const postojeciKorisnici = await payload.find({ collection: 'korisnici', limit: 1 })
 if (postojeciKorisnici.totalDocs === 0) {
+  // Kredencijali iz env (SEED_ADMIN_EMAIL/SEED_ADMIN_PASSWORD) — bez stvarne lozinke u repou.
+  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? 'admin@svijetsluha.com'
+  const adminLozinka = process.env.SEED_ADMIN_PASSWORD ?? 'PromijeniOdmah-2026!'
   await payload.create({
     collection: 'korisnici',
     data: {
-      email: 'vlasnik@audiobm.ba',
-      password: 'AudioBM-promijenite-me-2026!',
-      ime: 'Vlasnik Audio BM',
+      email: adminEmail,
+      password: adminLozinka,
+      ime: 'Vlasnik Svijet Sluha',
       uloga: 'vlasnik',
     },
   })
-  log('Korisnik vlasnik@audiobm.ba kreiran (lozinku promijeniti odmah nakon prve prijave!)')
+  log(`Korisnik ${adminEmail} kreiran — lozinku promijeniti odmah nakon prve prijave!`)
 } else {
   log('Korisnici već postoje — preskačem')
 }
