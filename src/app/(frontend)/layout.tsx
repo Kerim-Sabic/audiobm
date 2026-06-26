@@ -20,13 +20,10 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s — ${BREND.naziv}`,
     },
     description: brendOpis(podesavanja.seoOpis),
+    // Samo novi „Svijet Sluha" SVG znak — stari Audio BM PNG-ovi se NE referenciraju
+    // da Google/preglednici ne bi prikazali staru ikonu. (PNG-ove regenerisati iz novog loga.)
     icons: {
-      icon: [
-        { url: '/brand/favicon.svg', type: 'image/svg+xml' },
-        { url: '/brand/icon-32.png', sizes: '32x32', type: 'image/png' },
-        { url: '/brand/icon-16.png', sizes: '16x16', type: 'image/png' },
-      ],
-      apple: [{ url: '/brand/icon-180.png', sizes: '180x180' }],
+      icon: [{ url: '/brand/favicon.svg', type: 'image/svg+xml' }],
     },
     manifest: '/manifest.webmanifest',
   }

@@ -91,6 +91,9 @@ export function organizacijaJsonLd({
     description:
       'Slušni aparati, besplatne provjere sluha i audiološke usluge — u saradnji s Audio BM, audiološkom kućom s više od 30 godina iskustva u Bosni i Hercegovini.',
     brand: { '@type': 'Brand', name: BREND.naziv },
+    // Sidri entitet u BiH — razlikuje „Svijet Sluha" (BiH) od srpskog „Svet Sluha".
+    areaServed: { '@type': 'Country', name: 'Bosna i Hercegovina' },
+    address: { '@type': 'PostalAddress', addressCountry: 'BA' },
     parentOrganization: {
       '@type': 'Organization',
       name: BREND.provajderLegalni,
