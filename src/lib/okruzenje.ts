@@ -40,11 +40,25 @@ export function dajDatabaseUrl() {
 }
 
 export function dajServerUrl() {
+  // U produkciji UVIJEK prava domena (ne netlify.app iz env-a) — inače admin save-ovi
+  // padaju na CSRF („Nemate dopuštenje") jer se admin otvara na svijetsluha.com.
+  if (process.env.NODE_ENV === 'production') return BREND.domena
   return citaj('NEXT_PUBLIC_SERVER_URL')
 }
 
 export function dajCsrfUrl() {
   return dajServerUrl() ?? 'http://localhost:3000'
+}
+
+/** Dozvoljeni CSRF origini — admin radi s apex, www i (eventualno) netlify poddomene. */
+export function dajCsrfUrls() {
+  return Array.from(
+    new Set(
+      [BREND.domena, 'https://www.svijetsluha.com', citaj('NEXT_PUBLIC_SERVER_URL'), dajCsrfUrl()].filter(
+        (v): v is string => Boolean(v),
+      ),
+    ),
+  )
 }
 
 export function dajSmtpOkruzenje() {

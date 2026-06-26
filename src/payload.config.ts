@@ -24,7 +24,7 @@ import { Podesavanja } from './globals/Podesavanja'
 import { Navigacija } from './globals/Navigacija'
 import { Pocetna } from './globals/Pocetna'
 import {
-  dajCsrfUrl,
+  dajCsrfUrls,
   dajDatabaseUrl,
   dajPayloadSecret,
   dajS3Okruzenje,
@@ -121,5 +121,5 @@ export default buildConfig({
   graphQL: { disable: true },
   upload: { limits: { fileSize: 12_000_000 } },
   serverURL: dajServerUrl(),
-  csrf: [dajCsrfUrl()],
+  csrf: dajCsrfUrls(),
 })
