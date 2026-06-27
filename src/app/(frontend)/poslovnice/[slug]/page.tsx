@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Clock, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
-import { dajPayload, dajPoslovnice, dajPoslovnicu, dajOcjenu } from '@/lib/podaci'
+import { dajPayload, dajOcjenu } from '@/lib/podaci'
+import { dajLokacije, dajLokaciju } from '@/data/locations'
 import { metaStranice, poslovnicaJsonLd } from '@/lib/seo'
 import { stvarno } from '@/lib/tekst'
 import { Mrvice } from '@/components/ui/Mrvice'
@@ -13,13 +14,13 @@ import { uGradu } from '@/lib/gradovi'
 import type { Mediji } from '@/payload-types'
 
 export async function generateStaticParams() {
-  const poslovnice = await dajPoslovnice()
+  const poslovnice = await dajLokacije()
   return poslovnice.map((p) => ({ slug: p.slug }))
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const p = await dajPoslovnicu(slug)
+  const p = await dajLokaciju(slug)
   if (!p) return {}
   return metaStranice({
     naslov: p.seo?.naslov ?? `Audio BM ${p.grad} — slušni aparati i provjera sluha`,
@@ -42,7 +43,7 @@ const DANI: Record<string, string> = {
 
 export default async function PoslovnicaStranica({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const poslovnica = await dajPoslovnicu(slug)
+  const poslovnica = await dajLokaciju(slug)
   if (!poslovnica) notFound()
 
   const payload = await dajPayload()

@@ -246,6 +246,19 @@
   .prose-bm strong {
     @apply font-semibold text-neutral-900;
   }
+  .article-prose {
+    max-width: none;
+  }
+  .article-prose picture,
+  .article-prose img {
+    @apply my-9 block w-full overflow-hidden rounded-[24px] shadow-[var(--shadow-lift)];
+  }
+  .article-prose picture img {
+    @apply my-0 rounded-none shadow-none;
+  }
+  .article-prose figure img {
+    @apply my-0 rounded-none shadow-none;
+  }
 }
 
 /* ——— Otkrivanje pri skrolanju (CSS + IntersectionObserver) ———

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { Store } from 'lucide-react'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { dajPayload, dajPodesavanja } from '@/lib/podaci'
-import { metaStranice, proizvodJsonLd, OSNOVNI_URL } from '@/lib/seo'
+import { metaOpisProizvoda, metaStranice, proizvodJsonLd, OSNOVNI_URL } from '@/lib/seo'
 import { stvarno } from '@/lib/tekst'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { SlikaMedija } from '@/components/ui/SlikaMedija'
@@ -42,7 +42,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!p) return {}
   return metaStranice({
     naslov: p.seo?.naslov ?? p.naziv,
-    opis: p.seo?.opis ?? p.kratkiOpis ?? `${p.naziv} — dostupno u našim poslovnicama.`,
+    opis: metaOpisProizvoda({
+      naziv: p.naziv,
+      seo: p.seo,
+      kratkiOpis: p.kratkiOpis,
+      fallback: 'dostupno u našim poslovnicama.',
+    }),
     putanja: `/proizvodi/${slug}`,
   })
 }

@@ -1,21 +1,25 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { MessageCircle, MapPin } from 'lucide-react'
-import { dajPoslovnice } from '@/lib/podaci'
+import { dajLokacije, brojPoslovnica } from '@/data/locations'
 import { metaStranice } from '@/lib/seo'
 import { stvarno } from '@/lib/tekst'
 import { ZaglavljeStranice } from '@/components/ui/ZaglavljeStranice'
 import { TelefonLink, ViberLink, WhatsAppLink } from '@/components/ui/TelefonLink'
 import { KontaktObrazac } from '@/components/kontakt/KontaktObrazac'
 
-export const metadata: Metadata = metaStranice({
-  naslov: 'Kontakt — pišite nam ili pozovite najbližu poslovnicu',
-  opis: 'Pitanje za doktora, poruka za poslovnicu ili kupovina — odgovaramo isti radni dan. Telefoni svih 6 poslovnica na jednom mjestu.',
-  putanja: '/kontakt',
-})
+export async function generateMetadata(): Promise<Metadata> {
+  const poslovnice = await dajLokacije()
+
+  return metaStranice({
+    naslov: 'Kontakt — pišite nam ili pozovite najbližu poslovnicu',
+    opis: `Pitanje za doktora, poruka za poslovnicu ili kupovina — odgovaramo isti radni dan. Telefoni svih ${brojPoslovnica(poslovnice)} poslovnica na jednom mjestu.`,
+    putanja: '/kontakt',
+  })
+}
 
 export default async function KontaktStranica() {
-  const poslovnice = await dajPoslovnice()
+  const poslovnice = await dajLokacije()
 
   return (
     <>

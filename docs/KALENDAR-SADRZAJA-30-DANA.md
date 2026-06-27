@@ -51,7 +51,7 @@ documentary photography, soft focus background, authentic Balkan home interior.*
 > Iza svake provjere stoji čovjek koji sluša — i prije nego uključi aparat. 🤍
 >
 > Naš tim su akustičari i stručnjaci sa decenijama iskustva (u saradnji s Audio BM,
-> 30+ godina). Strpljivo, bez žurbe, dok zvuk ne „sjedne". Upoznajte nas u 6 gradova BiH.
+> 30+ godina). Strpljivo, bez žurbe, dok zvuk ne „sjedne". Upoznajte nas u 7 gradova BiH.
 **Image prompt:** *Professional but warm portrait of a friendly female audiologist (40s)
 in a clean modern hearing clinic, white coat, smiling reassuringly at an elderly patient,
 soft clinical lighting, hearing test booth softly blurred in background, trustworthy and
@@ -132,11 +132,11 @@ and precise, soft technical lighting, sense of craftsmanship and care, editorial
 **Caption:**
 > Sada smo bliže Vama — i u Sarajevu! 📍
 >
-> Svijet Sluha (u saradnji s Audio BM) brine o Vašem sluhu u 6 gradova:
-> Sarajevo · Banja Luka · Gradiška · Bijeljina · Doboj · Brčko.
+> Svijet Sluha (u saradnji s Audio BM) brine o Vašem sluhu u 7 gradova:
+> Sarajevo · Banja Luka · Gradiška · Bijeljina · Doboj · Brčko · Tuzla.
 >
 > Dođite na kafu i besplatnu provjeru sluha u Vama najbližu poslovnicu. Link u opisu. 🤍
-**Image prompt:** *Clean, warm map illustration of Bosnia and Herzegovina with 6 glowing
+**Image prompt:** *Clean, warm map illustration of Bosnia and Herzegovina with 7 glowing
 red location pins on the cities, minimal modern flat-design style, brand red accents on
 white, premium and friendly, subtle soundwave motif in the background.*
 
@@ -193,7 +193,7 @@ relaxed and modern, approachable healthcare-tech feel.*
 
 **Naslov:** 7 ranih znakova slabljenja sluha (i zašto ih ne treba ignorisati)
 **Meta opis (≈155):** Gubitak sluha dolazi postepeno i lako se previdi. Evo 7 ranih znakova
-na koje treba obratiti pažnju — i šta učiniti. Besplatna provjera sluha u 6 gradova BiH.
+na koje treba obratiti pažnju — i šta učiniti. Besplatna provjera sluha u 7 gradova BiH.
 
 > **Kratak odgovor (prvi pasus — ovo AI „podiže"):**
 > Najčešći rani znakovi slabljenja sluha su: pojačavanje TV-a, često traženje da se ponovi,
@@ -226,8 +226,8 @@ dio troška može biti pokriven preko **FZO/RFZO** (pomažemo oko papirologije).
 ### Često postavljana pitanja
 **Da li provjera boli?** Ne. Potpuno je bezbolna i traje 30–45 minuta.
 **Moram li odmah kupiti aparat?** Ne. Provjera je informativna i ne obavezuje ni na šta.
-**Gdje mogu na provjeru?** U 6 gradova BiH: Sarajevo, Banja Luka, Gradiška, Bijeljina,
-Doboj i Brčko.
+**Gdje mogu na provjeru?** U 7 gradova BiH: Sarajevo, Banja Luka, Gradiška, Bijeljina,
+Doboj, Brčko i Tuzla.
 
 > **CTA na kraju:** Zakažite besplatnu provjeru sluha online za 2 minute ili nas pozovite.
 > [Dugme → /zakazivanje]

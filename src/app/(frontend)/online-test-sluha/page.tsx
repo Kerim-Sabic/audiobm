@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { Clock, Headphones, ShieldCheck, Activity } from 'lucide-react'
-import { dajPoslovnice } from '@/lib/podaci'
+import { dajLokacije } from '@/data/locations'
 import { metaStranice } from '@/lib/seo'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { TestSluha } from '@/components/online-test/TestSluha'
@@ -13,7 +13,7 @@ export const metadata: Metadata = metaStranice({
 })
 
 export default async function OnlineTestSluhaStranica() {
-  const poslovnice = await dajPoslovnice()
+  const poslovnice = await dajLokacije()
 
   return (
     <>

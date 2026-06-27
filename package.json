@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "audit:prod": "pnpm audit --prod",
     "check": "pnpm typecheck",
+    "seo:validate": "node scripts/seo-validate.mjs",
     "start": "next start",
     "payload": "payload",
     "generate:types": "payload generate:types",

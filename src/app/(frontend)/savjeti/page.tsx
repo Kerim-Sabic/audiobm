@@ -8,17 +8,27 @@ import { SlikaMedija } from '@/components/ui/SlikaMedija'
 import { OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
 import type { Mediji } from '@/payload-types'
 
-export const metadata: Metadata = metaStranice({
-  naslov: 'Savjeti i novosti o sluhu',
-  opis: 'Praktični savjeti o sluhu i slušnim aparatima, novosti iz naših poslovnica i vijesti iz Sarajeva.',
-  putanja: '/savjeti',
-})
-
 const KATEGORIJE = [
   { value: 'savjeti', label: 'Savjeti' },
   { value: 'novosti', label: 'Novosti' },
   { value: 'sarajevo', label: 'Sarajevo' },
 ] as const
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ kategorija?: string }>
+}): Promise<Metadata> {
+  const params = await searchParams
+  const filtrirano = KATEGORIJE.some((k) => k.value === params.kategorija)
+
+  return metaStranice({
+    naslov: 'Savjeti i novosti o sluhu',
+    opis: 'Praktični savjeti o sluhu i slušnim aparatima, novosti iz naših poslovnica i vijesti iz Sarajeva.',
+    putanja: '/savjeti',
+    bezIndeksa: filtrirano,
+  })
+}
 
 export default async function SavjetiStranica({
   searchParams,

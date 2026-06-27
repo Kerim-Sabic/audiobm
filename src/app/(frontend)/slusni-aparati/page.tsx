@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, BatteryCharging, Bluetooth, Tv } from 'lucide-react'
 import { dajPayload } from '@/lib/podaci'
+import { dajLokacije, opisGradova } from '@/data/locations'
 import { metaStranice } from '@/lib/seo'
 import { ZaglavljeStranice } from '@/components/ui/ZaglavljeStranice'
 import { DugmeLink } from '@/components/ui/Dugme'
@@ -11,11 +12,15 @@ import { ProizvodKartica } from '@/components/proizvodi/ProizvodKartica'
 import { UhoVizualizacija } from '@/components/slusni-aparati/UhoVizualizacija'
 import { TIPOVI_APARATA } from '@/lib/catalog'
 
-export const metadata: Metadata = metaStranice({
-  naslov: 'Slušni aparati — vrste, brendovi i kako odabrati',
-  opis: 'Kanalni, zaušni i snažni slušni aparati Bernafon i Unitron. Saznajte koji je pravi za Vas — uz besplatno savjetovanje u 6 gradova BiH.',
-  putanja: '/slusni-aparati',
-})
+export async function generateMetadata(): Promise<Metadata> {
+  const poslovnice = await dajLokacije()
+
+  return metaStranice({
+    naslov: 'Slušni aparati — vrste, brendovi i kako odabrati',
+    opis: `Kanalni, zaušni i snažni slušni aparati Bernafon i Unitron. Saznajte koji je pravi za Vas — uz besplatno savjetovanje u ${opisGradova(poslovnice)} BiH.`,
+    putanja: '/slusni-aparati',
+  })
+}
 
 export default async function SlusniAparatiStranica() {
   const payload = await dajPayload()

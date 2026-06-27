@@ -2,17 +2,22 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { dajPayload } from '@/lib/podaci'
+import { dajLokacije, brojPoslovnica } from '@/data/locations'
 import { metaStranice } from '@/lib/seo'
 import { ZaglavljeStranice } from '@/components/ui/ZaglavljeStranice'
 import { OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
 import { ProizvodKartica } from '@/components/proizvodi/ProizvodKartica'
 import { KATEGORIJE, type Kategorija } from '@/lib/catalog'
 
-export const metadata: Metadata = metaStranice({
-  naslov: 'Proizvodi — baterije, čepovi, pribor i medicinski aparati',
-  opis: 'Varta baterije, čepovi za uši po mjeri, pribor za održavanje i kućni medicinski aparati. Naručite upitom ili telefonom — preuzimanje u 6 poslovnica.',
-  putanja: '/proizvodi',
-})
+export async function generateMetadata(): Promise<Metadata> {
+  const poslovnice = await dajLokacije()
+
+  return metaStranice({
+    naslov: 'Proizvodi — baterije, čepovi, pribor i medicinski aparati',
+    opis: `Varta baterije, čepovi za uši po mjeri, pribor za održavanje i kućni medicinski aparati. Naručite upitom ili telefonom — preuzimanje u ${brojPoslovnica(poslovnice)} poslovnica.`,
+    putanja: '/proizvodi',
+  })
+}
 
 // maloprodajni katalog — slušni aparati imaju vlastitu edukativnu stranicu
 const KATALOSKE: Kategorija[] = [

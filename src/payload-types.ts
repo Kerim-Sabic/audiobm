@@ -1396,7 +1396,7 @@ export interface Podesavanja {
   seoOpis?: string | null;
   ogSlika?: (number | null) | Mediji;
   /**
-   * Na ovu adresu stižu obavještenja ako nije podešen poseban primalac.
+   * Na ovu adresu stižu obavještenja o svakom upitu/zakazivanju (ako nije podešen poseban primalac).
    */
   emailZaUpite?: string | null;
   primaoci?:

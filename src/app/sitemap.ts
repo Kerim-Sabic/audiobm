@@ -1,16 +1,24 @@
 import type { MetadataRoute } from 'next'
-import { dajPayload, dajPoslovnice, dajUsluge } from '@/lib/podaci'
+import { dajPayload, dajUsluge } from '@/lib/podaci'
+import { dajLokacije } from '@/data/locations'
 import { OSNOVNI_URL } from '@/lib/seo'
-import { TIPOVI_APARATA } from '@/lib/catalog'
+import { KATEGORIJE, TIPOVI_APARATA } from '@/lib/catalog'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const payload = await dajPayload()
+  const danas = new Date().toISOString()
   const [poslovnice, usluge, proizvodi, objave, akcije] = await Promise.all([
-    dajPoslovnice(),
+    dajLokacije(),
     dajUsluge(),
     payload.find({ collection: 'proizvodi', where: { aktivan: { equals: true } }, limit: 300, depth: 0, draft: false }),
     payload.find({ collection: 'objave', limit: 300, depth: 0, draft: false }),
-    payload.find({ collection: 'akcije', limit: 100, depth: 0, draft: false }),
+    payload.find({
+      collection: 'akcije',
+      where: { and: [{ vrijediOd: { less_than_equal: danas } }, { vrijediDo: { greater_than_equal: danas } }] },
+      limit: 100,
+      depth: 0,
+      draft: false,
+    }),
   ])
 
   const url = (putanja: string, prioritet = 0.7, frekvencija: 'daily' | 'weekly' | 'monthly' = 'weekly') => ({
@@ -38,6 +46,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url('/politika-privatnosti', 0.2, 'monthly'),
     url('/uslovi-koristenja', 0.2, 'monthly'),
     ...Object.keys(TIPOVI_APARATA).map((tip) => url(`/slusni-aparati/${tip}`, 0.8)),
+    ...Object.keys(KATEGORIJE)
+      .filter((kat) => kat !== 'slusni-aparati')
+      .map((kat) => url(`/proizvodi/kategorija/${kat}`, 0.7)),
     ...poslovnice.map((p) => url(`/poslovnice/${p.slug}`, 0.9)),
     ...usluge.map((u) => url(`/usluge/${u.slug}`, 0.8)),
     ...proizvodi.docs.map((p) =>

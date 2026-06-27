@@ -2,15 +2,20 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, Ear, MessagesSquare, Settings2, ShieldCheck, Stethoscope } from 'lucide-react'
 import { dajUsluge } from '@/lib/podaci'
+import { dajLokacije, opisGradova } from '@/data/locations'
 import { metaStranice } from '@/lib/seo'
 import { ZaglavljeStranice } from '@/components/ui/ZaglavljeStranice'
 import { OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
 
-export const metadata: Metadata = metaStranice({
-  naslov: 'Usluge — provjera sluha, servis aparata, implanti',
-  opis: 'Besplatna provjera sluha, prilagođavanje i servis slušnih aparata, podrška za kohlearne implante — u 6 gradova BiH.',
-  putanja: '/usluge',
-})
+export async function generateMetadata(): Promise<Metadata> {
+  const poslovnice = await dajLokacije()
+
+  return metaStranice({
+    naslov: 'Usluge — provjera sluha, servis aparata, implanti',
+    opis: `Besplatna provjera sluha, prilagođavanje i servis slušnih aparata, podrška za kohlearne implante — u ${opisGradova(poslovnice)} BiH.`,
+    putanja: '/usluge',
+  })
+}
 
 const IKONE: Record<string, typeof Ear> = {
   ear: Ear,

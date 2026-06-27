@@ -14,7 +14,7 @@ import {
   tipAparata,
   type ManifestProduct,
 } from '../src/lib/catalog'
-import { dokument, paragraf, naslov, lista, tekst, izHtml } from '../src/lib/lexical'
+import { dokument, paragraf, naslov, lista, tekst, link, slika, izHtml } from '../src/lib/lexical'
 
 const ROOT = path.resolve(process.cwd())
 
@@ -61,15 +61,15 @@ const POSLOVNICE: PoslovnicaSeed[] = [
     naziv: 'Audio BM Sarajevo',
     slug: 'sarajevo',
     grad: 'Sarajevo',
-    adresa: '[ADRESA_PLACEHOLDER]',
-    geoSirina: 43.8563,
-    geoDuzina: 18.4131,
+    adresa: 'Fra Anđela Zvizdovića 1, UNITIC neboderi',
+    geoSirina: 43.8558,
+    geoDuzina: 18.4085,
     telefoni: [{ oznaka: 'Telefon', broj: '[TELEFON_PLACEHOLDER]' }],
     emaili: [],
     novaPoslovnica: true,
     redoslijed: 1,
     opis:
-      'Naša najnovija poslovnica — od sada smo dostupni i u Sarajevu. Dobro došli na besplatnu provjeru sluha!',
+      'Svijet Sluha u Sarajevu — centar za slušnu akustiku, Experience Room, savjetovanje i besplatna provjera sluha u UNITIC-u.',
   },
   {
     naziv: 'Audio BM Banja Luka',
@@ -131,6 +131,18 @@ const POSLOVNICE: PoslovnicaSeed[] = [
     redoslijed: 6,
     opis: 'Poslovnica u Brčkom — provjera sluha i kompletna ponuda slušnih aparata.',
   },
+  {
+    naziv: 'Audio BM Tuzla',
+    slug: 'tuzla',
+    grad: 'Tuzla',
+    adresa: 'Soline 10',
+    geoSirina: 44.5594495,
+    geoDuzina: 18.6952466,
+    telefoni: [{ oznaka: 'Telefon', broj: '063132400' }],
+    emaili: [],
+    redoslijed: 7,
+    opis: 'Poslovnica u Tuzli — besplatna provjera sluha, slušni aparati i servis.',
+  },
 ]
 
 // lokativ gradova za prirodne SEO rečenice
@@ -141,6 +153,7 @@ const LOKATIV: Record<string, string> = {
   Bijeljina: 'Bijeljini',
   Doboj: 'Doboju',
   Brčko: 'Brčkom',
+  Tuzla: 'Tuzli',
 }
 
 const poslovniceIds: Record<string, number> = {}
@@ -160,8 +173,17 @@ for (const p of POSLOVNICE) {
     data: {
       ...p,
       aktivna: true,
-      radnoVrijemePotvrdjeno: false, // staro „7–15h" je nepouzdano — [RADNO_VRIJEME_PLACEHOLDER]
-      radnoVrijeme: [],
+      radnoVrijemePotvrdjeno: p.slug === 'sarajevo',
+      radnoVrijeme:
+        p.slug === 'sarajevo'
+          ? [
+              { dan: 'ponedjeljak', od: '08:00', do: '16:00', zatvoreno: false },
+              { dan: 'utorak', od: '08:00', do: '16:00', zatvoreno: false },
+              { dan: 'srijeda', od: '08:00', do: '18:00', zatvoreno: false },
+              { dan: 'cetvrtak', od: '08:00', do: '16:00', zatvoreno: false },
+              { dan: 'petak', od: '08:00', do: '16:00', zatvoreno: false },
+            ]
+          : [],
       googleMapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
         `Audio BM ${p.adresa.startsWith('[') ? p.grad : p.adresa + ', ' + p.grad}`,
       )}`,
@@ -536,6 +558,86 @@ if (postojecaPitanja.totalDocs === 0) {
 }
 
 // ————————————————— 6. Objave (blog) —————————————————
+const SARAJEVO_CLANAK_SLUG = 'svijet-sluha-sarajevo-slusni-aparati-provjera-sluha'
+const URL_ZAKAZIVANJE_SARAJEVO = 'https://svijetsluha.com/zakazivanje?poslovnica=sarajevo'
+const URL_SLUSNI_APARATI = 'https://svijetsluha.com/slusni-aparati'
+const URL_POSLOVNICA_SARAJEVO = 'https://svijetsluha.com/poslovnice/sarajevo'
+
+const SARAJEVO_MEDIJI = [
+  {
+    kljuc: 'otvaranje',
+    file: 'otvaranje-svijet-sluha-sarajevo-vrpca.png',
+    alt: 'Svečano otvaranje centra Svijet Sluha u Sarajevu',
+  },
+  {
+    kljuc: 'partneri',
+    file: 'audio-bm-svijet-sluha-partneri.png',
+    alt: 'Predstavnici Audio BM ispred zida brendova Bernafon, Unitron i Cochlear',
+  },
+  {
+    kljuc: 'savjetovanje',
+    file: 'savjetovanje-u-svijetu-sluha-sarajevo.png',
+    alt: 'Savjetovanje o slušnim aparatima u centru Svijet Sluha Sarajevo',
+  },
+  {
+    kljuc: 'interijer',
+    file: 'interijer-centra-svijet-sluha-sarajevo.png',
+    alt: 'Interijer centra Svijet Sluha Sarajevo sa izložbenim zonama Bernafon i Unitron',
+  },
+  {
+    kljuc: 'liftLearn',
+    file: 'lift-and-learn-slusni-aparati-sarajevo.png',
+    alt: 'Lift and Learn prezentacija slušnih aparata u centru Svijet Sluha Sarajevo',
+  },
+  {
+    kljuc: 'experienceDemo',
+    file: 'experience-room-demonstracija-sarajevo.png',
+    alt: 'Demonstracija slušanja u Experience Room prostoru Svijet Sluha Sarajevo',
+  },
+  {
+    kljuc: 'experienceRoom',
+    file: 'experience-room-svijet-sluha-sarajevo.png',
+    alt: 'Experience Room za isprobavanje slušnih aparata u realnim zvučnim situacijama',
+  },
+  {
+    kljuc: 'ulaz',
+    file: 'ulaz-svijet-sluha-sarajevo-unitic.png',
+    alt: 'Ulaz u Svijet Sluha Sarajevo u UNITIC neboderima',
+  },
+  {
+    kljuc: 'izlozba',
+    file: 'slusni-aparati-izlozba-sarajevo.png',
+    alt: 'Izloženi slušni aparati u centru Svijet Sluha Sarajevo',
+  },
+] as const
+
+const sarajevoMediji: Record<(typeof SARAJEVO_MEDIJI)[number]['kljuc'], number> = {} as never
+for (const m of SARAJEVO_MEDIJI) {
+  const postoji = await payload.find({
+    collection: 'mediji',
+    where: { alt: { equals: m.alt } },
+    limit: 1,
+    depth: 0,
+  })
+  if (postoji.totalDocs > 0) {
+    sarajevoMediji[m.kljuc] = postoji.docs[0].id as number
+    continue
+  }
+
+  const filePath = path.join(ROOT, 'assets-src', 'content', 'svijet-sluha-sarajevo', m.file)
+  if (!existsSync(filePath)) {
+    log(`! [MISSING_ASSET] Sarajevo članak nema sliku: ${m.file}`)
+    continue
+  }
+
+  const medij = await payload.create({
+    collection: 'mediji',
+    data: { alt: m.alt },
+    filePath,
+  })
+  sarajevoMediji[m.kljuc] = medij.id as number
+}
+
 const OBJAVE = [
   {
     naslov: 'Kako prepoznati prve znakove slabljenja sluha',
@@ -579,21 +681,154 @@ const OBJAVE = [
     ),
   },
   {
-    naslov: 'Audio BM stigao u Sarajevo — dobro došli!',
-    slug: 'otvaranje-poslovnice-sarajevo',
+    naslov: 'Svijet Sluha u Sarajevu: slušni aparati, Experience Room i besplatna provjera sluha',
+    slug: SARAJEVO_CLANAK_SLUG,
+    stariSlug: 'otvaranje-poslovnice-sarajevo',
     kategorija: 'sarajevo',
     izvod:
-      'Nakon više od 30 godina rada, s ponosom otvaramo vrata naše prve poslovnice u Sarajevu. Zakažite besplatnu provjeru sluha već danas.',
+      'Posjetite Svijet Sluha u Sarajevu, Fra Anđela Zvizdovića 1 u UNITIC-u. Istražite slušne aparate, Experience Room i zakažite besplatnu provjeru sluha.',
+    naslovnaSlika: sarajevoMediji.ulaz,
+    seoNaslov: 'Svijet Sluha Sarajevo: slušni aparati i provjera sluha',
+    seoOpis:
+      'Posjetite Svijet Sluha u Sarajevu, Fra Anđela Zvizdovića 1 u UNITIC-u. Istražite slušne aparate, Experience Room i zakažite besplatnu provjeru sluha.',
     sadrzaj: dokument(
       paragraf(
-        'S velikim zadovoljstvom obavještavamo da je Audio BM otvorio poslovnicu u Sarajevu — našu šestu u Bosni i Hercegovini.',
+        tekst('Svijet Sluha', true),
+        ' otvoren je u Sarajevu kao specijalizovani centar za slušnu akustiku, provjeru sluha, savjetovanje i odabir slušnih aparata. Centar se nalazi na adresi ',
+        tekst('Fra Anđela Zvizdovića 1, UNITIC neboderi', true),
+        ', gdje građani Sarajeva mogu dobiti stručne informacije, isprobati odabrane modele slušnih aparata i obaviti besplatnu provjeru sluha.',
       ),
-      paragraf('Adresa: ', tekst('[ADRESA_PLACEHOLDER]', true)),
-      paragraf('Telefon: ', tekst('[TELEFON_PLACEHOLDER]', true)),
-      paragraf('Radno vrijeme: ', tekst('[RADNO_VRIJEME_PLACEHOLDER]', true)),
       paragraf(
-        'U novoj poslovnici Vas očekuje kompletna ponuda: besplatna provjera sluha, slušni aparati renomiranih brendova, baterije, pribor i servis.',
+        'Iza centra stoji kompanija ',
+        tekst('Audio BM', true),
+        ', regionalno prepoznata u oblasti slušne akustike sa više od tri decenije iskustva.',
       ),
+      paragraf(link('Zakažite besplatnu provjeru sluha', URL_ZAKAZIVANJE_SARAJEVO, 'sarajevo-link-zakazivanje-uvod')),
+      slika(sarajevoMediji.interijer, 'sarajevo-upload-interijer'),
+      paragraf(
+        'Interijer centra je uređen tako da posjetioci mogu mirno razgovarati, pregledati modele i razumjeti kako različita rješenja odgovaraju njihovim svakodnevnim potrebama.',
+      ),
+      naslov('Šta možete očekivati u Svijetu Sluha u Sarajevu?'),
+      paragraf(
+        'Svijet Sluha osmišljen je kao mjesto gdje osoba ne dobija samo tehničke informacije o slušnim aparatima, nego i priliku da bolje razumije vlastite potrebe i situacije u kojima joj je sluh najvažniji.',
+      ),
+      lista([
+        ['besplatna provjera sluha'],
+        ['savjetovanje o izboru slušnog aparata'],
+        ['demonstracija i isprobavanje odabranih uređaja'],
+        ['podrška pri prilagođavanju slušnog aparata'],
+        ['informacije o održavanju, podešavanju i korištenju uređaja'],
+        ['modeli slušnih aparata brendova Bernafon i Unitron, prema dostupnosti'],
+      ]),
+      paragraf(
+        'Za osobe koje primjećuju da teže prate razgovor, pojačavaju televizor, imaju poteškoće u bučnim prostorima ili često traže od drugih da ponove rečeno, provjera sluha može biti koristan prvi korak.',
+      ),
+      slika(sarajevoMediji.savjetovanje, 'sarajevo-upload-savjetovanje'),
+      naslov('Experience Room: kako slušni aparat može zvučati u stvarnom životu'),
+      paragraf(
+        'Jedna od posebnosti centra je ',
+        tekst('Experience Room', true),
+        ' — iskustvena soba u kojoj se može doživjeti kako različite svakodnevne situacije utiču na slušanje i komunikaciju.',
+      ),
+      paragraf('Za razliku od standardne procjene sluha, Experience Room stavlja fokus na realne životne scenarije, kao što su:'),
+      lista([
+        ['razgovor u dnevnoj sobi'],
+        ['komunikacija na poslu'],
+        ['kupovina u prodavnici'],
+        ['razgovor u restoranu ili kafiću'],
+        ['buka javnog prijevoza'],
+        ['razgovor sa porodicom u prostoru gdje govori više osoba'],
+      ]),
+      slika(sarajevoMediji.experienceRoom, 'sarajevo-upload-experience-room'),
+      paragraf(
+        'U kontrolisanim akustičnim uslovima korisnik može bolje razumjeti kako određeni slušni aparat funkcioniše u konkretnim situacijama koje su mu važne.',
+      ),
+      paragraf(
+        'Ovaj pristup može olakšati izbor uređaja jer ne živimo svi u istom zvučnom okruženju. Nekome je prioritet razgovor s porodicom, nekome sastanci na poslu, a nekome sigurnije praćenje zvukova u gradu ili javnom prijevozu.',
+      ),
+      slika(sarajevoMediji.experienceDemo, 'sarajevo-upload-experience-demo'),
+      naslov('Isprobavanje slušnih aparata prije odluke'),
+      paragraf(
+        'Odabir slušnog aparata nije samo pitanje glasnoće. Važni su svakodnevne navike, okruženje, način komunikacije, udobnost, diskretnost, rukovanje uređajem i funkcije koje korisniku zaista trebaju.',
+      ),
+      paragraf(
+        'U Svijetu Sluha korisnici mogu dobiti savjetovanje i upoznati se s opcijama koje odgovaraju njihovim potrebama. Cilj je da se odabir slušnog aparata zasniva na praktičnom iskustvu i stručnoj procjeni, a ne samo na tehničkim specifikacijama.',
+      ),
+      paragraf(link('Pregledajte slušne aparate', URL_SLUSNI_APARATI, 'sarajevo-link-slusni-aparati')),
+      naslov('Lift & Learn: informacije o slušnim aparatima na jednostavan način'),
+      paragraf(
+        'U centru je dostupna i ',
+        tekst('Lift & Learn', true),
+        ' prezentacija slušnih aparata. Dovoljno je uzeti određeni model u ruku kako bi se na ekranu prikazale osnovne informacije o uređaju.',
+      ),
+      paragraf(
+        'Ovaj način prezentacije može pomoći posjetiocima da jednostavnije uporede modele i funkcije. Naravno, stručno osoblje ostaje dostupno za dodatna pitanja, objašnjenja i demonstracije.',
+      ),
+      slika(sarajevoMediji.liftLearn, 'sarajevo-upload-lift-learn'),
+      naslov('Slušni aparati u Sarajevu: Bernafon i Unitron'),
+      paragraf(
+        'U ponudi Svijeta Sluha dostupni su modeli slušnih aparata proizvođača ',
+        tekst('Bernafon', true),
+        ' i ',
+        tekst('Unitron', true),
+        '. Prilikom savjetovanja važno je uzeti u obzir individualne potrebe osobe, rezultate provjere sluha, svakodnevno okruženje i praktične zahtjeve korisnika.',
+      ),
+      paragraf(
+        'Neki korisnici traže diskretan uređaj, drugi punjivu opciju, lakše upravljanje, bolju komunikaciju u bučnim prostorijama ili povezivost s telefonom. Pravi izbor zavisi od osobe i njenog načina života.',
+      ),
+      slika(sarajevoMediji.izlozba, 'sarajevo-upload-izlozba'),
+      naslov('Besplatna provjera sluha u Sarajevu'),
+      paragraf('Građani Sarajeva koji primjećuju promjene u kvalitetu sluha mogu posjetiti Svijet Sluha i obaviti besplatnu provjeru sluha.'),
+      paragraf('Provjera sluha može biti posebno korisna ako:'),
+      lista([
+        ['često tražite od drugih da ponove rečeno'],
+        ['razgovori u buci postaju naporni'],
+        ['imate osjećaj da drugi govore tiho ili nerazgovijetno'],
+        ['pojačavate televizor više nego ranije'],
+        ['teže pratite razgovor u društvu'],
+        ['članovi porodice primjećuju promjene u vašem sluhu'],
+      ]),
+      paragraf(
+        'Provjera sluha je informativan korak. Za medicinsku dijagnozu, nagle promjene sluha, bol, iscjedak iz uha, vrtoglavicu ili druge izražene simptome, potrebno je obratiti se ljekaru ili ORL specijalisti.',
+      ),
+      paragraf(link('Zakažite provjeru sluha u Sarajevu', URL_ZAKAZIVANJE_SARAJEVO, 'sarajevo-link-zakazivanje-sredina')),
+      naslov('Gdje se nalazi Svijet Sluha u Sarajevu?'),
+      paragraf(tekst('Svijet Sluha Sarajevo', true)),
+      paragraf('Fra Anđela Zvizdovića 1, UNITIC neboderi, Sarajevo, Bosna i Hercegovina'),
+      paragraf(tekst('Radno vrijeme:', true)),
+      lista([
+        ['ponedjeljak: 08:00-16:00'],
+        ['utorak: 08:00-16:00'],
+        ['srijeda: 08:00-18:00'],
+        ['četvrtak: 08:00-16:00'],
+        ['petak: 08:00-16:00'],
+      ]),
+      paragraf(link('Pronađite Svijet Sluha u Sarajevu', URL_POSLOVNICA_SARAJEVO, 'sarajevo-link-poslovnica')),
+      slika(sarajevoMediji.otvaranje, 'sarajevo-upload-otvaranje'),
+      slika(sarajevoMediji.partneri, 'sarajevo-upload-partneri'),
+      naslov('Najčešća pitanja'),
+      naslov('Gdje mogu uraditi provjeru sluha u Sarajevu?', 'h3'),
+      paragraf('Besplatnu provjeru sluha možete obaviti u centru Svijet Sluha na adresi Fra Anđela Zvizdovića 1, u UNITIC neboderima u Sarajevu.'),
+      naslov('Šta je Experience Room?', 'h3'),
+      paragraf(
+        'Experience Room je prostor u kojem se simuliraju svakodnevne zvučne situacije, poput razgovora kod kuće, na poslu, u prodavnici ili u javnom prijevozu. Cilj je da korisnik bolje razumije kako određeni slušni aparat može funkcionisati u realnim okolnostima.',
+      ),
+      naslov('Mogu li isprobati slušni aparat prije konačne odluke?', 'h3'),
+      paragraf(
+        'U Svijetu Sluha možete dobiti savjetovanje i upoznati se s odabranim opcijama slušnih aparata. Dostupnost demonstracije i pojedinih modela treba potvrditi direktno sa poslovnicom.',
+      ),
+      naslov('Da li je provjera sluha besplatna?', 'h3'),
+      paragraf('Prema trenutnoj ponudi centra, besplatna provjera sluha dostupna je građanima Sarajeva. Preporučuje se prethodno zakazivanje termina.'),
+      naslov('Koje je radno vrijeme Svijeta Sluha u Sarajevu?', 'h3'),
+      paragraf('Centar radi ponedjeljkom, utorkom, četvrtkom i petkom od 08:00 do 16:00, a srijedom od 08:00 do 18:00.'),
+      naslov('Koje brendove slušnih aparata mogu pronaći u Svijetu Sluha?', 'h3'),
+      paragraf('U ponudi su modeli slušnih aparata proizvođača Bernafon i Unitron, prema dostupnosti i individualnim potrebama korisnika.'),
+      naslov('Zakažite termin u Svijetu Sluha'),
+      paragraf(
+        'Ako primjećujete promjene sluha ili želite saznati koje opcije slušnih aparata mogu odgovarati vašim potrebama, posjetite Svijet Sluha u Sarajevu.',
+      ),
+      paragraf(link('Zakažite besplatnu provjeru sluha', URL_ZAKAZIVANJE_SARAJEVO, 'sarajevo-link-zakazivanje-kraj')),
+      paragraf(link('Kontaktirajte poslovnicu Sarajevo', URL_POSLOVNICA_SARAJEVO, 'sarajevo-link-kontakt-kraj')),
     ),
   },
 ] as const
@@ -606,18 +841,46 @@ for (const o of OBJAVE) {
     draft: false,
   })
   if (postoji.totalDocs > 0) continue
+
+  const stariSlug = 'stariSlug' in o ? o.stariSlug : null
+  const staraObjava = stariSlug
+    ? await payload.find({
+        collection: 'objave',
+        where: { slug: { equals: stariSlug } },
+        limit: 1,
+        draft: false,
+      })
+    : null
+
+  const data = {
+    naslov: o.naslov,
+    slug: o.slug,
+    kategorija: o.kategorija as never,
+    izvod: o.izvod,
+    ...('naslovnaSlika' in o && o.naslovnaSlika ? { naslovnaSlika: o.naslovnaSlika } : {}),
+    sadrzaj: o.sadrzaj as never,
+    datumObjave: '2026-06-28T00:00:00.000Z',
+    seo: {
+      naslov: ('seoNaslov' in o ? o.seoNaslov : o.naslov).slice(0, 60),
+      opis: ('seoOpis' in o ? o.seoOpis : o.izvod).slice(0, 155),
+      ...('naslovnaSlika' in o && o.naslovnaSlika ? { slika: o.naslovnaSlika } : {}),
+    },
+    _status: 'published' as const,
+  }
+
+  if (staraObjava && staraObjava.totalDocs > 0) {
+    await payload.update({
+      collection: 'objave',
+      id: staraObjava.docs[0].id,
+      data,
+    })
+    log(`Objava ažurirana: ${o.naslov}`)
+    continue
+  }
+
   await payload.create({
     collection: 'objave',
-    data: {
-      naslov: o.naslov,
-      slug: o.slug,
-      kategorija: o.kategorija as never,
-      izvod: o.izvod,
-      sadrzaj: o.sadrzaj as never,
-      datumObjave: new Date().toISOString(),
-      seo: { naslov: o.naslov.slice(0, 60), opis: o.izvod.slice(0, 155) },
-      _status: 'published',
-    },
+    data,
   })
   log(`Objava: ${o.naslov}`)
 }
@@ -675,7 +938,7 @@ await payload.updateGlobal({
     emailGlavni: 'gradiska@audiobm.ba',
     seoNaslov: 'Audio BM — Slušni aparati i besplatna provjera sluha',
     seoOpis:
-      'Više od 30 godina povjerenja. Besplatna provjera sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju i Brčkom.',
+      'Više od 30 godina povjerenja. Besplatna provjera sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju, Brčkom i Tuzli.',
     emailZaUpite: 'svijetsluha@gmail.com',
   },
 })
@@ -686,7 +949,7 @@ await payload.updateGlobal({
     hero: {
       naslov: 'Besplatna provjera sluha — više od 30 godina povjerenja',
       podnaslov:
-        'Stručni tim, vrhunski slušni aparati i strpljiv pristup — u šest gradova širom Bosne i Hercegovine.',
+        'Stručni tim, vrhunski slušni aparati i strpljiv pristup — u poslovnicama širom Bosne i Hercegovine.',
       ctaTekst: 'Zakažite besplatnu provjeru sluha',
     },
     sarajevoBaner: {

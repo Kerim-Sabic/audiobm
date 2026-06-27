@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { dajPoslovnice } from '@/lib/podaci'
+import { dajLokacije, naslovPoslovnica, opisGradova } from '@/data/locations'
 import { metaStranice } from '@/lib/seo'
 import { ZaglavljeStranice } from '@/components/ui/ZaglavljeStranice'
 import { MapaBiH } from '@/components/poslovnice/MapaBiH'
@@ -7,14 +7,18 @@ import { LokacijaKartica } from '@/components/poslovnice/LokacijaKartica'
 import { Otkrij, OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
 import { DugmeLink } from '@/components/ui/Dugme'
 
-export const metadata: Metadata = metaStranice({
-  naslov: 'Poslovnice — Sarajevo, Banja Luka, Gradiška, Bijeljina, Doboj, Brčko',
-  opis: 'Audio BM poslovnice u šest gradova BiH. Pronađite najbližu, pozovite ili zakažite besplatnu provjeru sluha.',
-  putanja: '/poslovnice',
-})
+export async function generateMetadata(): Promise<Metadata> {
+  const poslovnice = await dajLokacije()
+
+  return metaStranice({
+    naslov: naslovPoslovnica(poslovnice),
+    opis: `Audio BM poslovnice u ${opisGradova(poslovnice)} BiH. Pronađite najbližu, pozovite ili zakažite besplatnu provjeru sluha.`,
+    putanja: '/poslovnice',
+  })
+}
 
 export default async function PoslovniceStranica() {
-  const poslovnice = await dajPoslovnice()
+  const poslovnice = await dajLokacije()
 
   return (
     <>
@@ -22,7 +26,7 @@ export default async function PoslovniceStranica() {
         mrvice={[{ naziv: 'Poslovnice' }]}
         nadnaslov="Uvijek blizu Vas"
         naslov="Naše poslovnice"
-        uvod="Dobro došli u šest gradova širom Bosne i Hercegovine — od sada i u Sarajevu."
+        uvod={`Dobro došli u ${opisGradova(poslovnice)} širom Bosne i Hercegovine.`}
       />
 
       <div className="kontejner pb-16 md:pb-24">

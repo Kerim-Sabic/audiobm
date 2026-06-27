@@ -5,6 +5,7 @@
 
 type Tekst = { type: 'text'; text: string; format: number; detail: 0; mode: 'normal'; style: ''; version: 1 }
 type Cvor = Record<string, unknown>
+type Inline = Tekst | Cvor | string
 
 export const tekst = (text: string, podebljano = false): Tekst => ({
   type: 'text',
@@ -26,23 +27,41 @@ const blok = (type: string, children: Cvor[], extra: Record<string, unknown> = {
   ...extra,
 })
 
-export const paragraf = (...djeca: (Tekst | string)[]): Cvor =>
-  blok('paragraph', djeca.map((d) => (typeof d === 'string' ? tekst(d) : d)))
+const inlineCvorovi = (djeca: Inline[]) => djeca.map((d) => (typeof d === 'string' ? tekst(d) : d))
+
+export const paragraf = (...djeca: Inline[]): Cvor => blok('paragraph', inlineCvorovi(djeca))
+
+export const link = (label: string, url: string, id: string): Cvor =>
+  blok('link', [tekst(label)], {
+    id,
+    fields: { linkType: 'custom', url, newTab: false },
+    version: 3,
+  })
 
 export const naslov = (text: string, tag: 'h2' | 'h3' = 'h2'): Cvor => blok('heading', [tekst(text)], { tag })
 
-export const lista = (stavke: (Tekst | string)[][]): Cvor =>
+export const lista = (stavke: Inline[][]): Cvor =>
   blok(
     'list',
     stavke.map((djeca, i) =>
       blok(
         'listitem',
-        djeca.map((d) => (typeof d === 'string' ? tekst(d) : d)),
+        inlineCvorovi(djeca),
         { value: i + 1 },
       ),
     ),
     { listType: 'bullet', tag: 'ul', start: 1 },
   )
+
+export const slika = (medijId: number, id: string): Cvor => ({
+  type: 'upload',
+  version: 3,
+  format: '',
+  id,
+  relationTo: 'mediji',
+  value: medijId,
+  fields: {},
+})
 
 export const dokument = (...cvorovi: Cvor[]) => ({
   root: {

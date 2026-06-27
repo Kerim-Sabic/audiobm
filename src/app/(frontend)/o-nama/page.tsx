@@ -1,18 +1,27 @@
 import type { Metadata } from 'next'
 import { Award, HeartHandshake, MapPin, ArrowRight } from 'lucide-react'
+import { dajLokacije, brojPoslovnica, opisGradova } from '@/data/locations'
 import { metaStranice } from '@/lib/seo'
 import { ZaglavljeStranice } from '@/components/ui/ZaglavljeStranice'
 import { DugmeLink } from '@/components/ui/Dugme'
 import { Otkrij, OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
 import { Brojac } from '@/components/motion/Brojac'
 
-export const metadata: Metadata = metaStranice({
-  naslov: 'O nama — više od 30 godina brige o sluhu',
-  opis: 'Svijet Sluha — u saradnji s Audio BM. Od prvog dana do šest poslovnica u BiH: misija, vrijednosti i brendovi sa kojima sarađujemo.',
-  putanja: '/o-nama',
-})
+export async function generateMetadata(): Promise<Metadata> {
+  const poslovnice = await dajLokacije()
 
-export default function ONamaStranica() {
+  return metaStranice({
+    naslov: 'O nama — više od 30 godina brige o sluhu',
+    opis: `Svijet Sluha — u saradnji s Audio BM. Od prvog dana do ${brojPoslovnica(poslovnice)} poslovnica u BiH: misija, vrijednosti i brendovi sa kojima sarađujemo.`,
+    putanja: '/o-nama',
+  })
+}
+
+export default async function ONamaStranica() {
+  const poslovnice = await dajLokacije()
+  const ukupanBrojPoslovnica = brojPoslovnica(poslovnice)
+  const gradoviOpis = opisGradova(poslovnice)
+
   return (
     <>
       <ZaglavljeStranice
@@ -27,7 +36,7 @@ export default function ONamaStranica() {
         <OtkrijGrupu className="mt-12 grid gap-5 sm:grid-cols-3">
           {[
             { broj: 32, sufiks: '+', oznaka: 'godine iskustva' },
-            { broj: 6, sufiks: '', oznaka: 'poslovnica u BiH' },
+            { broj: ukupanBrojPoslovnica, sufiks: '', oznaka: 'poslovnica u BiH' },
             { broj: 4, sufiks: '', oznaka: 'zemlje regiona (Audio BM grupa)' },
           ].map((s) => (
             <OtkrijStavku key={s.oznaka} className="h-full">
@@ -64,7 +73,7 @@ export default function ONamaStranica() {
               {
                 ikona: MapPin,
                 naslov: 'Blizu Vas',
-                opis: 'Šest poslovnica širom BiH znači da su servis, baterije i podrška uvijek na dohvat ruke — godinama nakon kupovine.',
+                opis: `${ukupanBrojPoslovnica} poslovnica širom BiH znači da su servis, baterije i podrška uvijek na dohvat ruke — godinama nakon kupovine.`,
               },
             ].map((v) => (
               <OtkrijStavku key={v.naslov} className="h-full">
@@ -102,12 +111,12 @@ export default function ONamaStranica() {
               <div>
                 <p className="nadnaslov !text-brand-400">Naš put</p>
                 <h2 id="put-naslov" className="text-h2 mt-3.5">
-                  Od prvog audiograma do šest gradova
+                  Od prvog audiograma do {gradoviOpis}
                 </h2>
                 <p className="mt-5 leading-relaxed text-neutral-300">
                   Više od tri decenije gradimo povjerenje — strpljivo, pregled po pregled. Danas smo
-                  prisutni u šest gradova Bosne i Hercegovine, a od 2026. godine i u Sarajevu. Audio
-                  BM grupa djeluje i u Srbiji, Sloveniji, Crnoj Gori i Makedoniji.
+                  prisutni u {gradoviOpis} Bosne i Hercegovine. Audio BM grupa djeluje i u Srbiji,
+                  Sloveniji, Crnoj Gori i Makedoniji.
                 </p>
               </div>
               <div className="border-t border-white/10 pt-7 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-16">
