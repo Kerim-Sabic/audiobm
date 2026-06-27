@@ -2,11 +2,11 @@
  * Brend-pipeline: iz preuzetog logotipa pravi izvedene resurse i tačne boje.
  *  - prozirni PNG (flood-fill pozadine — bijela slova „AUDIO" ostaju neprozirna)
  *  - bijela (monohromatska) varijanta za tamni footer (slova izbušena)
- *  - set favicona (16/32/180/512 + maskable) — SVG rekonstrukcija znaka
+ *  - set favicona iz Svijet Sluha ZIP resursa (16/32/48/96/180/192/512 + maskable)
  *  - ekstrakcija boja → public/brand/brand.json (izvor za dizajn-tokene)
  */
 import sharp from 'sharp'
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 const SRC = 'assets-src/brand'
@@ -81,59 +81,62 @@ await sharp(path.join(OUT, 'logo.png')).resize({ width: 1200 }).png().toFile(pat
 await sharp(whiteVar, { raw: { width: W, height: H, channels: 4 } }).trim().png().toFile(path.join(OUT, 'logo-bijeli.png'))
 console.log(`Logo: ${meta.width}×${meta.height} (trim), + 600/1200 + bijela varijanta`)
 
-// ---------- 4. Favicon set — SVG rekonstrukcija znaka „o" ----------
-// Izmjeri geometriju originalnog favicona (134×134): podjela crveno/crno, prsten
-const fav = await sharp(path.join(SRC, 'favicon-original.png')).ensureAlpha().raw().toBuffer()
-const FW = 134
-const px = (x, y) => [fav[(y * FW + x) * 4], fav[(y * FW + x) * 4 + 1], fav[(y * FW + x) * 4 + 2], fav[(y * FW + x) * 4 + 3]]
-const isRed = ([r, g]) => r > 150 && g < 90
-const isBlack = ([r, g, b, a]) => r < 70 && g < 70 && b < 70 && a > 200
-const isWhite = ([r, g, b, a]) => r > 200 && g > 200 && b > 200 && a > 200
-// centar reda: granice prstena
-const cy = Math.floor(FW / 2)
-let marks = { redStart: -1, whiteOuterL: -1, redInnerL: -1, redInnerR: -1, whiteOuterR: -1, blackEnd: -1, split: -1 }
-for (let x = 0; x < FW; x++) {
-  const p = px(x, cy)
-  if (marks.redStart < 0 && isRed(p)) marks.redStart = x
-  if (marks.redStart >= 0 && marks.whiteOuterL < 0 && isWhite(p)) marks.whiteOuterL = x
-  if (marks.whiteOuterL >= 0 && marks.redInnerL < 0 && isRed(p)) marks.redInnerL = x
+// ---------- 4. Favicon set — Svijet Sluha ZIP resurs ----------
+const faviconSource = await readFile(path.join(SRC, 'svijet-sluha_favicon_transparent.png'))
+const faviconPng = (size) =>
+  sharp(faviconSource)
+    .resize(size, size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .png()
+    .toBuffer()
+const icoFromPngs = (images) => {
+  const headerBytes = 6 + images.length * 16
+  const totalBytes = headerBytes + images.reduce((sum, image) => sum + image.buffer.length, 0)
+  const ico = Buffer.alloc(totalBytes)
+  ico.writeUInt16LE(0, 0)
+  ico.writeUInt16LE(1, 2)
+  ico.writeUInt16LE(images.length, 4)
+
+  let imageOffset = headerBytes
+  images.forEach((image, index) => {
+    const entryOffset = 6 + index * 16
+    ico.writeUInt8(image.size === 256 ? 0 : image.size, entryOffset)
+    ico.writeUInt8(image.size === 256 ? 0 : image.size, entryOffset + 1)
+    ico.writeUInt8(0, entryOffset + 2)
+    ico.writeUInt8(0, entryOffset + 3)
+    ico.writeUInt16LE(1, entryOffset + 4)
+    ico.writeUInt16LE(32, entryOffset + 6)
+    ico.writeUInt32LE(image.buffer.length, entryOffset + 8)
+    ico.writeUInt32LE(imageOffset, entryOffset + 12)
+    image.buffer.copy(ico, imageOffset)
+    imageOffset += image.buffer.length
+  })
+
+  return ico
 }
-for (let x = FW - 1; x >= 0; x--) {
-  const p = px(x, cy)
-  if (marks.blackEnd < 0 && isBlack(p)) marks.blackEnd = x
-  if (marks.blackEnd >= 0 && marks.whiteOuterR < 0 && isWhite(p)) marks.whiteOuterR = x
-  if (marks.whiteOuterR >= 0 && marks.redInnerR < 0 && isRed(p)) marks.redInnerR = x
+const generatedIcons = new Map()
+for (const size of [16, 32, 48, 96, 180, 192, 512]) {
+  const png = await faviconPng(size)
+  generatedIcons.set(size, png)
+  await writeFile(path.join(OUT, `icon-${size}.png`), png)
 }
-// vertikalna podjela crveno/crno na vrhu
-const ty = 6
-for (let x = 0; x < FW; x++) { if (isBlack(px(x, ty))) { marks.split = x; break } }
-console.log('Favicon mjere:', JSON.stringify(marks))
-const S = 134
-const cx = S / 2
-const rOuter = (marks.whiteOuterR - marks.whiteOuterL) / 2 // vanjski radijus bijelog prstena
-const rInner = (marks.redInnerR - marks.redInnerL) / 2 + (marks.redInnerL - marks.redInnerL) // unutrašnji crveni krug
-const rInnerCircle = (marks.redInnerR - marks.redInnerL) / 2
-const split = marks.split
-const corner = 30 // vizuelno provjeriti
-const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${S} ${S}">
-  <defs><clipPath id="rr"><rect width="${S}" height="${S}" rx="${corner}"/></clipPath></defs>
-  <g clip-path="url(#rr)">
-    <rect width="${split}" height="${S}" fill="${brandRed}"/>
-    <rect x="${split}" width="${S - split}" height="${S}" fill="${brandInk}"/>
-    <circle cx="${cx}" cy="${cx}" r="${rOuter}" fill="#FFFFFF"/>
-    <circle cx="${cx}" cy="${cx}" r="${rInnerCircle}" fill="${brandRed}"/>
-  </g>
-</svg>`
-await writeFile(path.join(OUT, 'favicon.svg'), faviconSvg)
-for (const size of [16, 32, 48, 180, 512]) {
-  await sharp(Buffer.from(faviconSvg)).resize(size, size).png().toFile(path.join(OUT, `icon-${size}.png`))
-}
-// maskable: znak na 66% s bijelom pozadinom (sigurna zona)
-const mark512 = await sharp(Buffer.from(faviconSvg)).resize(338, 338).png().toBuffer()
+await writeFile('public/favicon.png', generatedIcons.get(48))
+await writeFile(
+  'public/favicon.ico',
+  icoFromPngs([16, 32, 48].map((size) => ({ size, buffer: generatedIcons.get(size) }))),
+)
+await writeFile(
+  path.join(OUT, 'favicon.svg'),
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><image width="512" height="512" href="data:image/png;base64,${generatedIcons.get(512).toString('base64')}"/></svg>`,
+)
+// maskable: ZIP znak u sigurnoj zoni na bijeloj pozadini
+const mark512 = await sharp(faviconSource)
+  .resize(338, 338, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+  .png()
+  .toBuffer()
 await sharp({ create: { width: 512, height: 512, channels: 4, background: '#FFFFFF' } })
   .composite([{ input: mark512, gravity: 'centre' }])
   .png().toFile(path.join(OUT, 'icon-maskable-512.png'))
-console.log('Favicon set: 16/32/48/180/512 + maskable + svg')
+console.log('Favicon set: 16/32/48/96/180/192/512 + maskable + svg + root ico/png iz ZIP resursa')
 
 // ---------- 5. Zapis brand.json ----------
 await writeFile(path.join(OUT, 'brand.json'), JSON.stringify({
