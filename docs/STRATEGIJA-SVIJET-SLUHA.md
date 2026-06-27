@@ -161,7 +161,7 @@ Već postoji Organization/LocalBusiness/FAQ/Article. Dodati:
 
 ### 4.2 `llms.txt` + činjenični sažetak  `[S]`
 - Dodati `/public/llms.txt` (novi standard koji AI alati čitaju): ko ste, gdje ste
-  (6 gradova + adrese + telefoni), šta nudite, brendovi, kako zakazati. Kratko, činjenično.
+  (7 gradova + adrese + telefoni), šta nudite, brendovi, kako zakazati. Kratko, činjenično.
 - Osigurati da je **NAP (Naziv-Adresa-Telefon) identičan** svuda: sajt, Google profil,
   Facebook, Instagram. Nedosljedan NAP ruši i lokalni SEO i povjerenje AI-a.
 
@@ -222,7 +222,7 @@ lokalni direktoriji, recenzije na Google/Facebook, eventualno lokalni mediji.
 | # | Zadatak | Zašto | Hitnost |
 |---|---|---|---|
 | 1 | Registruj/uperi **svijetsluha.com** (DNS) | Bez domene nema deploya | Sad |
-| 2 | **Google Business Profile** za svih 6 poslovnica (claim/verify) | #1 poluga za „blizu mene" i AI lokalne preporuke | Sad |
+| 2 | **Google Business Profile** za svih 7 poslovnica (claim/verify) | #1 poluga za „blizu mene" i AI lokalne preporuke | Sad |
 | 3 | Logo „Svijet Sluha" (+ „by Audio BM" potpis) | Vizuelni rebrand | Prije Faze 1 vizuala |
 | 4 | Potvrdi: tačna **godina osnivanja** i **legalni naziv** Audio BM | Tačan schema/„30+ god." | Brzo |
 | 5 | Odluka: **zaseban call-tracking broj** za web? (da/ne + budžet) | Najjači dokaz za proviziju na pozive | Faza 2 |

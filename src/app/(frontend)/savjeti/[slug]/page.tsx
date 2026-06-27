@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { RichText } from '@payloadcms/richtext-lexical/react'
+import type { JSXConvertersFunction } from '@payloadcms/richtext-lexical/react'
 import { dajPayload } from '@/lib/podaci'
-import { clanakJsonLd, metaStranice } from '@/lib/seo'
+import { clanakJsonLd, metaStranice, pitanjaJsonLd, OSNOVNI_URL } from '@/lib/seo'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { SlikaMedija } from '@/components/ui/SlikaMedija'
 import { DugmeLink } from '@/components/ui/Dugme'
@@ -21,6 +22,60 @@ async function dajObjavu(slug: string) {
   return docs[0] ?? null
 }
 
+function urlMedija(medij: Mediji | number | null | undefined) {
+  if (!medij || typeof medij !== 'object' || !medij.url) return undefined
+  return medij.url.startsWith('http') ? medij.url : `${OSNOVNI_URL}${medij.url}`
+}
+
+const FAQ_PO_OBJAVI: Record<string, { pitanje: string; odgovor: string }[]> = {
+  'svijet-sluha-sarajevo-slusni-aparati-provjera-sluha': [
+    {
+      pitanje: 'Gdje mogu uraditi provjeru sluha u Sarajevu?',
+      odgovor:
+        'Besplatnu provjeru sluha možete obaviti u centru Svijet Sluha na adresi Fra Anđela Zvizdovića 1, u UNITIC neboderima u Sarajevu.',
+    },
+    {
+      pitanje: 'Šta je Experience Room?',
+      odgovor:
+        'Experience Room je prostor u kojem se simuliraju svakodnevne zvučne situacije, poput razgovora kod kuće, na poslu, u prodavnici ili u javnom prijevozu.',
+    },
+    {
+      pitanje: 'Mogu li isprobati slušni aparat prije konačne odluke?',
+      odgovor:
+        'U Svijetu Sluha možete dobiti savjetovanje i upoznati se s odabranim opcijama slušnih aparata. Dostupnost demonstracije i pojedinih modela treba potvrditi direktno sa poslovnicom.',
+    },
+    {
+      pitanje: 'Da li je provjera sluha besplatna?',
+      odgovor:
+        'Prema trenutnoj ponudi centra, besplatna provjera sluha dostupna je građanima Sarajeva. Preporučuje se prethodno zakazivanje termina.',
+    },
+    {
+      pitanje: 'Koje je radno vrijeme Svijeta Sluha u Sarajevu?',
+      odgovor:
+        'Centar radi ponedjeljkom, utorkom, četvrtkom i petkom od 08:00 do 16:00, a srijedom od 08:00 do 18:00.',
+    },
+    {
+      pitanje: 'Koje brendove slušnih aparata mogu pronaći u Svijetu Sluha?',
+      odgovor:
+        'U ponudi su modeli slušnih aparata proizvođača Bernafon i Unitron, prema dostupnosti i individualnim potrebama korisnika.',
+    },
+  ],
+}
+
+const articleConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
+  ...defaultConverters,
+  upload: ({ node }) => {
+    const medij = typeof node.value === 'object' ? (node.value as Mediji) : null
+    if (!medij) return null
+
+    return (
+      <figure className="my-9 overflow-hidden rounded-[24px] shadow-[var(--shadow-lift)]">
+        <SlikaMedija medij={medij} sizes="(min-width: 1024px) 896px, 100vw" className="h-auto w-full" />
+      </figure>
+    )
+  },
+})
+
 export async function generateStaticParams() {
   const payload = await dajPayload()
   const { docs } = await payload.find({ collection: 'objave', limit: 100, depth: 0, draft: false })
@@ -35,6 +90,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     naslov: o.seo?.naslov ?? o.naslov,
     opis: o.seo?.opis ?? o.izvod,
     putanja: `/savjeti/${slug}`,
+    ogSlika: urlMedija((o.seo?.slika as Mediji | number | null | undefined) ?? (o.naslovnaSlika as Mediji | number | null | undefined)),
   })
 }
 
@@ -52,6 +108,10 @@ export default async function ObjavaStranica({ params }: { params: Promise<{ slu
     depth: 0,
     draft: false,
   })
+  const slikaUrl = urlMedija(
+    (objava.seo?.slika as Mediji | number | null | undefined) ?? (objava.naslovnaSlika as Mediji | number | null | undefined),
+  )
+  const faq = FAQ_PO_OBJAVI[slug] ?? []
 
   return (
     <article className="kontejner py-10 md:py-14">
@@ -64,13 +124,22 @@ export default async function ObjavaStranica({ params }: { params: Promise<{ slu
               slug: objava.slug,
               izvod: objava.izvod,
               datumObjave: objava.datumObjave,
+              slika: slikaUrl,
             }),
           ),
         }}
       />
+      {faq.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(pitanjaJsonLd(faq)),
+          }}
+        />
+      )}
       <Mrvice stavke={[{ naziv: 'Savjeti', putanja: '/savjeti' }, { naziv: objava.naslov }]} />
 
-      <div className="mx-auto mt-8 max-w-3xl">
+      <div className="mx-auto mt-8 max-w-4xl">
         {objava.datumObjave && (
           <p className="text-small font-semibold text-neutral-500">
             {new Date(objava.datumObjave).toLocaleDateString('bs-BA', {
@@ -80,16 +149,23 @@ export default async function ObjavaStranica({ params }: { params: Promise<{ slu
             })}
           </p>
         )}
+        <p className="mt-4 inline-flex rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-[13px] font-bold tracking-[0.12em] text-brand-700 uppercase">
+          {objava.kategorija === 'sarajevo' ? 'Sarajevo' : objava.kategorija}
+        </p>
         <h1 className="text-h1 mt-2">{objava.naslov}</h1>
-        <p className="mt-4 text-[19px] text-neutral-600">{objava.izvod}</p>
+        <p className="mt-4 max-w-3xl text-[19px] text-neutral-600">{objava.izvod}</p>
 
         {objava.naslovnaSlika && typeof objava.naslovnaSlika === 'object' && (
-          <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-[24px] shadow-[var(--shadow-lift)]">
-            <SlikaMedija medij={objava.naslovnaSlika as Mediji} fill sizes="(min-width: 768px) 768px, 100vw" prioritet />
+          <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-[28px] shadow-[var(--shadow-lift-lg)]">
+            <SlikaMedija medij={objava.naslovnaSlika as Mediji} fill sizes="(min-width: 1024px) 896px, 100vw" prioritet />
           </div>
         )}
 
-        <RichText data={objava.sadrzaj} className="prose-bm mt-10 text-[18px] text-neutral-800" />
+        <RichText
+          data={objava.sadrzaj}
+          converters={articleConverters}
+          className="prose-bm article-prose mt-10 text-[18px] text-neutral-800"
+        />
 
         <div className="mt-14 rounded-[28px] border border-brand-200/60 bg-gradient-to-br from-white to-brand-50/50 p-8 text-center md:p-10">
           <h2 className="text-h3">Brinete za svoj sluh?</h2>

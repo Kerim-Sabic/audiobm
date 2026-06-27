@@ -34,7 +34,7 @@ Postavlja se u **Meta Business Suite → Ads Manager**. Poveži FB stranicu (svi
   samo od zvuka, nego od ljudi koje volimo. Besplatna provjera traje 30 minuta i ne
   obavezuje ni na šta. Poklonite roditelju da ponovo čuje Vas."
 - *Headline:* „Besplatna provjera sluha — bez obaveze"
-- *Description:* „6 gradova u BiH · 30+ godina iskustva"
+- *Description:* „7 gradova u BiH · 30+ godina iskustva"
 - *Vizual:* emotivni video „prvi put čuje" (najjače) ILI topla fotografija djeda s unukom.
 
 **Reklama B — Problem/edukacija**
@@ -46,7 +46,7 @@ Postavlja se u **Meta Business Suite → Ads Manager**. Poveži FB stranicu (svi
 - *Vizual:* čista grafika sa 5 znakova ILI fotografija starije osobe pored TV-a.
 
 **Reklama C — Ponuda/povjerenje**
-- *Primary text:* „Besplatna provjera sluha u 6 gradova BiH. Bezbolno, za 30 minuta,
+- *Primary text:* „Besplatna provjera sluha u 7 gradova BiH. Bezbolno, za 30 minuta,
   bez obaveze na kupovinu. Slušni aparati vodećih brendova (Bernafon, Unitron, Cochlear),
   uz 30+ godina iskustva i pomoć oko FZO/RFZO. Zakažite online za 2 minute."
 - *Headline:* „Besplatna provjera sluha — 30 godina povjerenja"
@@ -66,7 +66,7 @@ Postavlja se u **Google Ads → Search campaign**. Hvata ljude koji **već traž
 
 ### Postavke
 - **Tip:** samo **Search** (NE Display — slab kvalitet).
-- **Geo:** 6 gradova + radius; „Presence: People in your targeted locations".
+- **Geo:** 7 gradova + radius; „Presence: People in your targeted locations".
 - **Jezik:** bosanski/hrvatski/srpski. **Budžet:** 5–10 KM/dan.
 - **Bidding:** start „Maximize clicks" (ili „Maximize conversions" kad imaš konverzije).
 
@@ -79,7 +79,7 @@ Postavlja se u **Google Ads → Search campaign**. Hvata ljude koji **već traž
 "audiolog [grad]"          "slušna pomagala"
 "baterije za slušni aparat"
 ```
-(zamijeni [grad] sa: Sarajevo, Banja Luka, Gradiška, Bijeljina, Doboj, Brčko)
+(zamijeni [grad] sa: Sarajevo, Banja Luka, Gradiška, Bijeljina, Doboj, Brčko, Tuzla)
 
 ### Negativne ključne riječi
 ```
@@ -93,13 +93,13 @@ za pse, polovno, iznajmljivanje, kako napraviti, youtube
   Zakažite za 2 minute · Bernafon, Unitron, Cochlear · Bezbolno i bez obaveze ·
   Pomoć oko FZO/RFZO · Svijet Sluha — centar za sluh
 - **Descriptions (do 4, evo 2):**
-  „Besplatna provjera sluha u 6 gradova BiH. Bezbolno, 30 minuta, bez obaveze. Zakažite online."
+  „Besplatna provjera sluha u 7 gradova BiH. Bezbolno, 30 minuta, bez obaveze. Zakažite online."
   „Slušni aparati vodećih brendova i stručan tim. 30+ godina povjerenja. Pozovite ili zakažite."
 - **Final URL:** `https://svijetsluha.com/zakazivanje?utm_source=google&utm_medium=cpc&utm_campaign=search`
 
 ### Ekstenzije (obavezno — dižu CTR)
 - **Sitelinks:** Poslovnice · Cijene i finansiranje · Online test sluha · Kontakt
-- **Callouts:** Besplatna provjera · Bez obaveze · 6 gradova · 30+ godina
+- **Callouts:** Besplatna provjera · Bez obaveze · 7 gradova · 30+ godina
 - **Call extension:** centralni telefon (051 218 781)
 - **Location extension:** poveži Google Business profile (kad budu postavljeni)
 

@@ -47,11 +47,11 @@ Bez #1, #2 i #3 ne pomažu (AI gubi povjerenje kod nedosljednih podataka). Zato 
 
 **Zlatno pravilo:** Naziv-Adresa-Telefon (**NAP**) mora biti **znak-po-znak identičan** na:
 - sajtu (✅ već: poslovnice = „Audio BM {grad}" u schemi, usklađeno s Google profilom)
-- Google Business Profile (×6) · Facebook · Instagram · Apple Maps · Bing Places
+- Google Business Profile (×7) · Facebook · Instagram · Apple Maps · Bing Places
 - lokalnim direktorijima (bizbih, zlatne stranije i sl.)
 
 **Akcije (uglavnom van koda — tvoji zadaci):**
-- [ ] Google Business Profile za svih 6 poslovnica — *claim, ne duplicate* (vidi strategiju §8)
+- [ ] Google Business Profile za svih 7 poslovnica — *claim, ne duplicate* (vidi strategiju §8)
 - [ ] Facebook + Instagram „About" sa identičnim NAP-om i linkom na svijetsluha.com
 - [ ] Apple Business Connect + Bing Places (AI/Siri/Copilot izvori)
 - [ ] Upis u relevantne BiH direktorije s istim NAP-om
@@ -136,7 +136,7 @@ Google pravilima (ne izmišljati). AI tretira ocjene kao signal povjerenja.
 ## 7. llms.txt & dostupnost za AI crawlere
 
 - [ ] `/public/llms.txt` — kratak, činjeničan sažetak za LLM-ove: ko ste (Svijet Sluha u
-      saradnji s Audio BM, 30+ god.), 6 gradova s adresama/telefonima, usluge, brendovi,
+      saradnji s Audio BM, 30+ god.), 7 gradova s adresama/telefonima, usluge, brendovi,
       kako zakazati, link na ključne stranice. (Mogu generisati iz CMS podataka.)
 - [ ] `robots.ts` — ne blokirati AI crawlere (GPTBot, PerplexityBot, ClaudeBot, Google-Extended)
       ako želimo da nas indeksiraju (trenutno blokira samo /admin i /api — ✅ ok).

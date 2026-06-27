@@ -34,7 +34,7 @@ export const Pocetna: GlobalConfig = {
           label: 'Podnaslov',
           type: 'textarea',
           defaultValue:
-            'Stručni tim, vrhunski slušni aparati i strpljiv pristup — u šest gradova širom Bosne i Hercegovine.',
+            'Stručni tim, vrhunski slušni aparati i strpljiv pristup — u poslovnicama širom Bosne i Hercegovine.',
         },
         {
           name: 'ctaTekst',

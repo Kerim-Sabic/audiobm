@@ -23,10 +23,10 @@ import {
   dajPitanja,
   dajPocetnu,
   dajPodesavanja,
-  dajPoslovnice,
   dajRecenzije,
   dajUsluge,
 } from '@/lib/podaci'
+import { brojGradova, dajLokacije, standardizujBrojLokacija } from '@/data/locations'
 import { stvarno, ocisti } from '@/lib/tekst'
 import { metaStranice, pitanjaJsonLd, brendNaslov, brendOpis } from '@/lib/seo'
 import { HeroUlaz } from '@/components/pocetna/HeroUlaz'
@@ -77,7 +77,7 @@ export default async function Pocetna() {
     await Promise.all([
       dajPocetnu(),
       dajPodesavanja(),
-      dajPoslovnice(),
+      dajLokacije(),
       dajUsluge(),
       dajPitanja(),
       dajRecenzije(),
@@ -103,6 +103,8 @@ export default async function Pocetna() {
   const istaknutaAkcija = akcije.find((a) => a.istaknutaNaPocetnoj) ?? akcije[0]
   const redoslijed = (pocetna.redoslijedSekcija ?? []).map((s) => s.sekcija)
   const telefon = stvarno(podesavanja.telefonGlavni)
+  const heroPodnaslov = standardizujBrojLokacija(pocetna.hero?.podnaslov, poslovnice)
+  const ukupnoGradova = brojGradova(poslovnice)
   const godine = pocetna.povjerenje?.godineRada ?? 32
   // samo stvarne statistike — placeholderi se ne prikazuju
   const statistike = (pocetna.povjerenje?.statistike ?? []).filter(
@@ -178,7 +180,7 @@ export default async function Pocetna() {
         <div className="kontejner relative grid items-center gap-14 lg:grid-cols-[0.92fr_1.08fr]">
           <div>
             <Otkrij>
-              <p className="nadnaslov">{poslovnice.length} gradova širom BiH</p>
+              <p className="nadnaslov">{ukupnoGradova} gradova širom BiH</p>
               <h2 id="poslovnice-naslov" className="text-h2 mt-3.5">
                 Posjetite nas — sada i u Sarajevu
               </h2>
@@ -637,7 +639,7 @@ export default async function Pocetna() {
                 />
               </h1>
               <p data-hero-stavka="3" className="uvodni mt-6 max-w-xl md:text-[20px]">
-                {pocetna.hero?.podnaslov}
+                {heroPodnaslov}
               </p>
               <div data-hero-stavka="4" className="mt-10">
                 <div className="flex flex-wrap items-center gap-3.5">
@@ -740,7 +742,7 @@ export default async function Pocetna() {
           <p className="mx-auto max-w-3xl text-center text-[17px] leading-relaxed text-neutral-600 md:text-[19px]">
             U <strong className="font-semibold text-neutral-800">Svijet Sluha</strong> nudimo besplatnu
             provjeru sluha i vrhunske slušne aparate vodećih svjetskih brendova — uz više od 30 godina
-            povjerenja i stručan tim u šest gradova širom Bosne i Hercegovine. Provjera sluha je
+            povjerenja i stručan tim u {poslovnice.length} poslovnica širom Bosne i Hercegovine. Provjera sluha je
             bezbolna, traje 30–45 minuta i ne obavezuje na kupovinu.
           </p>
         </div>

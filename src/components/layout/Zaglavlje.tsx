@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Headphones, MapPin, Phone } from 'lucide-react'
-import { dajNavigaciju, dajPodesavanja, dajPoslovnice } from '@/lib/podaci'
+import { dajNavigaciju, dajPodesavanja } from '@/lib/podaci'
+import { dajLokacije } from '@/data/locations'
 import { stvarno } from '@/lib/tekst'
 import { BREND } from '@/lib/brend'
 import { Logotip } from '@/components/ui/Logotip'
@@ -20,7 +21,7 @@ export async function Zaglavlje() {
   const [navigacija, podesavanja, poslovnice] = await Promise.all([
     dajNavigaciju(),
     dajPodesavanja(),
-    dajPoslovnice(),
+    dajLokacije(),
   ])
   const stavke = (navigacija.glavniMeni ?? []).map((s) => ({ oznaka: s.oznaka, putanja: s.putanja }))
   // online test je proizvodna funkcija stranice (fiksna ruta) — u mobilnom meniju

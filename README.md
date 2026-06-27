@@ -101,7 +101,7 @@ Vidljivo označeni na stranici i u administraciji; svaki nestaje unosom stvarnog
 |---|---|---|
 | `[ADRESA_PLACEHOLDER]` | Adresa poslovnice **Sarajevo** | Admin → Poslovnice → Sarajevo (+ Početna → Sarajevo baner; + objava na blogu) |
 | `[TELEFON_PLACEHOLDER]` | Telefon poslovnice Sarajevo | Admin → Poslovnice → Sarajevo |
-| `[RADNO_VRIJEME_PLACEHOLDER]` | Radno vrijeme **svih 6 poslovnica** (staro „7–15h" je nepouzdano) | Admin → Poslovnice → svaka poslovnica + kvačica „potvrđeno" |
+| `[RADNO_VRIJEME_PLACEHOLDER]` | Radno vrijeme **svih aktivnih poslovnica** (staro „7–15h" je nepouzdano) | Admin → Poslovnice → svaka poslovnica + kvačica „potvrđeno" |
 | `[CIJENA_PLACEHOLDER]` | Cijene čepova za uši (stara stranica ima neispravne, npr. „3600 KM" umjesto 36 KM) i rasponi cijena aparata po klasama | Admin → Proizvodi; stranica „Cijene i finansiranje" |
 | `[POTVRDA_VLASNIKA]` | FAQ odgovori: garancija, plaćanje na rate, zamjenski aparat, servis tuđih aparata, uputnica/refundacija | Admin → Česta pitanja |
 | `[OWNER_INPUT_PLACEHOLDER]` | Postupak refundacije po entitetima; historijat firme (godine, prekretnice) | `cijene-i-finansiranje` i `o-nama` stranice |

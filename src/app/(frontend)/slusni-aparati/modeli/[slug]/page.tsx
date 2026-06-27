@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { ShieldCheck, CalendarCheck } from 'lucide-react'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { dajPayload } from '@/lib/podaci'
-import { metaStranice, proizvodJsonLd, OSNOVNI_URL } from '@/lib/seo'
+import { metaOpisProizvoda, metaStranice, proizvodJsonLd, OSNOVNI_URL } from '@/lib/seo'
 import { stvarno } from '@/lib/tekst'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { DugmeLink } from '@/components/ui/Dugme'
@@ -42,7 +42,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!p) return {}
   return metaStranice({
     naslov: p.seo?.naslov ?? `${p.naziv} — besplatno savjetovanje`,
-    opis: p.seo?.opis ?? p.kratkiOpis ?? `${p.naziv} — saznajte da li je pravi za Vas na besplatnom savjetovanju kod nas.`,
+    opis: metaOpisProizvoda({
+      naziv: p.naziv,
+      seo: p.seo,
+      kratkiOpis: p.kratkiOpis,
+      fallback: 'saznajte da li je pravi za Vas na besplatnom savjetovanju kod nas.',
+    }),
     putanja: `/slusni-aparati/modeli/${slug}`,
   })
 }

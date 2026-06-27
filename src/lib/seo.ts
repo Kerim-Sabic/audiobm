@@ -22,7 +22,7 @@ export function brendNaslov(cmsNaslov?: string | null) {
 export function brendOpis(cmsOpis?: string | null) {
   return cmsOpis && cmsOpis.includes(BREND.naziv) && cmsOpis.length >= 140
     ? cmsOpis
-    : 'Svijet Sluha — besplatna provjera sluha i slušni aparati vodećih svjetskih brendova, uz više od 30 godina povjerenja. Posjetite nas u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju ili Brčkom.'
+    : 'Svijet Sluha — besplatna provjera sluha i slušni aparati vodećih svjetskih brendova, uz više od 30 godina povjerenja i fizičke poslovnice širom Bosne i Hercegovine.'
 }
 
 /** Gradi Metadata za stranicu: jedinstven naslov ≤60, opis ≤155, OG/Twitter, canonical, hreflang. */
@@ -65,6 +65,18 @@ export function metaStranice({
     },
     ...(bezIndeksa ? { robots: { index: false, follow: false } } : {}),
   }
+}
+
+export function metaOpisProizvoda(p: {
+  naziv: string
+  seo?: { opis?: string | null } | null
+  kratkiOpis?: string | null
+  fallback: string
+}) {
+  const seoOpis = stvarno(p.seo?.opis)
+  const kratkiOpis = stvarno(p.kratkiOpis)
+  const opis = seoOpis ?? kratkiOpis ?? p.fallback
+  return opis.toLocaleLowerCase('bs-BA').includes(p.naziv.toLocaleLowerCase('bs-BA')) ? opis : `${p.naziv}: ${opis}`
 }
 
 /**

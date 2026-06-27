@@ -1,4 +1,5 @@
-import { dajPoslovnice, dajUsluge } from '@/lib/podaci'
+import { dajUsluge } from '@/lib/podaci'
+import { dajLokacije, brojGradova, opisGradova } from '@/data/locations'
 import { BREND, nazivPoslovnice } from '@/lib/brend'
 import { OSNOVNI_URL } from '@/lib/seo'
 import { stvarno } from '@/lib/tekst'
@@ -8,12 +9,12 @@ import { stvarno } from '@/lib/tekst'
 export const revalidate = 86400
 
 export async function GET() {
-  const [poslovnice, usluge] = await Promise.all([dajPoslovnice(), dajUsluge()])
+  const [poslovnice, usluge] = await Promise.all([dajLokacije(), dajUsluge()])
   const l: string[] = []
 
   l.push(`# ${BREND.naziv}`, '')
   l.push(
-    `> ${BREND.naziv} — ${BREND.tagline}, u saradnji s Audio BM (osnovan ${BREND.provajderOd}, više od 30 godina iskustva). Besplatna provjera sluha, slušni aparati (Bernafon, Unitron, Cochlear), baterije, čepovi za uši po mjeri i servis, u šest gradova Bosne i Hercegovine.`,
+    `> ${BREND.naziv} — ${BREND.tagline}, u saradnji s Audio BM (osnovan ${BREND.provajderOd}, više od 30 godina iskustva). Besplatna provjera sluha, slušni aparati (Bernafon, Unitron, Cochlear), baterije, čepovi za uši po mjeri i servis, u ${opisGradova(poslovnice)} Bosne i Hercegovine.`,
     '',
   )
 
@@ -31,7 +32,7 @@ export async function GET() {
   l.push(`- [Kontakt](${OSNOVNI_URL}/kontakt): telefoni i obrazac za upit`)
   l.push('')
 
-  l.push('## Poslovnice (6 gradova u BiH)', '')
+  l.push(`## Poslovnice (${brojGradova(poslovnice)} gradova u BiH)`, '')
   for (const p of poslovnice) {
     const adresa = stvarno(p.adresa)
     const tel = stvarno(p.telefoni?.[0]?.broj)

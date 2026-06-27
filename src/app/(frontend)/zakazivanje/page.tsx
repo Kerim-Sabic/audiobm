@@ -1,20 +1,29 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ShieldCheck, Clock, PhoneCall } from 'lucide-react'
-import { dajPoslovnice } from '@/lib/podaci'
+import { dajLokacije } from '@/data/locations'
 import { metaStranice } from '@/lib/seo'
 import { stvarno } from '@/lib/tekst'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { ZakazivanjeKoraci } from '@/components/zakazivanje/ZakazivanjeKoraci'
 
-export const metadata: Metadata = metaStranice({
-  naslov: 'Zakažite besplatnu provjeru sluha',
-  opis: 'Zakazivanje za manje od 2 minute: odaberite poslovnicu, ostavite ime i telefon — kontaktiramo Vas isti radni dan radi potvrde termina.',
-  putanja: '/zakazivanje',
-})
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ poslovnica?: string }>
+}): Promise<Metadata> {
+  const params = await searchParams
+
+  return metaStranice({
+    naslov: 'Zakažite besplatnu provjeru sluha',
+    opis: 'Zakazivanje za manje od 2 minute: odaberite poslovnicu, ostavite ime i telefon — kontaktiramo Vas isti radni dan radi potvrde termina.',
+    putanja: '/zakazivanje',
+    bezIndeksa: Boolean(params.poslovnica),
+  })
+}
 
 export default async function ZakazivanjeStranica() {
-  const poslovnice = await dajPoslovnice()
+  const poslovnice = await dajLokacije()
 
   const lokacije = poslovnice.map((p) => ({
     id: p.id as number,

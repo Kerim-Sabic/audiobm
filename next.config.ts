@@ -45,6 +45,11 @@ function legacyRedirects() {
     { source: '/blogs/:path*', destination: '/savjeti', permanent: true },
     { source: '/account', destination: '/', permanent: true },
     { source: '/cart', destination: '/proizvodi', permanent: true },
+    {
+      source: '/svijet-sluha-sarajevo-slusni-aparati-provjera-sluha',
+      destination: '/savjeti/svijet-sluha-sarajevo-slusni-aparati-provjera-sluha',
+      permanent: true,
+    },
   ]
 
   let proizvodi: { source: string; destination: string; permanent: boolean }[] = []
