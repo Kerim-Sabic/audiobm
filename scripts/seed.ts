@@ -676,7 +676,7 @@ await payload.updateGlobal({
     seoNaslov: 'Audio BM — Slušni aparati i besplatna provjera sluha',
     seoOpis:
       'Više od 30 godina povjerenja. Besplatna provjera sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju i Brčkom.',
-    emailZaUpite: 'gradiska@audiobm.ba',
+    emailZaUpite: 'svijetsluha@gmail.com',
   },
 })
 

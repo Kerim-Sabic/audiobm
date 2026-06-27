@@ -22,7 +22,7 @@
 
 ## Korak 2 — Netlify Environment variables
 
-Netlify → tvoj sajt → **Site configuration → Environment variables → Add** (dodaj ovih 5):
+Netlify → tvoj sajt → **Site configuration → Environment variables → Add** (dodaj ovih 6):
 
 | Key | Value |
 |---|---|
@@ -31,9 +31,11 @@ Netlify → tvoj sajt → **Site configuration → Environment variables → Add
 | `SMTP_USER` | `svijetsluha@gmail.com` |
 | `SMTP_PASS` | *(16-cifrena App lozinka, BEZ razmaka)* |
 | `EMAIL_FROM` | `Svijet Sluha <svijetsluha@gmail.com>` |
+| `EMAIL_TO` | `svijetsluha@gmail.com` |
 
 > ⚠️ `EMAIL_FROM` mora koristiti **isti Gmail** (`svijetsluha@gmail.com`) — Gmail ne dozvoljava
 > slanje s tuđe adrese.
+> `EMAIL_TO` je primalac obavještenja o novom terminu/upitu.
 
 Zatim **Deploys → Trigger deploy → Deploy site** (da funkcije pokupe nove varijable).
 

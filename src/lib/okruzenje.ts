@@ -79,6 +79,10 @@ export function dajSmtpOkruzenje() {
   }
 }
 
+export function dajEmailPrimaocaUpita() {
+  return citaj('EMAIL_TO') ?? citaj('NOTIFICATION_EMAIL')
+}
+
 export function dajS3Okruzenje() {
   const bucket = citaj('S3_BUCKET')
   if (!bucket) return undefined

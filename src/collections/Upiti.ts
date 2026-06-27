@@ -1,7 +1,7 @@
 import type { CollectionConfig, PayloadRequest } from 'payload'
 import { jePrijavljen, jeVlasnik, upitiPristup } from '../access/uloge'
 import { posaljiObavijestOUpitu } from '../email/obavijesti'
-import { dajSmtpOkruzenje } from '../lib/okruzenje'
+import { dajEmailPrimaocaUpita, dajSmtpOkruzenje } from '../lib/okruzenje'
 import { KAKO_CULI, kanalLeada, labelKakoCuo } from '../lib/atribucija'
 import type { Upiti as UpitDokument } from '../payload-types'
 
@@ -124,6 +124,7 @@ const testEmail = async (req: PayloadRequest): Promise<Response> => {
     SMTP_USER: process.env.SMTP_USER ? 'postavljen ✓' : '(NIJE postavljen)',
     SMTP_PASS: process.env.SMTP_PASS ? `postavljen (${process.env.SMTP_PASS.length} znakova)` : '(NIJE postavljen)',
     EMAIL_FROM: process.env.EMAIL_FROM ?? '(NIJE postavljen)',
+    EMAIL_TO: dajEmailPrimaocaUpita() ?? '(NIJE postavljen)',
     smtpAktivan,
     ...(smtpGreska ? { smtpGreska } : {}),
   }
@@ -138,7 +139,7 @@ const testEmail = async (req: PayloadRequest): Promise<Response> => {
 
   try {
     await req.payload.sendEmail({
-      to: 'svijetsluha@gmail.com',
+      to: dajEmailPrimaocaUpita() ?? 'svijetsluha@gmail.com',
       subject: 'Test — Svijet Sluha SMTP radi 🎉',
       html: '<p>Ako vidiš ovaj e-mail, SMTP je ispravno povezan. — Svijet Sluha</p>',
     })
@@ -180,10 +181,15 @@ export const Upiti: CollectionConfig = {
     afterChange: [
       async ({ doc, operation, req }) => {
         if (operation === 'create' && process.env.PAYLOAD_SEED !== 'true') {
-          // e-mail obavještenje primaocu prema vrsti upita i poslovnici
-          posaljiObavijestOUpitu(req.payload, doc).catch((e) =>
-            req.payload.logger.error(`Slanje obavještenja o upitu nije uspjelo: ${e.message}`),
-          )
+          // Netlify/serverless može ugasiti izvršavanje nakon odgovora; e-mail
+          // mora biti await-an da ne ostane u pozadini.
+          try {
+            await posaljiObavijestOUpitu(req.payload, doc)
+          } catch (e) {
+            req.payload.logger.error(
+              `Slanje obavještenja o upitu nije uspjelo: ${e instanceof Error ? e.message : String(e)}`,
+            )
+          }
         }
         return doc
       },
