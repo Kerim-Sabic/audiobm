@@ -3,6 +3,7 @@ import { dajPayload, dajUsluge } from '@/lib/podaci'
 import { dajLokacije } from '@/data/locations'
 import { OSNOVNI_URL } from '@/lib/seo'
 import { KATEGORIJE, TIPOVI_APARATA } from '@/lib/catalog'
+import { objavaJeUklonjena } from '@/lib/objave'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const payload = await dajPayload()
@@ -57,7 +58,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         0.6,
       ),
     ),
-    ...objave.docs.map((o) => url(`/savjeti/${o.slug}`, 0.5, 'monthly')),
+    ...objave.docs
+      .filter((o) => !objavaJeUklonjena(o.slug))
+      .map((o) => url(`/savjeti/${o.slug}`, 0.5, 'monthly')),
     ...akcije.docs.map((a) => url(`/akcije/${a.slug}`, 0.6, 'daily')),
   ]
 }

@@ -5,12 +5,14 @@ import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { JSXConvertersFunction } from '@payloadcms/richtext-lexical/react'
 import { dajPayload } from '@/lib/podaci'
 import { clanakJsonLd, metaStranice, pitanjaJsonLd, OSNOVNI_URL } from '@/lib/seo'
+import { objavaJeUklonjena } from '@/lib/objave'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { SlikaMedija } from '@/components/ui/SlikaMedija'
 import { DugmeLink } from '@/components/ui/Dugme'
 import type { Mediji } from '@/payload-types'
 
 async function dajObjavu(slug: string) {
+  if (objavaJeUklonjena(slug)) return null
   const payload = await dajPayload()
   const { docs } = await payload.find({
     collection: 'objave',
@@ -28,6 +30,50 @@ function urlMedija(medij: Mediji | number | null | undefined) {
 }
 
 const FAQ_PO_OBJAVI: Record<string, { pitanje: string; odgovor: string }[]> = {
+  'prvi-znakovi-slabljenja-sluha': [
+    {
+      pitanje: 'Koji su prvi znakovi slabljenja sluha?',
+      odgovor:
+        'Najčešći prvi znakovi su pojačavanje televizora, često traženje da se ponovi, teže razumijevanje govora u buci, naporni telefonski razgovori i osjećaj da drugi govore nerazgovijetno.',
+    },
+    {
+      pitanje: 'Kada treba zakazati provjeru sluha?',
+      odgovor:
+        'Provjeru sluha vrijedi zakazati čim promjene počnu smetati u razgovoru, porodici, poslu, saobraćaju ili gledanju televizora. Ranija provjera olakšava planiranje sljedećeg koraka.',
+    },
+    {
+      pitanje: 'Da li je online test sluha dovoljan?',
+      odgovor:
+        'Online test može biti dobar orijentacioni prvi korak, ali ne zamjenjuje stručnu provjeru sluha u poslovnici niti pregled kod ORL specijaliste kada postoje medicinski simptomi.',
+    },
+    {
+      pitanje: 'Kada je potrebna hitna medicinska pomoć?',
+      odgovor:
+        'Ako je sluh naglo oslabio, posebno na jednom uhu, ili imate bol, iscjedak, vrtoglavicu, šum koji se iznenada pojavio ili osjećaj pritiska, obratite se ljekaru ili ORL specijalisti.',
+    },
+  ],
+  'pet-savjeta-odrzavanje-slusnog-aparata': [
+    {
+      pitanje: 'Kako svakodnevno čistiti slušni aparat?',
+      odgovor:
+        'Slušni aparat svaku večer obrišite suhom mekom krpicom, uklonite vidljivu nečistoću odgovarajućom četkicom i ne koristite alkohol, vodu ili vlažne maramice.',
+    },
+    {
+      pitanje: 'Zašto je vlaga opasna za slušni aparat?',
+      odgovor:
+        'Vlaga može uticati na mikrofon, zvučnik, kontakte baterije i elektroniku. Aparat treba skinuti prije tuširanja, plivanja, saune i nanošenja laka za kosu.',
+    },
+    {
+      pitanje: 'Kada mijenjati filtere i nastavke?',
+      odgovor:
+        'Filtere, kapice, cjevčice i nastavke treba mijenjati kada zvuk oslabi, aparat počne prekidati, zviždi ili se vidi nakupljen ušni vosak. Tačan ritam zavisi od modela i korisnika.',
+    },
+    {
+      pitanje: 'Koliko često treba doći na servisnu kontrolu?',
+      odgovor:
+        'Za većinu korisnika korisna je kontrola svakih šest mjeseci, a ranije ako aparat slabi, zviždi, ne puni se uredno ili se promijenio osjećaj slušanja.',
+    },
+  ],
   'svijet-sluha-sarajevo-slusni-aparati-provjera-sluha': [
     {
       pitanje: 'Gdje mogu uraditi provjeru sluha u Sarajevu?',
@@ -79,7 +125,7 @@ const articleConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
 export async function generateStaticParams() {
   const payload = await dajPayload()
   const { docs } = await payload.find({ collection: 'objave', limit: 100, depth: 0, draft: false })
-  return docs.map((d) => ({ slug: d.slug }))
+  return docs.filter((d) => !objavaJeUklonjena(d.slug)).map((d) => ({ slug: d.slug }))
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -108,6 +154,7 @@ export default async function ObjavaStranica({ params }: { params: Promise<{ slu
     depth: 0,
     draft: false,
   })
+  const vidljivePovezane = povezane.filter((p) => !objavaJeUklonjena(p.slug))
   const slikaUrl = urlMedija(
     (objava.seo?.slika as Mediji | number | null | undefined) ?? (objava.naslovnaSlika as Mediji | number | null | undefined),
   )
@@ -175,11 +222,11 @@ export default async function ObjavaStranica({ params }: { params: Promise<{ slu
           </DugmeLink>
         </div>
 
-        {povezane.length > 0 && (
+        {vidljivePovezane.length > 0 && (
           <aside className="mt-14" aria-label="Povezane objave">
             <h2 className="text-h3 mb-4">Pročitajte i ovo</h2>
             <ul className="space-y-3">
-              {povezane.map((p) => (
+              {vidljivePovezane.map((p) => (
                 <li key={p.id}>
                   <Link
                     href={`/savjeti/${p.slug}`}

@@ -15,6 +15,7 @@ import {
   type ManifestProduct,
 } from '../src/lib/catalog'
 import { dokument, paragraf, naslov, lista, tekst, link, slika, izHtml } from '../src/lib/lexical'
+import { UKLONJENI_SLUGOVI_OBJAVA } from '../src/lib/objave'
 
 const ROOT = path.resolve(process.cwd())
 
@@ -560,8 +561,12 @@ if (postojecaPitanja.totalDocs === 0) {
 // ————————————————— 6. Objave (blog) —————————————————
 const SARAJEVO_CLANAK_SLUG = 'svijet-sluha-sarajevo-slusni-aparati-provjera-sluha'
 const URL_ZAKAZIVANJE_SARAJEVO = 'https://svijetsluha.com/zakazivanje?poslovnica=sarajevo'
+const URL_ZAKAZIVANJE = 'https://svijetsluha.com/zakazivanje'
+const URL_ONLINE_TEST = 'https://svijetsluha.com/online-test-sluha'
+const URL_POSLOVNICE = 'https://svijetsluha.com/poslovnice'
 const URL_SLUSNI_APARATI = 'https://svijetsluha.com/slusni-aparati'
 const URL_POSLOVNICA_SARAJEVO = 'https://svijetsluha.com/poslovnice/sarajevo'
+const URL_SERVIS = 'https://svijetsluha.com/servis-i-podrska'
 
 const SARAJEVO_MEDIJI = [
   {
@@ -638,28 +643,101 @@ for (const m of SARAJEVO_MEDIJI) {
   sarajevoMediji[m.kljuc] = medij.id as number
 }
 
-const OBJAVE = [
+for (const slug of UKLONJENI_SLUGOVI_OBJAVA) {
+  const postojece = await payload.find({
+    collection: 'objave',
+    where: { slug: { equals: slug } },
+    limit: 50,
+    depth: 0,
+  })
+
+  for (const objava of postojece.docs) {
+    await payload.delete({ collection: 'objave', id: objava.id })
+    log(`Objava uklonjena: ${slug}`)
+  }
+}
+
+type ObjavaSeed = {
+  naslov: string
+  slug: string
+  stariSlug?: string
+  kategorija: 'savjeti' | 'novosti' | 'sarajevo'
+  izvod: string
+  naslovnaSlika?: number
+  seoNaslov?: string
+  seoOpis?: string
+  azurirajUvijek?: boolean
+  sadrzaj: ReturnType<typeof dokument>
+}
+
+const OBJAVE: ObjavaSeed[] = [
   {
     naslov: 'Kako prepoznati prve znakove slabljenja sluha',
     slug: 'prvi-znakovi-slabljenja-sluha',
     kategorija: 'savjeti',
+    azurirajUvijek: true,
     izvod:
-      'Slabljenje sluha dolazi postepeno, pa ga je lako previdjeti. Ovo su znakovi na koje treba obratiti pažnju — kod sebe i kod najbližih.',
+      'Pojačavate TV, često tražite da se ponovi ili teško pratite razgovor u buci? Ovo su prvi znakovi slabljenja sluha i kada zakazati provjeru.',
+    seoNaslov: 'Prvi znakovi slabljenja sluha: kada provjeriti sluh',
+    seoOpis:
+      'Pojačavate TV, često tražite ponavljanje ili teško pratite razgovor u buci? Saznajte prve znakove slabljenja sluha i kada zakazati provjeru.',
     sadrzaj: dokument(
       paragraf(
-        'Sluh najčešće ne oslabi preko noći. Promjene dolaze polako, mjesecima i godinama, pa ih osoba sama posljednja primijeti. Porodica obično primijeti prva.',
+        tekst('Kratak odgovor: ', true),
+        'prvi znakovi slabljenja sluha najčešće su pojačavanje televizora, često traženje da se ponovi, teže razumijevanje govora u buci, naporni telefonski razgovori i osjećaj da drugi govore tiho ili nerazgovijetno.',
       ),
-      naslov('Najčešći znakovi'),
-      lista([
-        [tekst('Televizor je sve glasniji', true), tekst(' — ukućani komentarišu da je preglasno.')],
-        [tekst('Često pitate „molim?"', true), tekst(' — naročito kad govori više ljudi odjednom.')],
-        [tekst('Teško pratite razgovor u kafani ili na slavlju', true), tekst(' — buka u pozadini „proguta" govor.')],
-        [tekst('Zvona i ptice se više ne čuju', true), tekst(' — visoki tonovi nestaju prvi.')],
-        [tekst('Telefonski razgovori postaju naporni', true), tekst(' — bez gledanja u sagovornika teže razumijete.')],
-      ]),
-      naslov('Šta učiniti?'),
       paragraf(
-        'Najjednostavniji prvi korak je besplatna provjera sluha. Traje pola sata, potpuno je bezbolna i odmah znate na čemu ste. Ako je sluh uredan — mirni ste. Ako nije — što ranije reagujete, lakše se mozak navikne na pomoć.',
+        'Sluh obično ne oslabi preko noći. Promjene često dolaze postepeno, pa ih porodica, kolege ili prijatelji primijete prije osobe kojoj sluh slabi. Zato je važno obratiti pažnju na svakodnevne situacije, a ne samo na to da li nešto „čujete".',
+      ),
+      naslov('7 ranih znakova slabljenja sluha'),
+      lista([
+        [tekst('TV, radio ili telefon su sve glasniji. ', true), tekst('Ukućani komentarišu da je zvuk preglasan, dok Vama djeluje normalno.')],
+        [tekst('Često pitate „molim?" ili „šta?". ', true), tekst('Posebno kada sagovornik govori tiše, brže ili iz druge prostorije.')],
+        [tekst('Razgovor u buci postaje naporan. ', true), tekst('Restoran, kafić, porodično slavlje ili sastanak traže više koncentracije nego ranije.')],
+        [tekst('Lakše čujete glas nego riječi. ', true), tekst('Čujete da neko govori, ali ne razumijete jasno svaku riječ.')],
+        [tekst('Telefonski razgovori su teži. ', true), tekst('Bez gledanja u lice sagovornika teže pratite šta je rečeno.')],
+        [tekst('Visoki zvukovi nestaju prvi. ', true), tekst('Zvono na vratima, cvrkut ptica, dječiji glasovi ili pojedini suglasnici mogu postati manje jasni.')],
+        [tekst('Umor nakon razgovora je veći. ', true), tekst('Mozak ulaže više napora da popuni ono što uho ne prenese jasno.')],
+      ]),
+      naslov('Brzi samopregled: kada vrijedi provjeriti sluh'),
+      paragraf('Ako se prepoznajete u dvije ili više stavki, provjera sluha je razuman sljedeći korak:'),
+      lista([
+        ['pojačavate televizor više nego ranije'],
+        ['izbjegavate bučna mjesta jer razgovor postaje težak'],
+        ['porodica Vam češće govori da ne čujete dobro'],
+        ['razgovori preko telefona traže mnogo koncentracije'],
+        ['imate osjećaj da ljudi mumlaju ili govore nerazgovijetno'],
+      ]),
+      paragraf(
+        'Možete početi i od ',
+        link('online testa sluha', URL_ONLINE_TEST, 'prvi-znakovi-online-test'),
+        ', ali online test je samo orijentacija. Za jasniju sliku potreban je razgovor sa stručnim osobljem i provjera sluha u kontrolisanim uslovima.',
+      ),
+      naslov('Zašto je rana provjera važna'),
+      paragraf(
+        'Kada se sluh slabije koristi, razgovori mogu postati zamorni, a osoba se nesvjesno povlači iz društvenih situacija. Ranija provjera pomaže da se na vrijeme razumije šta se dešava i da se, ako je potrebno, lakše planira sljedeći korak.',
+      ),
+      paragraf(
+        'U poslovnicama Svijet Sluha možete zakazati besplatnu provjeru sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju, Brčkom i Tuzli, prema dostupnim terminima.',
+      ),
+      paragraf(link('Pronađite najbližu poslovnicu', URL_POSLOVNICE, 'prvi-znakovi-poslovnice')),
+      paragraf(link('Zakažite besplatnu provjeru sluha', URL_ZAKAZIVANJE, 'prvi-znakovi-zakazivanje')),
+      naslov('Kada se obratiti ljekaru ili ORL specijalisti'),
+      paragraf(
+        'Besplatna provjera sluha je korisna za postepene promjene, ali nije zamjena za medicinski pregled. Ako je sluh naglo oslabio, posebno na jednom uhu, ili imate bol, iscjedak iz uha, vrtoglavicu, nagli šum ili osjećaj pritiska, obratite se ljekaru ili ORL specijalisti.',
+      ),
+      naslov('Najčešća pitanja'),
+      naslov('Da li slabljenje sluha uvijek znači da trebam slušni aparat?', 'h3'),
+      paragraf(
+        'Ne uvijek. Prvo je potrebno provjeriti sluh i razgovarati o svakodnevnim poteškoćama. Tek nakon toga se može govoriti o tome da li je potreban slušni aparat, praćenje, dodatna obrada ili savjet ljekara.',
+      ),
+      naslov('Da li online test može zamijeniti provjeru sluha?', 'h3'),
+      paragraf(
+        'Online test može pomoći da odlučite da li vrijedi doći na provjeru, ali ne zamjenjuje stručnu procjenu, audiometrijsko testiranje niti medicinski pregled kada postoje simptomi koji zahtijevaju ljekara.',
+      ),
+      naslov('Koliko traje provjera sluha?', 'h3'),
+      paragraf(
+        'Uobičajena provjera sluha i razgovor o rezultatima planiraju se tako da osoba dobije jasno objašnjenje, bez žurbe. Tačan tok zavisi od poslovnice i potreba korisnika.',
       ),
     ),
   },
@@ -667,17 +745,82 @@ const OBJAVE = [
     naslov: 'Pet savjeta za duži vijek Vašeg slušnog aparata',
     slug: 'pet-savjeta-odrzavanje-slusnog-aparata',
     kategorija: 'savjeti',
+    azurirajUvijek: true,
     izvod:
-      'Slušni aparat je mali, precizan uređaj koji radi po cijeli dan. Uz ovih pet navika služiće Vas godinama.',
+      'Pravilno održavanje slušnog aparata smanjuje kvarove, čuva jačinu zvuka i produžava vijek uređaja. Ovo je rutina koju vrijedi usvojiti.',
+    seoNaslov: 'Održavanje slušnog aparata: 5 savjeta za duži vijek',
+    seoOpis:
+      'Kako čistiti i čuvati slušni aparat? Pet praktičnih savjeta za zaštitu od vlage, voska, vrućine i kvarova, uz servisnu podršku u BiH.',
     sadrzaj: dokument(
+      paragraf(
+        tekst('Kratak odgovor: ', true),
+        'slušni aparat najduže traje kada ga držite suhim, čistite svaku večer, redovno mijenjate filtere i nastavke, čuvate ga od toplote i dolazite na servisne kontrole prije nego mali problem postane kvar.',
+      ),
+      paragraf(
+        'Slušni aparat je mali elektronski uređaj koji radi satima svaki dan, često u kontaktu sa vlagom, prašinom, znojem i ušnim voskom. Dobra rutina održavanja čuva stabilan zvuk i smanjuje rizik od nepotrebnih popravki.',
+      ),
+      naslov('1. Čuvajte aparat od vlage'),
+      paragraf(
+        'Skinite aparat prije tuširanja, kupanja, plivanja, saune i nanošenja laka za kosu. Navečer ga ostavite na suhom i sigurnom mjestu, dalje od kupatila i direktne vlage.',
+      ),
+      paragraf(
+        'Ako koristite aparat na baterije, otvorite ležište baterije preko noći. Ako koristite punjivi aparat, punite ga prema uputstvu koje ste dobili uz uređaj.',
+      ),
+      naslov('2. Očistite ga svaku večer'),
+      paragraf(
+        'Mekom suhom krpicom obrišite kućište aparata. Ako imate četkicu ili alat za čišćenje, nježno uklonite vidljivu nečistoću oko otvora mikrofona, nastavka ili zvučnika.',
+      ),
+      paragraf(
+        'Ne koristite alkohol, vodu, sapun, vlažne maramice ili agresivna sredstva. Vlaga i hemikalije mogu oštetiti elektroniku, mikrofone i zaštitne filtere.',
+      ),
+      naslov('3. Mijenjajte filtere, kapice i cjevčice na vrijeme'),
+      paragraf(
+        'Ušni vosak je jedan od najčešćih razloga za slabiji zvuk, prekidanje ili zviždanje aparata. Filteri i nastavci služe da zaštite osjetljive dijelove uređaja, ali se vremenom zapune.',
+      ),
+      paragraf('Vrijeme je za provjeru filtera ili nastavka ako:'),
       lista([
-        [tekst('1. Suho je zakon. ', true), tekst('Skinite aparat prije tuširanja i plivanja, a uveče ga ostavite na suhom mjestu — ne u kupatilu.')],
-        [tekst('2. Čistite ga svaku večer. ', true), tekst('Mekom suhom krpicom obrišite cijeli aparat. Bez alkohola i vlažnih maramica.')],
-        [tekst('3. Mijenjajte filtere. ', true), tekst('Filter štiti aparat od ušnog voska. Zamjena u našoj poslovnici traje par minuta.')],
-        [tekst('4. Čuvajte ga od vrućine. ', true), tekst('Ne ostavljajte aparat na suncu, radijatoru ili u autu ljeti.')],
-        [tekst('5. Dolazite na redovne kontrole. ', true), tekst('Dva puta godišnje provjerimo i fino podesimo aparat — besplatno.')],
+        ['zvuk je tiši nego inače'],
+        ['aparat povremeno prekida'],
+        ['čuje se zviždanje koje ranije nije bilo prisutno'],
+        ['vidi se nakupljen vosak ili nečistoća'],
+        ['nastavak ne stoji udobno kao ranije'],
       ]),
-      paragraf('Imate pitanje o svom aparatu? Navratite u najbližu poslovnicu — rado ćemo pomoći.'),
+      naslov('4. Ne ostavljajte aparat na vrućini'),
+      paragraf(
+        'Ne ostavljajte slušni aparat na suncu, radijatoru, prozorskoj dasci ili u automobilu tokom ljeta. Visoka temperatura može oštetiti bateriju, plastiku, zvučnik i elektroniku.',
+      ),
+      paragraf(
+        'Kada aparat ne nosite, držite ga u kutiji ili punjaču, na sigurnom mjestu i van domašaja male djece.',
+      ),
+      naslov('5. Dođite na kontrolu prije kvara'),
+      paragraf(
+        'Ako aparat slabije radi, zviždi, ne puni se uredno ili više ne čujete jasno kao ranije, nemojte čekati da potpuno prestane raditi. U poslovnici se mogu provjeriti filteri, nastavci, cjevčice, punjenje i osnovno podešavanje.',
+      ),
+      paragraf(
+        'Servisnu podršku i savjet možete dobiti u poslovnicama Svijet Sluha širom Bosne i Hercegovine, uključujući Sarajevo, Banju Luku, Gradišku, Bijeljinu, Doboj, Brčko i Tuzlu.',
+      ),
+      paragraf(link('Pogledajte servis i podršku', URL_SERVIS, 'odrzavanje-servis')),
+      paragraf(link('Pronađite najbližu poslovnicu', URL_POSLOVNICE, 'odrzavanje-poslovnice')),
+      naslov('Šta ponijeti na kontrolu aparata'),
+      lista([
+        ['slušni aparat ili oba aparata ako ih nosite u paru'],
+        ['punjač ili baterije koje trenutno koristite'],
+        ['nastavke, kutiju i dodatnu opremu koju ste dobili uz aparat'],
+        ['kratak opis problema: kada se javlja, da li je stalno ili povremeno, i u kojim situacijama smeta'],
+      ]),
+      naslov('Najčešća pitanja'),
+      naslov('Koliko često čistiti slušni aparat?', 'h3'),
+      paragraf(
+        'Najbolje je obrisati aparat svaku večer. Detaljnije čišćenje, zamjena filtera i provjera nastavaka zavise od modela aparata i količine ušnog voska.',
+      ),
+      naslov('Šta ako se aparat smoči?', 'h3'),
+      paragraf(
+        'Isključite ga, izvadite bateriju ako je model na baterije i ostavite ga da se osuši. Ne koristite fen, radijator ili direktnu vrućinu. Ako nakon toga ne radi normalno, donesite ga na provjeru.',
+      ),
+      naslov('Zašto aparat zviždi?', 'h3'),
+      paragraf(
+        'Zviždanje može nastati zbog nakupljenog ušnog voska, zapušenog filtera, lošeg položaja nastavka ili promjene u pristajanju aparata. Najsigurnije je provjeriti aparat i uho u poslovnici ili kod stručne osobe.',
+      ),
     ),
   },
   {
@@ -831,7 +974,7 @@ const OBJAVE = [
       paragraf(link('Kontaktirajte poslovnicu Sarajevo', URL_POSLOVNICA_SARAJEVO, 'sarajevo-link-kontakt-kraj')),
     ),
   },
-] as const
+]
 
 for (const o of OBJAVE) {
   const postoji = await payload.find({
@@ -840,7 +983,6 @@ for (const o of OBJAVE) {
     limit: 1,
     draft: false,
   })
-  if (postoji.totalDocs > 0) continue
 
   const stariSlug = 'stariSlug' in o ? o.stariSlug : null
   const staraObjava = stariSlug
@@ -861,11 +1003,23 @@ for (const o of OBJAVE) {
     sadrzaj: o.sadrzaj as never,
     datumObjave: '2026-06-28T00:00:00.000Z',
     seo: {
-      naslov: ('seoNaslov' in o ? o.seoNaslov : o.naslov).slice(0, 60),
-      opis: ('seoOpis' in o ? o.seoOpis : o.izvod).slice(0, 155),
+      naslov: (o.seoNaslov ?? o.naslov).slice(0, 60),
+      opis: (o.seoOpis ?? o.izvod).slice(0, 155),
       ...('naslovnaSlika' in o && o.naslovnaSlika ? { slika: o.naslovnaSlika } : {}),
     },
     _status: 'published' as const,
+  }
+
+  if (postoji.totalDocs > 0) {
+    if ('azurirajUvijek' in o && o.azurirajUvijek) {
+      await payload.update({
+        collection: 'objave',
+        id: postoji.docs[0].id,
+        data,
+      })
+      log(`Objava ažurirana: ${o.naslov}`)
+    }
+    continue
   }
 
   if (staraObjava && staraObjava.totalDocs > 0) {
