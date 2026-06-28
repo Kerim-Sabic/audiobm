@@ -82,11 +82,7 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 30,
   },
   async redirects() {
-    return [
-      ...legacyRedirects(),
-      // Google i neki klijenti traže /favicon.ico na korijenu — vodi na novi SVG znak.
-      { source: '/favicon.ico', destination: '/brand/favicon.svg', permanent: true },
-    ]
+    return legacyRedirects()
   },
 }
 

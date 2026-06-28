@@ -51,7 +51,14 @@ export default async function SlusniAparatiStranica() {
           src: '/media/site-refresh/hearing-aids-page.png',
           alt: 'Audiologinja pokazuje savremeni slušni aparat korisniku tokom savjetovanja',
         }}
-      />
+      >
+        <div className="flex flex-wrap gap-3.5">
+          <DugmeLink href="/slusni-aparati-sarajevo" varijanta="sekundarno">
+            Slušni aparati Sarajevo
+          </DugmeLink>
+          <DugmeLink href="/zakazivanje">Zakažite besplatno savjetovanje</DugmeLink>
+        </div>
+      </ZaglavljeStranice>
 
       <div className="kontejner">
         {/* animirana vizualizacija rada aparata */}

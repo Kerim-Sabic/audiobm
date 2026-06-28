@@ -299,6 +299,16 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
             >
               Zakažite termin {uGradu(poslovnica.grad)}
             </DugmeLink>
+            {poslovnica.slug === 'sarajevo' && (
+              <DugmeLink
+                href="/slusni-aparati-sarajevo"
+                varijanta="sekundarno"
+                velicina="veliko"
+                className="w-full"
+              >
+                Slušni aparati Sarajevo
+              </DugmeLink>
+            )}
             <p className="text-small text-center text-neutral-500">
               Besplatno i bez obaveze · odgovaramo isti radni dan
             </p>

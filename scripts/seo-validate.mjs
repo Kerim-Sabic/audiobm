@@ -59,6 +59,13 @@ function robotsContent(html) {
   return html.match(/<meta[^>]+name=["']robots["'][^>]+content=["']([^"']+)/i)?.[1] ?? ''
 }
 
+function hasNoindex(page) {
+  return (
+    robotsContent(page.text).toLowerCase().includes('noindex') ||
+    (page.response.headers.get('x-robots-tag') ?? '').toLowerCase().includes('noindex')
+  )
+}
+
 const failures = []
 const warnings = []
 const report = {
@@ -76,10 +83,12 @@ report.sitemap.urlCount = sitemapUrls.length
 report.sitemap.includesBlackFriday = sitemap.text.includes('/akcije/blackfriday')
 report.sitemap.includesProductCategory = sitemap.text.includes('/proizvodi/kategorija/baterije')
 report.sitemap.includesTuzla = sitemap.text.includes('/poslovnice/tuzla')
+report.sitemap.includesSarajevoHearingAids = sitemap.text.includes('/slusni-aparati-sarajevo')
 
 if (report.sitemap.includesBlackFriday) failures.push('sitemap includes expired /akcije/blackfriday URL')
 if (!report.sitemap.includesProductCategory) failures.push('sitemap is missing product category URLs')
 if (!report.sitemap.includesTuzla) failures.push('sitemap is missing Tuzla branch URL')
+if (!report.sitemap.includesSarajevoHearingAids) failures.push('sitemap is missing Sarajevo hearing aids URL')
 
 const robots = await fetchText('/robots.txt')
 if (robots.status !== 200) failures.push(`/robots.txt returned ${robots.status}`)
@@ -88,14 +97,14 @@ if (!robots.text.includes('Sitemap:')) failures.push('robots.txt does not expose
 
 for (const path of ['/savjeti?kategorija=savjeti', '/zakazivanje?poslovnica=tuzla']) {
   const page = await fetchText(path)
-  const robotsMeta = robotsContent(page.text)
-  if (!robotsMeta.includes('noindex')) failures.push(`${path} is missing noindex robots meta`)
+  if (!hasNoindex(page)) failures.push(`${path} is missing noindex robots directive`)
 }
 
 const importantPaths = [
   '/',
   '/poslovnice',
   '/poslovnice/tuzla',
+  '/slusni-aparati-sarajevo',
   '/usluge/provjera-sluha',
   '/proizvodi/kategorija/baterije',
   '/savjeti/prvi-znakovi-slabljenja-sluha',

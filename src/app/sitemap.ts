@@ -34,6 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url('/zakazivanje', 0.9),
     url('/online-test-sluha', 0.9),
     url('/slusni-aparati', 0.9),
+    url('/slusni-aparati-sarajevo', 0.9),
     url('/poslovnice', 0.9),
     url('/proizvodi', 0.8),
     url('/usluge', 0.8),
