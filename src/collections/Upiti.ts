@@ -111,10 +111,12 @@ const testEmail = async (req: PayloadRequest): Promise<Response> => {
     return Response.json({ greska: 'Samo vlasnik moze pokrenuti test.' }, { status: 403 })
   }
 
+  let smtp: ReturnType<typeof dajSmtpOkruzenje> = undefined
   let smtpAktivan = false
   let smtpGreska: string | null = null
   try {
-    smtpAktivan = Boolean(dajSmtpOkruzenje())
+    smtp = dajSmtpOkruzenje()
+    smtpAktivan = Boolean(smtp)
   } catch (e) {
     smtpGreska = e instanceof Error ? e.message : String(e)
   }
@@ -123,8 +125,10 @@ const testEmail = async (req: PayloadRequest): Promise<Response> => {
     SMTP_HOST: process.env.SMTP_HOST ?? '(NIJE postavljen)',
     SMTP_USER: process.env.SMTP_USER ? 'postavljen ✓' : '(NIJE postavljen)',
     SMTP_PASS: process.env.SMTP_PASS ? `postavljen (${process.env.SMTP_PASS.length} znakova)` : '(NIJE postavljen)',
-    EMAIL_FROM: process.env.EMAIL_FROM ?? '(NIJE postavljen)',
-    EMAIL_TO: dajEmailPrimaocaUpita() ?? '(NIJE postavljen)',
+    EMAIL_FROM: smtp ? `${smtp.fromName} <${smtp.fromAddress}>` : 'Svijet Sluha <svijetsluha@gmail.com>',
+    EMAIL_TO: dajEmailPrimaocaUpita(),
+    EMAIL_FROM_ENV: process.env.EMAIL_FROM ? 'postavljen, ali aplikacija koristi svijetsluha@gmail.com' : '(NIJE postavljen)',
+    EMAIL_TO_ENV: process.env.EMAIL_TO ? 'postavljen, ali aplikacija koristi svijetsluha@gmail.com' : '(NIJE postavljen)',
     smtpAktivan,
     ...(smtpGreska ? { smtpGreska } : {}),
   }
@@ -139,7 +143,7 @@ const testEmail = async (req: PayloadRequest): Promise<Response> => {
 
   try {
     await req.payload.sendEmail({
-      to: dajEmailPrimaocaUpita() ?? 'svijetsluha@gmail.com',
+      to: dajEmailPrimaocaUpita(),
       subject: 'Test — Svijet Sluha SMTP radi 🎉',
       html: '<p>Ako vidiš ovaj e-mail, SMTP je ispravno povezan. — Svijet Sluha</p>',
     })

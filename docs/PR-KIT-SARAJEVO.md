@@ -32,7 +32,7 @@ Sarajevu šesta je u mreži — uz Banju Luku, Gradišku, Bijeljinu, Doboj i Br�
 
 Termin za besplatnu provjeru sluha može se zakazati na **svijetsluha.com** ili telefonom.
 
-**Kontakt za medije:** [ime] · [telefon] · info@svijetsluha.com · https://svijetsluha.com
+**Kontakt za medije:** [ime] · [telefon] · svijetsluha@gmail.com · https://svijetsluha.com
 
 *— kraj —*
 
@@ -55,7 +55,7 @@ Termin za besplatnu provjeru sluha može se zakazati na **svijetsluha.com** ili 
 > intervju s našim stručnjakom, te informacije o pokrivenosti preko FZO/RFZO.
 >
 > Hvala unaprijed — stojim na raspolaganju.
-> [ime] · [telefon] · info@svijetsluha.com · https://svijetsluha.com
+> [ime] · [telefon] · svijetsluha@gmail.com · https://svijetsluha.com
 
 ---
 

@@ -21,16 +21,6 @@ const broj = (ime: string, podrazumijevano: number) => {
   throw new Error(`Varijabla okruzenja ${ime} mora biti pozitivan cijeli broj.`)
 }
 
-const emailFrom = (vrijednost: string) => {
-  const match = vrijednost.match(/^"?([^"<]+)"?\s*<([^>]+)>$/)
-  if (!match) return { adresa: vrijednost, naziv: BREND.emailNaziv }
-
-  return {
-    naziv: match[1].trim(),
-    adresa: match[2].trim(),
-  }
-}
-
 export function dajPayloadSecret() {
   return obavezno('PAYLOAD_SECRET', 'Kopirajte .env.example u .env i upisite dug nasumican niz.')
 }
@@ -65,7 +55,7 @@ export function dajSmtpOkruzenje() {
   const host = citaj('SMTP_HOST')
   if (!host) return undefined
 
-  const from = emailFrom(citaj('EMAIL_FROM') ?? `${BREND.emailNaziv} <${BREND.emailAdresa}>`)
+  const from = { adresa: BREND.emailAdresa, naziv: BREND.emailNaziv }
   const port = broj('SMTP_PORT', 587)
 
   return {
@@ -80,7 +70,7 @@ export function dajSmtpOkruzenje() {
 }
 
 export function dajEmailPrimaocaUpita() {
-  return citaj('EMAIL_TO') ?? citaj('NOTIFICATION_EMAIL')
+  return BREND.emailAdresa
 }
 
 export function dajS3Okruzenje() {

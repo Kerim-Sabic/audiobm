@@ -15,7 +15,7 @@ pnpm seed                   # 3) puni CMS podacima (idempotentno)
 pnpm dev                    # http://localhost:3000  (admin: /admin)
 ```
 
-**Prva prijava u administraciju:** `vlasnik@audiobm.ba` / `AudioBM-promijenite-me-2026!`
+**Prva prijava u administraciju:** `svijetsluha@gmail.com` / `AudioBM-promijenite-me-2026!`
 → **lozinku odmah promijenite** (Administracija → Korisnici).
 
 ## Šta gdje stoji
@@ -58,7 +58,7 @@ pnpm dev                    # http://localhost:3000  (admin: /admin)
 | `DATABASE_URL` | `postgres://…` (EU baza) |
 | `NEXT_PUBLIC_SERVER_URL` | `https://audiobm.ba` |
 | `SMTP_HOST/PORT/USER/PASS` | SMTP nalog (npr. Resend) — **[DNS_PLACEHOLDER: podesiti SPF/DKIM]** |
-| `EMAIL_FROM` | `"Audio BM <info@audiobm.ba>"` |
+| `EMAIL_FROM` | `"Svijet Sluha <svijetsluha@gmail.com>"` |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile (zaštita formi) |
 | `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | `audiobm.ba` (ili upišite domenu u Admin → Podešavanja) |
 

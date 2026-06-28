@@ -24,7 +24,7 @@ export function provjeriTelefon(telefon: unknown): string | null {
 export function provjeriEmail(email: unknown): string | null {
   if (email == null || email === '') return null // e-mail je neobavezan
   if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) {
-    return 'E-mail adresa nije ispravna. Primjer: ime@example.com.'
+    return 'E-mail adresa nije ispravna.'
   }
   return null
 }

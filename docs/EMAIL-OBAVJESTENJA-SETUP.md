@@ -70,7 +70,7 @@ Admin (`svijetsluha.com/admin`) → **Podešavanja → Obavještenja o upitima**
 - **Gmail limit:** ~500 mailova/dan (više nego dovoljno). Za veći obim ili bolju
   isporučivost koristi servis (npr. **Brevo** — besplatno 300/dan):
   `SMTP_HOST=smtp-relay.brevo.com`, `SMTP_PORT=587`, `SMTP_USER`=Brevo login,
-  `SMTP_PASS`=Brevo SMTP ključ, `EMAIL_FROM=Svijet Sluha <tvoja-verifikovana@adresa>`.
+  `SMTP_PASS`=Brevo SMTP ključ, `EMAIL_FROM=Svijet Sluha <svijetsluha@gmail.com>`.
 
 ---
 

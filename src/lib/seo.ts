@@ -221,7 +221,6 @@ type PoslovnicaZaShemu = {
   geoSirina?: number | null
   geoDuzina?: number | null
   telefoni?: { broj: string }[] | null
-  emaili?: { email: string }[] | null
   radnoVrijeme?: { dan: string; od?: string | null; do?: string | null; zatvoreno?: boolean | null }[] | null
   radnoVrijemePotvrdjeno?: boolean | null
 }
@@ -240,7 +239,6 @@ const DAN_SHEMA: Record<string, string> = {
  *  Placeholder podaci (adresa/telefon koji još nisu uneseni) se izostavljaju. */
 export function poslovnicaJsonLd(p: PoslovnicaZaShemu, ocjena?: { broj: number; prosjek: number }) {
   const telefon = stvarno(p.telefoni?.[0]?.broj)
-  const email = stvarno(p.emaili?.[0]?.email)
   const adresa = stvarno(p.adresa)
   return {
     '@context': 'https://schema.org',
@@ -251,7 +249,7 @@ export function poslovnicaJsonLd(p: PoslovnicaZaShemu, ocjena?: { broj: number; 
     url: `${OSNOVNI_URL}/poslovnice/${p.slug}`,
     image: `${OSNOVNI_URL}/brand/og-podrazumijevana.png`,
     ...(telefon ? { telephone: telefon } : {}),
-    ...(email ? { email } : {}),
+    email: BREND.emailAdresa,
     address: {
       '@type': 'PostalAddress',
       ...(adresa ? { streetAddress: adresa } : {}),

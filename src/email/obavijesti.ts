@@ -2,7 +2,7 @@ import type { Payload } from 'payload'
 import type { Poslovnice, Upiti } from '../payload-types'
 import { ZASTAVICE, type KategorijaTesta } from '../lib/test-sluha'
 import { BREND } from '../lib/brend'
-import { dajEmailPrimaocaUpita, dajSmtpOkruzenje } from '../lib/okruzenje'
+import { dajEmailPrimaocaUpita } from '../lib/okruzenje'
 
 type VrstaUpita = Upiti['vrsta']
 
@@ -72,27 +72,10 @@ const dajZastavice = (rezultat?: Record<string, unknown>) => {
 }
 
 /**
- * Šalje e-mail obavještenje o novom upitu primaocu određenom
- * vrstom upita i poslovnicom (Podešavanja -> Obavještenja o upitima).
+ * Šalje e-mail obavještenje o novom upitu na jedini službeni inbox.
  */
 export async function posaljiObavijestOUpitu(payload: Payload, upit: Upiti): Promise<void> {
-  const podesavanja = await payload.findGlobal({ slug: 'podesavanja' })
-
-  // ISKLJUČIVO jedan primalac. EMAIL_TO je namjerna destinacija, dok EMAIL_FROM
-  // ostaje SMTP identitet pošiljaoca. Zadržavamo from fallback zbog postojećih
-  // deploy varijabli, ali nova podešavanja treba da koriste EMAIL_TO.
-  let smtpFrom: string | undefined
-  try {
-    smtpFrom = dajSmtpOkruzenje()?.fromAddress
-  } catch {
-    /* nepotpun SMTP */
-  }
-  const primalac = dajEmailPrimaocaUpita() || smtpFrom || podesavanja.emailZaUpite
-
-  if (!primalac) {
-    payload.logger.warn('Upit zaprimljen, ali nijedan e-mail primalac nije podešen (Podešavanja -> Obavještenja).')
-    return
-  }
+  const primalac = dajEmailPrimaocaUpita()
 
   const vrsta = NAZIVI_VRSTA[upit.vrsta]
   const poslovnicaNaziv = jePoslovnica(upit.poslovnica) ? upit.poslovnica.naziv : undefined

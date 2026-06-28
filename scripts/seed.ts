@@ -17,6 +17,7 @@ import {
 } from '../src/lib/catalog'
 import { dokument, paragraf, naslov, lista, tekst, link, slika, izHtml } from '../src/lib/lexical'
 import { UKLONJENI_SLUGOVI_OBJAVA } from '../src/lib/objave'
+import { GLAVNI_EMAIL } from '../src/lib/brend'
 
 const ROOT = path.resolve(process.cwd())
 
@@ -27,7 +28,7 @@ const log = (m: string) => payload.logger.info(`[seed] ${m}`)
 const postojeciKorisnici = await payload.find({ collection: 'korisnici', limit: 1 })
 if (postojeciKorisnici.totalDocs === 0) {
   // Kredencijali iz env (SEED_ADMIN_EMAIL/SEED_ADMIN_PASSWORD) — bez stvarne lozinke u repou.
-  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? 'admin@svijetsluha.com'
+  const adminEmail = GLAVNI_EMAIL
   const adminLozinka = process.env.SEED_ADMIN_PASSWORD ?? 'PromijeniOdmah-2026!'
   await payload.create({
     collection: 'korisnici',
@@ -67,7 +68,7 @@ const POSLOVNICE: PoslovnicaSeed[] = [
     geoSirina: 43.8558,
     geoDuzina: 18.4085,
     telefoni: [{ oznaka: 'Telefon', broj: '[TELEFON_PLACEHOLDER]' }],
-    emaili: [],
+    emaili: [{ email: GLAVNI_EMAIL }],
     novaPoslovnica: true,
     redoslijed: 1,
     opis:
@@ -81,7 +82,7 @@ const POSLOVNICE: PoslovnicaSeed[] = [
     geoSirina: 44.7722,
     geoDuzina: 17.191,
     telefoni: [{ oznaka: 'Telefon', broj: '051 218 781' }],
-    emaili: [{ email: 'banjaluka@audiobm.ba' }],
+    emaili: [{ email: GLAVNI_EMAIL }],
     redoslijed: 2,
     opis: 'Centralna poslovnica u Banjoj Luci — kompletna audiološka dijagnostika i servis.',
   },
@@ -93,7 +94,7 @@ const POSLOVNICE: PoslovnicaSeed[] = [
     geoSirina: 45.1447,
     geoDuzina: 17.2521,
     telefoni: [{ oznaka: 'Telefon', broj: '051 816 908' }],
-    emaili: [{ email: 'gradiska@audiobm.ba' }],
+    emaili: [{ email: GLAVNI_EMAIL }],
     redoslijed: 3,
     opis: 'Poslovnica u centru Gradiške — provjera sluha, slušni aparati i pribor.',
   },
@@ -105,7 +106,7 @@ const POSLOVNICE: PoslovnicaSeed[] = [
     geoSirina: 44.7587,
     geoDuzina: 19.2164,
     telefoni: [{ oznaka: 'Telefon', broj: '055 410 010' }],
-    emaili: [{ email: 'bijeljina@audiobm.ba' }],
+    emaili: [{ email: GLAVNI_EMAIL }],
     redoslijed: 4,
     opis: 'Poslovnica u Bijeljini — besplatna provjera sluha i stručno savjetovanje.',
   },
@@ -117,7 +118,7 @@ const POSLOVNICE: PoslovnicaSeed[] = [
     geoSirina: 44.7318,
     geoDuzina: 18.0856,
     telefoni: [{ oznaka: 'Telefon', broj: '053 242 498' }],
-    emaili: [{ email: 'doboj@audiobm.ba' }],
+    emaili: [{ email: GLAVNI_EMAIL }],
     redoslijed: 5,
     opis: 'Poslovnica u Doboju — slušni aparati, baterije i servis.',
   },
@@ -129,7 +130,7 @@ const POSLOVNICE: PoslovnicaSeed[] = [
     geoSirina: 44.8694,
     geoDuzina: 18.8081,
     telefoni: [{ oznaka: 'Telefon', broj: '049 206 212' }],
-    emaili: [{ email: 'brcko@audiobm.ba' }],
+    emaili: [{ email: GLAVNI_EMAIL }],
     redoslijed: 6,
     opis: 'Poslovnica u Brčkom — provjera sluha i kompletna ponuda slušnih aparata.',
   },
@@ -141,7 +142,7 @@ const POSLOVNICE: PoslovnicaSeed[] = [
     geoSirina: 44.5594495,
     geoDuzina: 18.6952466,
     telefoni: [{ oznaka: 'Telefon', broj: '063132400' }],
-    emaili: [],
+    emaili: [{ email: GLAVNI_EMAIL }],
     redoslijed: 7,
     opis: 'Poslovnica u Tuzli — besplatna provjera sluha, slušni aparati i servis.',
   },
@@ -167,7 +168,13 @@ for (const p of POSLOVNICE) {
     draft: false,
   })
   if (postoji.totalDocs > 0) {
-    poslovniceIds[p.slug] = postoji.docs[0].id as number
+    const id = postoji.docs[0].id as number
+    poslovniceIds[p.slug] = id
+    await payload.update({
+      collection: 'poslovnice',
+      id,
+      data: { emaili: p.emaili },
+    })
     continue
   }
   const doc = await payload.create({
@@ -1144,11 +1151,11 @@ await payload.updateGlobal({
   data: {
     nazivSajta: 'Audio BM',
     telefonGlavni: '051 218 781',
-    emailGlavni: 'gradiska@audiobm.ba',
+    emailGlavni: GLAVNI_EMAIL,
     seoNaslov: 'Audio BM — Slušni aparati i besplatna provjera sluha',
     seoOpis:
       'Više od 30 godina povjerenja. Besplatna provjera sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju, Brčkom i Tuzli.',
-    emailZaUpite: 'svijetsluha@gmail.com',
+    emailZaUpite: GLAVNI_EMAIL,
   },
 })
 

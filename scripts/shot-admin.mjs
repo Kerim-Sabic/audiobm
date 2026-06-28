@@ -2,7 +2,7 @@ import { chromium } from 'playwright'
 const b = await chromium.launch()
 const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage()
 await p.goto('http://localhost:3000/admin/login', { waitUntil: 'networkidle' })
-await p.fill('input[name="email"]', 'vlasnik@audiobm.ba')
+await p.fill('input[name="email"]', 'svijetsluha@gmail.com')
 await p.fill('input[name="password"]', 'AudioBM-promijenite-me-2026!')
 await p.click('button[type="submit"]')
 await p.waitForURL('**/admin**', { timeout: 15000 })

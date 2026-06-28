@@ -11,6 +11,8 @@
  *    Naziv-adresa-telefon (NAP) mora biti identičan na sajtu, Google profilu,
  *    Facebooku i Instagramu — zato imena poslovnica ostaju „Audio BM".
  */
+export const GLAVNI_EMAIL = 'svijetsluha@gmail.com'
+
 export const BREND = {
   /** Marketinški/web brend — naslovi, logo, copyright, OG siteName. */
   naziv: 'Svijet Sluha',
@@ -28,7 +30,7 @@ export const BREND = {
   domena: 'https://svijetsluha.com',
   /** Ime + adresa za „from" polje e-mail obavještenja. */
   emailNaziv: 'Svijet Sluha',
-  emailAdresa: 'info@svijetsluha.com',
+  emailAdresa: GLAVNI_EMAIL,
   /** Zvanični društveni profili — za Organization „sameAs" (povezuje entitet za Google/AI). */
   drustvene: {
     facebook: 'https://www.facebook.com/svijetsluha',

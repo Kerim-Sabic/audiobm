@@ -1388,6 +1388,9 @@ export interface Podesavanja {
   id: number;
   nazivSajta: string;
   telefonGlavni?: string | null;
+  /**
+   * Jedini sluzbeni e-mail za aplikaciju.
+   */
   emailGlavni?: string | null;
   seoNaslov?: string | null;
   /**
@@ -1396,7 +1399,7 @@ export interface Podesavanja {
   seoOpis?: string | null;
   ogSlika?: (number | null) | Mediji;
   /**
-   * Na ovu adresu stižu obavještenja o svakom upitu/zakazivanju (ako nije podešen poseban primalac).
+   * Svi upiti i zakazivanja idu iskljucivo na svijetsluha@gmail.com.
    */
   emailZaUpite?: string | null;
   primaoci?:

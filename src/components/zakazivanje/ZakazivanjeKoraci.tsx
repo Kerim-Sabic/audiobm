@@ -182,7 +182,7 @@ export function ZakazivanjeKoraci({
                 type="email"
                 autoComplete="email"
                 greska={stanje.greske?.email}
-                placeholder="npr. ime@example.com"
+                placeholder="nije obavezno"
               />
               <PoljeUnos
                 oznaka="Kada Vam najviše odgovara? (nije obavezno)"

@@ -5,6 +5,7 @@ import { dajPayload, dajOcjenu } from '@/lib/podaci'
 import { dajLokacije, dajLokaciju } from '@/data/locations'
 import { metaStranice, poslovnicaJsonLd } from '@/lib/seo'
 import { stvarno } from '@/lib/tekst'
+import { BREND } from '@/lib/brend'
 import { Mrvice } from '@/components/ui/Mrvice'
 import { TelefonLink, ViberLink, WhatsAppLink } from '@/components/ui/TelefonLink'
 import { DugmeLink } from '@/components/ui/Dugme'
@@ -66,7 +67,7 @@ export default async function PoslovnicaStranica({ params }: { params: Promise<{
 
   const telefon = stvarno(poslovnica.telefoni?.[0]?.broj)
   const adresa = stvarno(poslovnica.adresa)
-  const email = stvarno(poslovnica.emaili?.[0]?.email)
+  const email = BREND.emailAdresa
   const fotografija = (poslovnica.fotografije as (Mediji | number)[] | undefined)?.[0]
   const imaFotografiju = fotografija && typeof fotografija === 'object'
   // nova poslovnica bez fotografije, mape, tima i recenzija → jedna centrirana kolona

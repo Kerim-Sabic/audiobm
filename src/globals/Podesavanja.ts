@@ -30,7 +30,13 @@ export const Podesavanja: GlobalConfig = {
               type: 'text',
               defaultValue: '051 218 781',
             },
-            { name: 'emailGlavni', label: 'Glavni e-mail', type: 'email' },
+            {
+              name: 'emailGlavni',
+              label: 'Glavni e-mail',
+              type: 'email',
+              defaultValue: 'svijetsluha@gmail.com',
+              admin: { readOnly: true, description: 'Jedini sluzbeni e-mail za aplikaciju.' },
+            },
           ],
         },
         {
@@ -63,12 +69,13 @@ export const Podesavanja: GlobalConfig = {
               label: 'Glavni e-mail za sve upite',
               type: 'email',
               defaultValue: 'svijetsluha@gmail.com',
-              admin: { description: 'Na ovu adresu stižu obavještenja o svakom upitu/zakazivanju (ako nije podešen poseban primalac).' },
+              admin: { readOnly: true, description: 'Svi upiti i zakazivanja idu iskljucivo na svijetsluha@gmail.com.' },
             },
             {
               name: 'primaoci',
               label: 'Posebni primaoci po vrsti upita',
               type: 'array',
+              admin: { hidden: true },
               fields: [
                 {
                   name: 'vrsta',

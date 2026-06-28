@@ -45,9 +45,9 @@ Na Netlifyu idite: **Site Settings** → **Environment Variables**
 | `NEXT_PUBLIC_SERVER_URL` | Vaša Netlify domena ili custom domena | `https://audiobm.ba` |
 | `SMTP_HOST` | SMTP server | npr. `smtp.resend.com` |
 | `SMTP_PORT` | Port (obično 587) | `587` |
-| `SMTP_USER` | E-mail korisnik | npr. `onboarding@resend.dev` |
+| `SMTP_USER` | E-mail korisnik | `svijetsluha@gmail.com` |
 | `SMTP_PASS` | SMTP lozinka | `re_xxxxx` |
-| `EMAIL_FROM` | Noreply e-mail | `"Audio BM <info@audiobm.ba>"` |
+| `EMAIL_FROM` | Noreply e-mail | `"Svijet Sluha <svijetsluha@gmail.com>"` |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile ključ | Kreirajte na dash.cloudflare.com |
 | `TURNSTILE_SECRET_KEY` | Tajni Turnstile ključ | — |
 | `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Domena za analitiku | `audiobm.ba` |
@@ -116,5 +116,5 @@ Za medije (`/media`):
 
 ## Kontakt sa Netlify Supportom
 
-- Email: support@netlify.com
+- Kontakt: Netlify support centar
 - Slack: #netlify-support (ako ste u njihovoj zajednici)

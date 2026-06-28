@@ -79,6 +79,7 @@ export const Poslovnice: CollectionConfig = {
       name: 'emaili',
       label: 'E-mail adrese',
       type: 'array',
+      admin: { hidden: true },
       fields: [{ name: 'email', label: 'E-mail', type: 'email', required: true }],
     },
     {
