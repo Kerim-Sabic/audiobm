@@ -5,7 +5,8 @@
  */
 import { getPayload } from 'payload'
 import path from 'node:path'
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, existsSync, statSync } from 'node:fs'
+import sharp from 'sharp'
 import config from '../src/payload.config'
 import {
   kategorijaProizvoda,
@@ -643,6 +644,58 @@ for (const m of SARAJEVO_MEDIJI) {
   sarajevoMediji[m.kljuc] = medij.id as number
 }
 
+const SAVJETI_MEDIJI = [
+  {
+    kljuc: 'prviZnakovi',
+    file: 'prvi-znakovi-slabljenja-sluha-tv-razgovor.webp',
+    alt: 'Stariji muškarac pojačava televizor dok razgovara sa članom porodice',
+  },
+  {
+    kljuc: 'odrzavanjeAparata',
+    file: 'odrzavanje-slusnog-aparata-savjeti.webp',
+    alt: 'Slušni aparat, krpica za čišćenje, četkica, baterije i kutija za odlaganje',
+  },
+] as const
+
+const savjetiMediji: Partial<Record<(typeof SAVJETI_MEDIJI)[number]['kljuc'], number>> = {}
+for (const m of SAVJETI_MEDIJI) {
+  const postoji = await payload.find({
+    collection: 'mediji',
+    where: { alt: { equals: m.alt } },
+    limit: 1,
+    depth: 0,
+  })
+  if (postoji.totalDocs > 0) {
+    savjetiMediji[m.kljuc] = postoji.docs[0].id as number
+    continue
+  }
+
+  const filePath = path.join(ROOT, 'public', 'media', m.file)
+  if (!existsSync(filePath)) {
+    log(`! [MISSING_ASSET] Savjeti članak nema sliku: ${m.file}`)
+    continue
+  }
+
+  const meta = await sharp(filePath).metadata()
+  const lqip = await sharp(filePath).resize(24).blur(1.5).webp({ quality: 30 }).toBuffer()
+  const filesize = statSync(filePath).size
+  const medij = await payload.create({
+    collection: 'mediji',
+    data: {
+      alt: m.alt,
+      lqip: `data:image/webp;base64,${lqip.toString('base64')}`,
+      url: `/media/${m.file}`,
+      thumbnailURL: `/media/${m.file}`,
+      filename: m.file,
+      mimeType: 'image/webp',
+      filesize,
+      width: meta.width,
+      height: meta.height,
+    },
+  })
+  savjetiMediji[m.kljuc] = medij.id as number
+}
+
 for (const slug of UKLONJENI_SLUGOVI_OBJAVA) {
   const postojece = await payload.find({
     collection: 'objave',
@@ -681,6 +734,7 @@ const OBJAVE: ObjavaSeed[] = [
     seoNaslov: 'Prvi znakovi slabljenja sluha: kada provjeriti sluh',
     seoOpis:
       'Pojačavate TV, često tražite ponavljanje ili teško pratite razgovor u buci? Saznajte prve znakove slabljenja sluha i kada zakazati provjeru.',
+    naslovnaSlika: savjetiMediji.prviZnakovi,
     sadrzaj: dokument(
       paragraf(
         tekst('Kratak odgovor: ', true),
@@ -751,6 +805,7 @@ const OBJAVE: ObjavaSeed[] = [
     seoNaslov: 'Održavanje slušnog aparata: 5 savjeta za duži vijek',
     seoOpis:
       'Kako čistiti i čuvati slušni aparat? Pet praktičnih savjeta za zaštitu od vlage, voska, vrućine i kvarova, uz servisnu podršku u BiH.',
+    naslovnaSlika: savjetiMediji.odrzavanjeAparata,
     sadrzaj: dokument(
       paragraf(
         tekst('Kratak odgovor: ', true),
