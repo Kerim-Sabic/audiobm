@@ -4,8 +4,7 @@ import Script from 'next/script'
 
 /**
  * Nevidljivi Cloudflare Turnstile — učitava se samo kad je
- * NEXT_PUBLIC_TURNSTILE_SITE_KEY podešen. [PLACEHOLDER: ključeve kreirati
- * na dash.cloudflare.com i upisati u .env]
+ * NEXT_PUBLIC_TURNSTILE_SITE_KEY podešen.
  */
 export function Turnstile() {
   const kljuc = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY

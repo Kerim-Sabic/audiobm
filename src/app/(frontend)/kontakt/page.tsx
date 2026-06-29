@@ -69,7 +69,7 @@ export default async function KontaktStranica() {
                       />
                     ) : (
                       <p className="text-small mt-1.5 text-neutral-500">
-                        Broj telefona objavljujemo uskoro — pišite nam putem obrasca.
+                        Kontaktirajte nas putem obrasca — odgovaramo isti radni dan.
                       </p>
                     )}
                     {!p.radnoVrijemePotvrdjeno && telefon && (

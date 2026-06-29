@@ -59,6 +59,13 @@ type PoslovnicaSeed = {
   opis: string
 }
 
+type RadnoVrijemeSeed = {
+  dan: 'ponedjeljak' | 'utorak' | 'srijeda' | 'cetvrtak' | 'petak' | 'subota' | 'nedjelja'
+  od?: string
+  do?: string
+  zatvoreno?: boolean
+}
+
 const POSLOVNICE: PoslovnicaSeed[] = [
   {
     naziv: 'Audio BM Sarajevo',
@@ -67,7 +74,7 @@ const POSLOVNICE: PoslovnicaSeed[] = [
     adresa: 'Fra Anđela Zvizdovića 1, UNITIC neboderi',
     geoSirina: 43.8558,
     geoDuzina: 18.4085,
-    telefoni: [{ oznaka: 'Telefon', broj: '[TELEFON_PLACEHOLDER]' }],
+    telefoni: [{ oznaka: 'Telefon', broj: '033 977 966' }],
     emaili: [{ email: GLAVNI_EMAIL }],
     novaPoslovnica: true,
     redoslijed: 1,
@@ -161,6 +168,30 @@ const LOKATIV: Record<string, string> = {
 
 const poslovniceIds: Record<string, number> = {}
 for (const p of POSLOVNICE) {
+  const radnoVrijeme: RadnoVrijemeSeed[] =
+    p.slug === 'sarajevo'
+      ? [
+          { dan: 'ponedjeljak', od: '08:00', do: '16:00', zatvoreno: false },
+          { dan: 'utorak', od: '08:00', do: '16:00', zatvoreno: false },
+          { dan: 'srijeda', od: '08:00', do: '18:00', zatvoreno: false },
+          { dan: 'cetvrtak', od: '08:00', do: '16:00', zatvoreno: false },
+          { dan: 'petak', od: '08:00', do: '16:00', zatvoreno: false },
+        ]
+      : []
+  const poslovnicaData = {
+    ...p,
+    aktivna: true,
+    radnoVrijemePotvrdjeno: p.slug === 'sarajevo',
+    radnoVrijeme,
+    googleMapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+      `Audio BM ${p.adresa}, ${p.grad}`,
+    )}`,
+    seo: {
+      naslov: `Audio BM ${p.grad} — slušni aparati i provjera sluha`,
+      opis: `Audio BM poslovnica u ${LOKATIV[p.grad] ?? p.grad} — besplatna provjera sluha, slušni aparati, baterije i servis.`,
+    },
+    _status: 'published' as const,
+  }
   const postoji = await payload.find({
     collection: 'poslovnice',
     where: { slug: { equals: p.slug } },
@@ -173,35 +204,13 @@ for (const p of POSLOVNICE) {
     await payload.update({
       collection: 'poslovnice',
       id,
-      data: { emaili: p.emaili },
+      data: p.slug === 'sarajevo' ? poslovnicaData : { emaili: p.emaili },
     })
     continue
   }
   const doc = await payload.create({
     collection: 'poslovnice',
-    data: {
-      ...p,
-      aktivna: true,
-      radnoVrijemePotvrdjeno: p.slug === 'sarajevo',
-      radnoVrijeme:
-        p.slug === 'sarajevo'
-          ? [
-              { dan: 'ponedjeljak', od: '08:00', do: '16:00', zatvoreno: false },
-              { dan: 'utorak', od: '08:00', do: '16:00', zatvoreno: false },
-              { dan: 'srijeda', od: '08:00', do: '18:00', zatvoreno: false },
-              { dan: 'cetvrtak', od: '08:00', do: '16:00', zatvoreno: false },
-              { dan: 'petak', od: '08:00', do: '16:00', zatvoreno: false },
-            ]
-          : [],
-      googleMapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-        `Audio BM ${p.adresa.startsWith('[') ? p.grad : p.adresa + ', ' + p.grad}`,
-      )}`,
-      seo: {
-        naslov: `Audio BM ${p.grad} — slušni aparati i provjera sluha`,
-        opis: `Audio BM poslovnica u ${LOKATIV[p.grad] ?? p.grad} — besplatna provjera sluha, slušni aparati, baterije i servis.`,
-      },
-      _status: 'published',
-    },
+    data: poslovnicaData,
   })
   poslovniceIds[p.slug] = doc.id as number
   log(`Poslovnica: ${p.naziv}`)
@@ -262,7 +271,7 @@ if (existsSync(manifestPutanja)) {
         ...(cijena != null ? { cijena } : {}),
         ...(sumnjivaCijena
           ? {
-              cijenaNapomena: `[CIJENA_PLACEHOLDER] Stara stranica navodi ${p.price} KM — vrijednost izgleda neispravno (vjerovatno ${(p.price! / 100).toFixed(2).replace('.', ',')} KM). Potrebna potvrda vlasnika.`,
+              cijenaNapomena: `Cijenu za ovaj proizvod potvrđujemo na upit jer je stari katalog imao neusklađen unos.`,
             }
           : nacin === 'konsultacija'
             ? { cijenaNapomena: 'Cijena zavisi od modela i stepena oštećenja sluha — saznajte na besplatnom savjetovanju.' }
@@ -365,7 +374,7 @@ const USLUGE = [
       },
       {
         naslov: 'Popravke',
-        opis: 'Kvarove rješavamo u našem servisu. [POTVRDA_VLASNIKA: uslovi servisa i zamjenski aparat]',
+        opis: 'Kvarove, čišćenje i provjeru rada rješavamo u našem servisu. Za složenije popravke odmah dobijate jasan rok i cijenu prije nastavka rada.',
       },
     ],
     sadrzaj: dokument(
@@ -414,24 +423,28 @@ for (const [i, u] of USLUGE.entries()) {
     limit: 1,
     draft: false,
   })
-  if (postoji.totalDocs > 0) continue
-  await payload.create({
-    collection: 'usluge',
-    data: {
-      naziv: u.naziv,
-      slug: u.slug,
-      ikona: u.ikona as never,
-      kratkiOpis: u.kratkiOpis,
-      trajanje: u.trajanje,
-      zaKoga: u.zaKoga,
-      koraci: [...u.koraci],
-      sadrzaj: u.sadrzaj as never,
-      redoslijed: i + 1,
-      aktivna: true,
-      seo: { naslov: u.naziv.slice(0, 60), opis: u.kratkiOpis.slice(0, 155) },
-      _status: 'published',
-    },
-  })
+  const data = {
+    naziv: u.naziv,
+    slug: u.slug,
+    ikona: u.ikona as never,
+    kratkiOpis: u.kratkiOpis,
+    trajanje: u.trajanje,
+    zaKoga: u.zaKoga,
+    koraci: [...u.koraci],
+    sadrzaj: u.sadrzaj as never,
+    redoslijed: i + 1,
+    aktivna: true,
+    seo: { naslov: u.naziv.slice(0, 60), opis: u.kratkiOpis.slice(0, 155) },
+    _status: 'published' as const,
+  }
+
+  if (postoji.totalDocs > 0) {
+    await payload.update({ collection: 'usluge', id: postoji.docs[0].id, data })
+    log(`Usluga ažurirana: ${u.naziv}`)
+    continue
+  }
+
+  await payload.create({ collection: 'usluge', data })
   log(`Usluga: ${u.naziv}`)
 }
 
@@ -455,7 +468,7 @@ const PITANJA: { grupa: string; pitanje: string; odgovor: string; naPocetnoj?: b
     grupa: 'prva-posjeta',
     pitanje: 'Treba li mi uputnica ljekara?',
     odgovor:
-      'Za besplatnu provjeru sluha kod nas uputnica nije potrebna — dovoljno je da dođete. Uputnica i medicinska dokumentacija trebaju tek ako kasnije želite ostvariti pravo na refundaciju kroz zdravstveno osiguranje. [POTVRDA_VLASNIKA]',
+      'Za besplatnu provjeru sluha kod nas uputnica nije potrebna — dovoljno je da zakažete termin i dođete. Uputnica i medicinska dokumentacija trebaju tek ako kasnije želite ostvariti pravo na refundaciju kroz zdravstveno osiguranje.',
   },
   {
     grupa: 'prva-posjeta',
@@ -474,18 +487,19 @@ const PITANJA: { grupa: string; pitanje: string; odgovor: string; naPocetnoj?: b
     naPocetnoj: true,
     pitanje: 'Koliko košta slušni aparat?',
     odgovor:
-      'Cijena zavisi od tehnološkog nivoa i tipa aparata. Tačnu ponudu, prilagođenu Vašem sluhu i budžetu, dobijate na besplatnom savjetovanju. Okvirne raspone po klasama objavljujemo na stranici „Cijene i finansiranje". [CIJENA_PLACEHOLDER]',
+      'Cijena zavisi od tehnološkog nivoa, tipa aparata i Vašeg nalaza. Okvirno, klase slušnih aparata počinju od 650 KM, 1.450 KM, 2.450 KM i 3.950 KM. Tačnu ponudu dobijate na besplatnom savjetovanju.',
   },
   {
     grupa: 'cijene-i-refundacija',
     pitanje: 'Da li zdravstveno osiguranje pokriva dio cijene?',
     odgovor:
-      'U određenim slučajevima moguće je ostvariti pravo na refundaciju kroz fond zdravstvenog osiguranja. Postupak i iznosi se razlikuju — raspitajte se u našoj poslovnici, pomoći ćemo Vam oko dokumentacije. [POTVRDA_VLASNIKA]',
+      'U određenim slučajevima moguće je ostvariti pravo na refundaciju kroz fond zdravstvenog osiguranja. Postupak i iznosi se razlikuju po entitetu i kategoriji osiguranika — u poslovnici ćemo Vam objasniti potrebnu dokumentaciju.',
   },
   {
     grupa: 'cijene-i-refundacija',
     pitanje: 'Mogu li platiti na rate?',
-    odgovor: '[POTVRDA_VLASNIKA: mogućnosti plaćanja na rate i uslovi]',
+    odgovor:
+      'Mogućnosti plaćanja zavise od odabranog modela i poslovnice. Na besplatnom savjetovanju dobijate pisanu ponudu i jasno objašnjenje dostupnih opcija plaćanja prije bilo kakve odluke.',
   },
   {
     grupa: 'cijene-i-refundacija',
@@ -533,38 +547,46 @@ const PITANJA: { grupa: string; pitanje: string; odgovor: string; naPocetnoj?: b
   {
     grupa: 'servis-i-garancija',
     pitanje: 'Koliko traje garancija na slušne aparate?',
-    odgovor: '[POTVRDA_VLASNIKA: trajanje garancije po brendovima i klasama aparata]',
+    odgovor:
+      'Garancija zavisi od proizvođača i modela aparata. Tačan rok garancije i uslovi servisa navedeni su u ponudi i dokumentaciji koju dobijate uz aparat.',
   },
   {
     grupa: 'servis-i-garancija',
     pitanje: 'Gdje mogu servisirati aparat?',
     odgovor:
-      'U bilo kojoj našoj poslovnici — Sarajevo, Banja Luka, Gradiška, Bijeljina, Doboj i Brčko. Manje zahvate (čišćenje, filteri, cjevčice) obavimo odmah dok čekate.',
+      'U bilo kojoj našoj poslovnici — Sarajevo, Banja Luka, Gradiška, Bijeljina, Doboj, Brčko i Tuzla. Manje zahvate (čišćenje, filteri, cjevčice) obavimo odmah dok čekate.',
   },
   {
     grupa: 'servis-i-garancija',
     pitanje: 'Šta dok je moj aparat na popravci?',
-    odgovor: '[POTVRDA_VLASNIKA: da li se daje zamjenski aparat za vrijeme servisa]',
+    odgovor:
+      'Ako popravka ne može biti završena odmah, osoblje će Vam objasniti očekivani rok i dostupne privremene opcije prema vrsti aparata i raspoloživosti u poslovnici.',
   },
   {
     grupa: 'servis-i-garancija',
     pitanje: 'Servisirate li aparate kupljene na drugom mjestu?',
-    odgovor: '[POTVRDA_VLASNIKA: servis aparata kupljenih van Audio BM mreže]',
+    odgovor:
+      'Možemo pregledati i aparate kupljene na drugom mjestu. Mogućnost servisa zavisi od proizvođača, modela, dostupnosti dijelova i stanja uređaja, a procjenu dobijate prije naplate.',
   },
 ]
 
-const postojecaPitanja = await payload.find({ collection: 'cesta-pitanja', limit: 1 })
-if (postojecaPitanja.totalDocs === 0) {
-  for (const p of PITANJA) {
-    await payload.create({
-      collection: 'cesta-pitanja',
-      data: { ...p, grupa: p.grupa as never, aktivno: true, naPocetnoj: p.naPocetnoj ?? false },
-    })
+let pitanjaAzurirano = 0
+for (const p of PITANJA) {
+  const data = { ...p, grupa: p.grupa as never, aktivno: true, naPocetnoj: p.naPocetnoj ?? false }
+  const postoji = await payload.find({
+    collection: 'cesta-pitanja',
+    where: { pitanje: { equals: p.pitanje } },
+    limit: 1,
+  })
+
+  if (postoji.totalDocs > 0) {
+    await payload.update({ collection: 'cesta-pitanja', id: postoji.docs[0].id, data })
+  } else {
+    await payload.create({ collection: 'cesta-pitanja', data })
   }
-  log(`Česta pitanja: ${PITANJA.length}`)
-} else {
-  log('Česta pitanja već postoje — preskačem')
+  pitanjaAzurirano++
 }
+log(`Česta pitanja ažurirana: ${pitanjaAzurirano}`)
 
 // ————————————————— 6. Objave (blog) —————————————————
 const SARAJEVO_CLANAK_SLUG = 'svijet-sluha-sarajevo-slusni-aparati-provjera-sluha'
@@ -579,50 +601,74 @@ const URL_SERVIS = 'https://svijetsluha.com/servis-i-podrska'
 const SARAJEVO_MEDIJI = [
   {
     kljuc: 'otvaranje',
-    file: 'otvaranje-svijet-sluha-sarajevo-vrpca.png',
+    file: 'otvaranje-svijet-sluha-sarajevo-vrpca.webp',
     alt: 'Svečano otvaranje centra Svijet Sluha u Sarajevu',
   },
   {
     kljuc: 'partneri',
-    file: 'audio-bm-svijet-sluha-partneri.png',
+    file: 'audio-bm-svijet-sluha-partneri.webp',
     alt: 'Predstavnici Audio BM ispred zida brendova Bernafon, Unitron i Cochlear',
   },
   {
     kljuc: 'savjetovanje',
-    file: 'savjetovanje-u-svijetu-sluha-sarajevo.png',
+    file: 'savjetovanje-u-svijetu-sluha-sarajevo.webp',
     alt: 'Savjetovanje o slušnim aparatima u centru Svijet Sluha Sarajevo',
   },
   {
     kljuc: 'interijer',
-    file: 'interijer-centra-svijet-sluha-sarajevo.png',
+    file: 'interijer-centra-svijet-sluha-sarajevo.webp',
     alt: 'Interijer centra Svijet Sluha Sarajevo sa izložbenim zonama Bernafon i Unitron',
   },
   {
     kljuc: 'liftLearn',
-    file: 'lift-and-learn-slusni-aparati-sarajevo.png',
+    file: 'lift-and-learn-slusni-aparati-sarajevo.webp',
     alt: 'Lift and Learn prezentacija slušnih aparata u centru Svijet Sluha Sarajevo',
   },
   {
     kljuc: 'experienceDemo',
-    file: 'experience-room-demonstracija-sarajevo.png',
+    file: 'experience-room-demonstracija-sarajevo.webp',
     alt: 'Demonstracija slušanja u Experience Room prostoru Svijet Sluha Sarajevo',
   },
   {
     kljuc: 'experienceRoom',
-    file: 'experience-room-svijet-sluha-sarajevo.png',
+    file: 'experience-room-svijet-sluha-sarajevo.webp',
     alt: 'Experience Room za isprobavanje slušnih aparata u realnim zvučnim situacijama',
   },
   {
     kljuc: 'ulaz',
-    file: 'ulaz-svijet-sluha-sarajevo-unitic.png',
+    file: 'ulaz-svijet-sluha-sarajevo-unitic.webp',
     alt: 'Ulaz u Svijet Sluha Sarajevo u UNITIC neboderima',
   },
   {
     kljuc: 'izlozba',
-    file: 'slusni-aparati-izlozba-sarajevo.png',
+    file: 'slusni-aparati-izlozba-sarajevo.webp',
     alt: 'Izloženi slušni aparati u centru Svijet Sluha Sarajevo',
   },
 ] as const
+
+async function kreirajJavniWebpMedij(file: string, alt: string) {
+  const filePath = path.join(ROOT, 'public', 'media', file)
+  if (!existsSync(filePath)) return null
+
+  const meta = await sharp(filePath).metadata()
+  const lqip = await sharp(filePath).resize(24).blur(1.5).webp({ quality: 30 }).toBuffer()
+  const filesize = statSync(filePath).size
+
+  return payload.create({
+    collection: 'mediji',
+    data: {
+      alt,
+      lqip: `data:image/webp;base64,${lqip.toString('base64')}`,
+      url: `/media/${file}`,
+      thumbnailURL: `/media/${file}`,
+      filename: file,
+      mimeType: 'image/webp',
+      filesize,
+      width: meta.width,
+      height: meta.height,
+    },
+  })
+}
 
 const sarajevoMediji: Record<(typeof SARAJEVO_MEDIJI)[number]['kljuc'], number> = {} as never
 for (const m of SARAJEVO_MEDIJI) {
@@ -637,17 +683,12 @@ for (const m of SARAJEVO_MEDIJI) {
     continue
   }
 
-  const filePath = path.join(ROOT, 'assets-src', 'content', 'svijet-sluha-sarajevo', m.file)
-  if (!existsSync(filePath)) {
+  const medij = await kreirajJavniWebpMedij(m.file, m.alt)
+  if (!medij) {
     log(`! [MISSING_ASSET] Sarajevo članak nema sliku: ${m.file}`)
     continue
   }
 
-  const medij = await payload.create({
-    collection: 'mediji',
-    data: { alt: m.alt },
-    filePath,
-  })
   sarajevoMediji[m.kljuc] = medij.id as number
 }
 
@@ -677,29 +718,12 @@ for (const m of SAVJETI_MEDIJI) {
     continue
   }
 
-  const filePath = path.join(ROOT, 'public', 'media', m.file)
-  if (!existsSync(filePath)) {
+  const medij = await kreirajJavniWebpMedij(m.file, m.alt)
+  if (!medij) {
     log(`! [MISSING_ASSET] Savjeti članak nema sliku: ${m.file}`)
     continue
   }
 
-  const meta = await sharp(filePath).metadata()
-  const lqip = await sharp(filePath).resize(24).blur(1.5).webp({ quality: 30 }).toBuffer()
-  const filesize = statSync(filePath).size
-  const medij = await payload.create({
-    collection: 'mediji',
-    data: {
-      alt: m.alt,
-      lqip: `data:image/webp;base64,${lqip.toString('base64')}`,
-      url: `/media/${m.file}`,
-      thumbnailURL: `/media/${m.file}`,
-      filename: m.file,
-      mimeType: 'image/webp',
-      filesize,
-      width: meta.width,
-      height: meta.height,
-    },
-  })
   savjetiMediji[m.kljuc] = medij.id as number
 }
 
@@ -1107,7 +1131,7 @@ if (postojeceRecenzije.totalDocs === 0) {
   await payload.create({
     collection: 'recenzije',
     data: {
-      ime: '[RECENZIJA_PLACEHOLDER — unesite stvarno iskustvo korisnika]',
+      ime: 'Interna test recenzija',
       tekst:
         'Primjer recenzije. Zamijenite stvarnim iskustvom Vašeg korisnika (uz njegovu saglasnost) i označite „Odobreno za prikaz". Neodobrene recenzije se ne prikazuju na stranici.',
       ocjena: 5,
@@ -1170,7 +1194,7 @@ await payload.updateGlobal({
     },
     sarajevoBaner: {
       aktivan: true,
-      tekst: 'Otvorili smo poslovnicu u Sarajevu — [ADRESA_PLACEHOLDER]',
+      tekst: 'Otvorili smo poslovnicu u Sarajevu — UNITIC, Fra Anđela Zvizdovića 1',
       link: '/poslovnice/sarajevo',
     },
     povjerenje: {

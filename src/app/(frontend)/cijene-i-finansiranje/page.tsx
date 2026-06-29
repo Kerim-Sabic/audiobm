@@ -7,21 +7,29 @@ import { Otkrij, OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
 
 export const metadata: Metadata = metaStranice({
   naslov: 'Cijene i finansiranje slušnih aparata',
-  opis: 'Klase slušnih aparata, refundacija kroz zdravstveno osiguranje korak po korak, garancija i servis.',
+  opis: 'Slušni aparati od 650 KM, 1.450 KM, 2.450 KM i 3.950 KM. Klase aparata, refundacija, garancija i servis.',
   putanja: '/cijene-i-finansiranje',
 })
 
 const KLASE = [
   {
     naziv: 'Osnovna klasa',
+    cijena: 'od 650 KM',
     opis: 'Pouzdani aparati za mirniji svakodnevni život — razgovori u kući, televizor, telefon.',
   },
   {
     naziv: 'Srednja klasa',
+    cijena: 'od 1.450 KM',
     opis: 'Bolje razumijevanje u društvu i vani, automatsko prilagođavanje okolini, Bluetooth.',
   },
   {
+    naziv: 'Napredna klasa',
+    cijena: 'od 2.450 KM',
+    opis: 'Više komfora u buci, bolja obrada govora, punjive opcije i povezivanje sa telefonom ili TV-om.',
+  },
+  {
     naziv: 'Premium klasa',
+    cijena: 'od 3.950 KM',
     opis: 'Najprirodniji zvuk i najbolje razumijevanje govora u buci, punjive baterije, sve mogućnosti povezivanja.',
   },
 ]
@@ -52,11 +60,12 @@ export default function CijeneStranica() {
               Klase slušnih aparata
             </h2>
             <p className="mt-3 max-w-2xl text-neutral-600">
-              Tačna cijena zavisi od modela, tipa i Vašeg nalaza — konačnu ponudu dobijate na
+              Okvirne početne cijene su javne: 650 KM, 1.450 KM, 2.450 KM i 3.950 KM. Tačna cijena
+              zavisi od modela, tipa aparata i Vašeg nalaza — konačnu ponudu dobijate na
               besplatnom savjetovanju, bez obaveze.
             </p>
           </Otkrij>
-          <OtkrijGrupu className="mt-9 grid gap-5 md:grid-cols-3">
+          <OtkrijGrupu className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {KLASE.map((k, i) => (
               <OtkrijStavku key={k.naziv} className="h-full">
                 <div className="povrsina flex h-full flex-col p-7">
@@ -64,9 +73,12 @@ export default function CijeneStranica() {
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <h3 className="text-h3 mt-3">{k.naziv}</h3>
+                  <p className="mt-4 text-[30px] leading-none font-extrabold tracking-tight text-brand-600">
+                    {k.cijena}
+                  </p>
                   <p className="mt-2 flex-1 text-neutral-600">{k.opis}</p>
                   <p className="mt-5 border-t border-neutral-100 pt-4 text-[15px] font-semibold text-neutral-700">
-                    Cijenu i ponudu dobijate na besplatnom savjetovanju
+                    Konačan izbor nakon provjere sluha
                   </p>
                 </div>
               </OtkrijStavku>

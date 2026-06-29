@@ -1,15 +1,16 @@
 import type { Metadata } from 'next'
-import { Languages, MapPin, UserRound } from 'lucide-react'
+import { BadgeCheck, CalendarCheck, Languages, MapPin, Settings2, Stethoscope, UserRound } from 'lucide-react'
 import { dajPayload } from '@/lib/podaci'
 import { metaStranice, timJsonLd } from '@/lib/seo'
 import { ZaglavljeStranice } from '@/components/ui/ZaglavljeStranice'
+import { DugmeLink } from '@/components/ui/Dugme'
 import { SlikaMedija } from '@/components/ui/SlikaMedija'
 import { OtkrijGrupu, OtkrijStavku } from '@/components/motion/Otkrij'
 import type { Mediji, Poslovnice } from '@/payload-types'
 
 export const metadata: Metadata = metaStranice({
   naslov: 'Naš tim — stručnjaci za sluh',
-  opis: 'Upoznajte akustičare i stručnjake našeg tima u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju i Brčkom.',
+  opis: 'Upoznajte stručni tim za provjeru sluha, izbor, podešavanje i servis slušnih aparata u sedam poslovnica u BiH.',
   putanja: '/tim',
 })
 
@@ -77,6 +78,15 @@ export default async function TimStranica() {
                       </p>
                     )}
                     {clan.biografija && <p className="mt-3 text-[15px] text-neutral-600">{clan.biografija}</p>}
+                    {poslovnica && typeof poslovnica === 'object' && (
+                      <DugmeLink
+                        href={`/zakazivanje?poslovnica=${poslovnica.slug}`}
+                        varijanta="sekundarno"
+                        className="mt-5 w-full"
+                      >
+                        Zakažite termin
+                      </DugmeLink>
+                    )}
                   </div>
                 </article>
               </OtkrijStavku>
@@ -84,14 +94,48 @@ export default async function TimStranica() {
           })}
         </OtkrijGrupu>
       ) : (
-        <div className="relative mt-12 overflow-hidden rounded-[28px] border border-neutral-200/70 bg-neutral-50 p-16 text-center">
+        <div className="relative mt-12 overflow-hidden rounded-[28px] border border-neutral-200/70 bg-neutral-50 p-7 md:p-10">
           <div className="mreza-audiogram absolute inset-0" aria-hidden />
-          <div className="relative grid place-items-center">
-            <UserRound className="size-12 text-neutral-300" strokeWidth={1.25} aria-hidden />
-            <p className="mt-4 max-w-md text-neutral-600">
-              Predstavljanje tima uskoro — u međuvremenu nas upoznajte uživo, u najbližoj
-              poslovnici.
-            </p>
+          <div className="relative">
+            <div className="mx-auto max-w-2xl text-center">
+              <BadgeCheck className="mx-auto size-12 text-brand-600" strokeWidth={1.75} aria-hidden />
+              <h2 className="text-h2 mt-5">Stručni tim u svakoj poslovnici</h2>
+              <p className="mt-3 text-neutral-600">
+                U poslovnici Vas dočekuje tim za provjeru sluha, izbor slušnog aparata, fino
+                podešavanje i servis. Svaki termin počinje razgovorom i jasnim objašnjenjem nalaza,
+                bez pritiska na kupovinu.
+              </p>
+            </div>
+            <div className="mt-9 grid gap-4 md:grid-cols-3">
+              {[
+                {
+                  ikona: Stethoscope,
+                  naslov: 'Provjera sluha',
+                  opis: 'Razgovor, otoskopski pregled i audiometrija u tihoj prostoriji, uz objašnjenje rezultata.',
+                },
+                {
+                  ikona: Settings2,
+                  naslov: 'Podešavanje aparata',
+                  opis: 'Izbor tipa i tehnologije prema nalazu, navikama, rukovanju i svakodnevnim situacijama.',
+                },
+                {
+                  ikona: CalendarCheck,
+                  naslov: 'Kontrole i servis',
+                  opis: 'Redovne kontrole, čišćenje, filteri, cjevčice i podrška nakon kupovine aparata.',
+                },
+              ].map((stavka) => (
+                <div key={stavka.naslov} className="rounded-[18px] border border-neutral-200 bg-white p-5">
+                  <stavka.ikona className="size-6 text-brand-600" strokeWidth={1.75} aria-hidden />
+                  <h3 className="mt-4 text-[18px] font-bold text-neutral-900">{stavka.naslov}</h3>
+                  <p className="mt-2 text-[15px] text-neutral-600">{stavka.opis}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-9 text-center">
+              <DugmeLink href="/zakazivanje" velicina="veliko">
+                Zakažite termin sa stručnim timom
+              </DugmeLink>
+            </div>
           </div>
         </div>
       )}

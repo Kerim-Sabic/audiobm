@@ -68,8 +68,6 @@ export const Poslovnice: CollectionConfig = {
           required: true,
           validate: (value: unknown) => {
             if (typeof value === 'string' && /^[0-9+\s/-]{6,20}$/.test(value)) return true
-            // dozvoljen vidljivi placeholder dok vlasnik ne dostavi stvarni broj
-            if (typeof value === 'string' && /^\[.+\]$/.test(value)) return true
             return 'Unesite ispravan broj telefona, npr. 051 218 781.'
           },
         },
@@ -116,7 +114,7 @@ export const Poslovnice: CollectionConfig = {
       defaultValue: false,
       admin: {
         position: 'sidebar',
-        description: 'Dok nije označeno, stranica prikazuje [RADNO_VRIJEME_PLACEHOLDER] napomenu.',
+        description: 'Dok nije označeno, stranica prikazuje napomenu da se radno vrijeme provjeri telefonom.',
       },
     },
     {

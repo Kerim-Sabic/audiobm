@@ -268,16 +268,19 @@ export default async function Pocetna() {
                     <span className="text-[13px] font-extrabold tracking-[0.2em] text-neutral-300" aria-hidden>
                       {String(i + 1).padStart(2, '0')}
                     </span>
-                    <div className="my-6 grid h-40 place-items-center lg:h-44">
+                    <div className="relative my-6 h-32 overflow-hidden sm:h-36 lg:h-40">
                       {slika && typeof slika === 'object' ? (
                         <SlikaMedija
                           medij={slika}
                           altRezerva={`${info.naziv} — slušni aparat`}
-                          sizes="(min-width: 768px) 320px, 80vw"
-                          className="max-h-full w-auto object-contain drop-shadow-lg transition-transform duration-250 group-hover:scale-[1.07]"
+                          fill
+                          sizes="(min-width: 768px) 260px, 70vw"
+                          className="object-contain p-2 drop-shadow-lg transition-transform duration-250 group-hover:scale-[1.04]"
                         />
                       ) : (
-                        <Ear className="size-16 text-neutral-200" strokeWidth={1.25} aria-hidden />
+                        <div className="grid h-full place-items-center">
+                          <Ear className="size-16 text-neutral-200" strokeWidth={1.25} aria-hidden />
+                        </div>
                       )}
                     </div>
                     <h3 className="text-h3">

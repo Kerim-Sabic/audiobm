@@ -257,7 +257,7 @@ export interface Poslovnice {
       }[]
     | null;
   /**
-   * Dok nije označeno, stranica prikazuje [RADNO_VRIJEME_PLACEHOLDER] napomenu.
+   * Dok nije označeno, stranica prikazuje napomenu da se radno vrijeme provjeri telefonom.
    */
   radnoVrijemePotvrdjeno?: boolean | null;
   fotografije?: (number | Mediji)[] | null;

@@ -27,7 +27,7 @@ export function provjeriOgranicenje(ip: string): boolean {
 
 export async function provjeriTurnstile(token: unknown, ip: string): Promise<boolean> {
   const tajna = process.env.TURNSTILE_SECRET_KEY
-  if (!tajna) return true // Turnstile još nije podešen [PLACEHOLDER: ključevi sa dash.cloudflare.com]
+  if (!tajna) return true // Turnstile nije aktivan dok nema tajnog ključa.
   if (typeof token !== 'string' || !token) return false
   try {
     const odgovor = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {

@@ -54,7 +54,7 @@ export const Pocetna: GlobalConfig = {
           name: 'tekst',
           label: 'Tekst banera',
           type: 'text',
-          defaultValue: 'Otvorili smo poslovnicu u Sarajevu — [ADRESA_PLACEHOLDER]',
+          defaultValue: 'Otvorili smo poslovnicu u Sarajevu — UNITIC, Fra Anđela Zvizdovića 1',
         },
         { name: 'link', label: 'Vodi na', type: 'text', defaultValue: '/poslovnice/sarajevo' },
       ],

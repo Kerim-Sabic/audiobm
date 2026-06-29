@@ -96,7 +96,7 @@ export function nacinProdaje(p: ManifestProduct): 'konsultacija' | 'maloprodaja'
 /**
  * Stara stranica ima oštećene cijene (npr. čepovi „3600,00 KM" = 36,00 KM bez
  * decimalnog zareza). Cijene ≥ 1000 KM na potrošnom materijalu su neispravne —
- * vraćamo null i označavamo [CIJENA_PLACEHOLDER] za potvrdu vlasnika.
+ * vraćamo null i tražimo ručnu potvrdu prije prikaza cijene.
  */
 export function pouzdanaCijena(p: ManifestProduct): number | null {
   if (p.price == null || p.price === 0) return null

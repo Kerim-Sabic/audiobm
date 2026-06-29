@@ -108,10 +108,13 @@ export const dajPitanja = cache(async () => {
     sort: '_order',
     limit: 100,
   })
-  // uredničke oznake ([CIJENA_PLACEHOLDER] i sl.) se nikad ne prikazuju javno
+  const fallbackOdgovor =
+    'Za najtačniji odgovor pozovite najbližu poslovnicu ili pošaljite upit. Odgovaramo isti radni dan.'
+
+  // interne uredničke oznake se nikad ne prikazuju javno
   return docs.map((d) => ({
     ...d,
     pitanje: ocisti(d.pitanje) ?? d.pitanje,
-    odgovor: ocisti(d.odgovor) ?? d.odgovor,
+    odgovor: ocisti(d.odgovor) ?? fallbackOdgovor,
   }))
 })

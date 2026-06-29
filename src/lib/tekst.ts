@@ -1,28 +1,28 @@
 /**
- * Sadržaj iz CMS-a može sadržavati uredničke oznake poput „[ADRESA_PLACEHOLDER]".
+ * Sadržaj iz CMS-a može sadržavati interne uredničke napomene.
  * Na javnoj stranici se NIKAD ne prikazuju — polje se sakriva dok vlasnik ne unese
  * stvarni podatak.
  */
 
-const PLACEHOLDER = /\[[A-ZČĆĐŠŽ0-9_]+\]/
+const UREDNICKA_OZNAKA = /\[[^\]]+\]/
+const UREDNICKA_OZNAKA_GLOBAL = /\[[^\]]+\]/g
 
-/** Vraća tekst samo ako je stvaran sadržaj; placeholder ili prazno → null. */
+/** Vraća tekst samo ako je stvaran sadržaj; interna oznaka ili prazno → null. */
 export function stvarno(tekst: string | null | undefined): string | null {
   if (!tekst) return null
   const t = tekst.trim()
-  if (!t || PLACEHOLDER.test(t)) return null
+  if (!t || UREDNICKA_OZNAKA.test(t)) return null
   return t
 }
 
 /**
- * Uklanja placeholder segmente iz rečenice i čisti zaostale crtice/zareze,
- * npr. „Otvorili smo poslovnicu — [ADRESA_PLACEHOLDER]" → „Otvorili smo poslovnicu".
+ * Uklanja interne uredničke segmente iz rečenice i čisti zaostale crtice/zareze.
  * Ako ništa stvarno ne preostane, vraća null.
  */
 export function ocisti(tekst: string | null | undefined): string | null {
   if (!tekst) return null
   const t = tekst
-    .replace(PLACEHOLDER, '')
+    .replace(UREDNICKA_OZNAKA_GLOBAL, '')
     .replace(/\s*[—–-]\s*$/, '')
     .replace(/\s*[,;:·]\s*$/, '')
     .replace(/\s{2,}/g, ' ')
