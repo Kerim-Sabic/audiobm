@@ -145,13 +145,27 @@ const POSLOVNICE: PoslovnicaSeed[] = [
     naziv: 'Audio BM Tuzla',
     slug: 'tuzla',
     grad: 'Tuzla',
-    adresa: 'Soline 10',
-    geoSirina: 44.5594495,
-    geoDuzina: 18.6952466,
-    telefoni: [{ oznaka: 'Telefon', broj: '063132400' }],
+    adresa: 'Mehmedalije Maka Dizdara 31B',
+    geoSirina: 44.5384,
+    geoDuzina: 18.6761,
+    telefoni: [{ oznaka: 'Telefon', broj: '035 416 766' }],
     emaili: [{ email: GLAVNI_EMAIL }],
+    novaPoslovnica: true,
     redoslijed: 7,
-    opis: 'Poslovnica u Tuzli — besplatna provjera sluha, slušni aparati i servis.',
+    opis: 'Poslovnica u Tuzli — besplatna provjera sluha, slušni aparati, baterije i servis.',
+  },
+  {
+    naziv: 'Audio BM Mostar',
+    slug: 'mostar',
+    grad: 'Mostar',
+    adresa: 'Maršala Tita 235',
+    geoSirina: 43.3438,
+    geoDuzina: 17.8078,
+    telefoni: [{ oznaka: 'Telefon', broj: '063 890 629' }],
+    emaili: [{ email: GLAVNI_EMAIL }],
+    novaPoslovnica: true,
+    redoslijed: 8,
+    opis: 'Poslovnica u Mostaru — besplatna provjera sluha i stručno savjetovanje.',
   },
 ]
 
@@ -164,6 +178,7 @@ const LOKATIV: Record<string, string> = {
   Doboj: 'Doboju',
   Brčko: 'Brčkom',
   Tuzla: 'Tuzli',
+  Mostar: 'Mostaru',
 }
 
 const poslovniceIds: Record<string, number> = {}
@@ -204,8 +219,9 @@ for (const p of POSLOVNICE) {
     await payload.update({
       collection: 'poslovnice',
       id,
-      data: p.slug === 'sarajevo' ? poslovnicaData : { emaili: p.emaili },
+      data: poslovnicaData,
     })
+    log(`Poslovnica ažurirana: ${p.naziv}`)
     continue
   }
   const doc = await payload.create({
@@ -217,18 +233,45 @@ for (const p of POSLOVNICE) {
 }
 
 // ————————————————— 3. Proizvodi iz manifesta —————————————————
+const PROIZVODI_ZA_OPIS_ISPRAVKU = new Set([
+  'cepovi-za-impulsnu-buku',
+  'cepovi-za-industrijsku-buku',
+  'cepovi-za-muzicare',
+  'cepovi-za-plivanje',
+  'cepovi-za-spavanje',
+  'antidekubit-dusek-bubble-2',
+])
+
 const manifestPutanja = path.join(ROOT, 'products-manifest.json')
 if (existsSync(manifestPutanja)) {
   const manifest: ManifestProduct[] = JSON.parse(readFileSync(manifestPutanja, 'utf8'))
   let novih = 0
   for (const p of manifest) {
+    const kratkiOpisIzvor = p.bodyHtml.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()
     const postoji = await payload.find({
       collection: 'proizvodi',
       where: { slug: { equals: p.handle } },
       limit: 1,
       draft: false,
     })
-    if (postoji.totalDocs > 0) continue
+    if (postoji.totalDocs > 0) {
+      if (PROIZVODI_ZA_OPIS_ISPRAVKU.has(p.handle)) {
+        await payload.update({
+          collection: 'proizvodi',
+          id: postoji.docs[0].id,
+          data: {
+            kratkiOpis: kratkiOpisIzvor.slice(0, 200) || p.title,
+            opis: izHtml(p.bodyHtml) as never,
+            seo: {
+              naslov: p.title.slice(0, 60),
+              opis: (kratkiOpisIzvor || p.title).slice(0, 155),
+            },
+          },
+        })
+        log(`Proizvod ažuriran: ${p.title}`)
+      }
+      continue
+    }
 
     // otpremi slike (original → Payload pravi WebP verzije + LQIP)
     const slikeIds: number[] = []
@@ -256,8 +299,6 @@ if (existsSync(manifestPutanja)) {
     const nacin = nacinProdaje(p)
     const cijena = pouzdanaCijena(p)
     const sumnjivaCijena = nacin === 'maloprodaja' && p.price != null && p.price >= 1000
-
-    const kratkiOpisIzvor = p.bodyHtml.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()
 
     await payload.create({
       collection: 'proizvodi',
@@ -487,7 +528,7 @@ const PITANJA: { grupa: string; pitanje: string; odgovor: string; naPocetnoj?: b
     naPocetnoj: true,
     pitanje: 'Koliko košta slušni aparat?',
     odgovor:
-      'Cijena zavisi od tehnološkog nivoa, tipa aparata i Vašeg nalaza. Okvirno, klase slušnih aparata počinju od 650 KM, 1.450 KM, 2.450 KM i 3.950 KM. Tačnu ponudu dobijate na besplatnom savjetovanju.',
+      'Cijena zavisi od tehnološkog nivoa, tipa aparata i Vašeg nalaza. Okvirno, klase slušnih aparata počinju od 1250 KM. Tačnu ponudu dobijate na besplatnom savjetovanju.',
   },
   {
     grupa: 'cijene-i-refundacija',
@@ -554,7 +595,7 @@ const PITANJA: { grupa: string; pitanje: string; odgovor: string; naPocetnoj?: b
     grupa: 'servis-i-garancija',
     pitanje: 'Gdje mogu servisirati aparat?',
     odgovor:
-      'U bilo kojoj našoj poslovnici — Sarajevo, Banja Luka, Gradiška, Bijeljina, Doboj, Brčko i Tuzla. Manje zahvate (čišćenje, filteri, cjevčice) obavimo odmah dok čekate.',
+      'U bilo kojoj našoj poslovnici — Sarajevo, Banja Luka, Gradiška, Bijeljina, Doboj, Brčko, Tuzla i Mostar. Manje zahvate (čišćenje, filteri, cjevčice) obavimo odmah dok čekate.',
   },
   {
     grupa: 'servis-i-garancija',
@@ -1174,11 +1215,11 @@ await payload.updateGlobal({
   slug: 'podesavanja',
   data: {
     nazivSajta: 'Audio BM',
-    telefonGlavni: '051 218 781',
+    telefonGlavni: '033 977 966',
     emailGlavni: GLAVNI_EMAIL,
     seoNaslov: 'Audio BM — Slušni aparati i besplatna provjera sluha',
     seoOpis:
-      'Više od 30 godina povjerenja. Besplatna provjera sluha u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju, Brčkom i Tuzli.',
+      'Više od 30 godina povjerenja. Besplatna provjera sluha u 8 poslovnica širom BiH — Sarajevo, Banja Luka, Gradiška, Bijeljina, Doboj, Brčko, Tuzla i Mostar.',
     emailZaUpite: GLAVNI_EMAIL,
   },
 })
@@ -1189,7 +1230,7 @@ await payload.updateGlobal({
     hero: {
       naslov: 'Besplatna provjera sluha — više od 30 godina povjerenja',
       podnaslov:
-        'Stručni tim, vrhunski slušni aparati i strpljiv pristup — u poslovnicama širom Bosne i Hercegovine.',
+        'Stručni tim, vrhunski slušni aparati i strpljiv pristup — u 8 poslovnica širom Bosne i Hercegovine.',
       ctaTekst: 'Zakažite besplatnu provjeru sluha',
     },
     sarajevoBaner: {

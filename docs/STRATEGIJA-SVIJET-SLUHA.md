@@ -222,7 +222,7 @@ lokalni direktoriji, recenzije na Google/Facebook, eventualno lokalni mediji.
 | # | Zadatak | Zašto | Hitnost |
 |---|---|---|---|
 | 1 | Registruj/uperi **svijetsluha.com** (DNS) | Bez domene nema deploya | Sad |
-| 2 | **Google Business Profile** za svih 7 poslovnica (claim/verify) | #1 poluga za „blizu mene" i AI lokalne preporuke | Sad |
+| 2 | **Google Business Profile** za svih 8 poslovnica (claim/verify) | #1 poluga za „blizu mene" i AI lokalne preporuke | Sad |
 | 3 | Logo „Svijet Sluha" (+ „by Audio BM" potpis) | Vizuelni rebrand | Prije Faze 1 vizuala |
 | 4 | Potvrdi: tačna **godina osnivanja** i **legalni naziv** Audio BM | Tačan schema/„30+ god." | Brzo |
 | 5 | Odluka: **zaseban call-tracking broj** za web? (da/ne + budžet) | Najjači dokaz za proviziju na pozive | Faza 2 |

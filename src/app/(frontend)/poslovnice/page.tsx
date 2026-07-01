@@ -26,7 +26,7 @@ export default async function PoslovniceStranica() {
         mrvice={[{ naziv: 'Poslovnice' }]}
         nadnaslov="Uvijek blizu Vas"
         naslov="Naše poslovnice"
-        uvod={`Dobro došli u ${opisGradova(poslovnice)} širom Bosne i Hercegovine.`}
+        uvod={`Dobro došli u ${poslovnice.length} poslovnica širom Bosne i Hercegovine — od sada i u Mostaru.`}
       />
 
       <div className="kontejner pb-16 md:pb-24">

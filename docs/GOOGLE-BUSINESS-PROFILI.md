@@ -1,4 +1,4 @@
-# Google Business Profili — 7 poslovnica (paste-ready)
+# Google Business Profili — 8 poslovnica (paste-ready)
 
 > Najjači besplatni lever za lokalno rangiranje **i** AI preporuke. Svaki profil je
 > fizička poslovnica **Audio BM** (tako Google verifikuje lokaciju i signage), a **web
@@ -77,27 +77,35 @@ Greška „Invalid sitemap address" znači da je **unos pogrešan**, ne sitemap.
 
 ## 6) Audio BM Sarajevo  ⚠️ NOVA poslovnica
 - **Naziv:** Audio BM Sarajevo
-- **Adresa:** **[UNESI TAČNU ADRESU]**
-- **Telefon:** **[UNESI TAČAN BROJ]**
+- **Adresa:** Fra Anđela Zvizdovića 1, Sarajevo
+- **Telefon:** 033 977 966
 - **Web:** `https://svijetsluha.com/poslovnice/sarajevo?utm_source=google&utm_medium=gbp`
 - **Opis:**
   > Svijet Sluha — sada i u Sarajevu! U saradnji s Audio BM (30+ godina iskustva). Besplatna provjera sluha, slušni aparati vodećih svjetskih brendova (Bernafon, Unitron, Cochlear), prilagođavanje i servis, baterije i čepovi za uši po mjeri. Bezbolan pregled 30–45 min, bez obaveze. Pomoć oko FZO/RFZO. Dođite na besplatnu provjeru — zakažite online ili telefonom.
 - **Napomena:** kao nova lokacija, posebno potiči **Google recenzije** prvih mjeseci.
 
-## 7) Audio BM Tuzla  ⚠️ POTVRDI RADNO VRIJEME
+## 7) Audio BM Tuzla  ⚠️ NOVA poslovnica
 - **Naziv:** Audio BM Tuzla
-- **Adresa:** Soline 10, Tuzla
-- **Telefon:** 063132400
+- **Adresa:** Mehmedalije Maka Dizdara 31B, Tuzla
+- **Telefon:** 035 416 766
 - **Web:** `https://svijetsluha.com/poslovnice/tuzla?utm_source=google&utm_medium=gbp`
 - **Opis:**
-  > Svijet Sluha u Tuzli, u saradnji s Audio BM. Besplatna provjera sluha, slušni aparati vodećih svjetskih brendova, prilagođavanje i servis, baterije, pribor i čepovi za uši po mjeri. Bezbolan pregled 30–45 min, bez obaveze. Zakažite besplatnu provjeru online ili telefonom.
-- **Napomena:** na sajtu je potvrđen samo jedan unos radnog vremena (ponedjeljak 08:00–17:00). Prije objave profila potvrdi kompletno radno vrijeme za sve dane.
+  > Svijet Sluha — sada i u Tuzli! U saradnji s Audio BM (30+ godina iskustva). Besplatna provjera sluha, slušni aparati vodećih svjetskih brendova, prilagođavanje i servis, baterije i čepovi za uši po mjeri. Bezbolan pregled traje 30–45 minuta i ne obavezuje na kupovinu. Zakažite online ili telefonom.
+- **Napomena:** kao nova lokacija, posebno potiči **Google recenzije** prvih mjeseci.
+
+## 8) Audio BM Mostar  ⚠️ NOVA poslovnica
+- **Naziv:** Audio BM Mostar
+- **Adresa:** Maršala Tita 235, Mostar
+- **Telefon:** 063 890 629
+- **Web:** `https://svijetsluha.com/poslovnice/mostar?utm_source=google&utm_medium=gbp`
+- **Opis:**
+  > Svijet Sluha — sada i u Mostaru! U saradnji s Audio BM (30+ godina iskustva). Besplatna provjera sluha, slušni aparati vodećih svjetskih brendova, prilagođavanje i servis, baterije i čepovi za uši po mjeri. Bezbolan pregled traje 30–45 minuta i ne obavezuje na kupovinu. Zakažite online ili telefonom.
+- **Napomena:** kao nova lokacija, posebno potiči **Google recenzije** prvih mjeseci.
 
 ---
 
 ## Nakon postavljanja — obavezno
-- [ ] **Sarajevo:** unijeti tačnu adresu i telefon u CMS prije verifikacije profila.
-- [ ] **Tuzla:** potvrditi kompletno radno vrijeme i unijeti ga u CMS + Google Business Profile.
+- [ ] **Sarajevo, Tuzla, Mostar:** potvrditi kompletno radno vrijeme i unijeti ga u CMS + Google Business Profile.
 - [ ] **Recenzije:** zamoli zadovoljne korisnike (QR kartica u poslovnici, SMS link). Cilj ≥4.5★. Odgovaraj na **sve**.
 - [ ] **Isti NAP** na svim profilima + sajtu + FB/IG (znak-po-znak isto = #1 AI faktor).
 - [ ] **Posts sedmično** (iz kalendara sadržaja).

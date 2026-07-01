@@ -25,6 +25,8 @@ export function ProizvodKartica({ proizvod }: { proizvod: Proizvodi }) {
       : `/proizvodi/${proizvod.slug}`
   const cijena = cijenaPrikaz(proizvod)
   const napomena = proizvod.cijenaNapomena?.startsWith('[') ? null : proizvod.cijenaNapomena
+  const opisKartice = proizvod.kratkiOpis?.startsWith('[') ? null : proizvod.kratkiOpis
+  const prikaziOpisNaKartici = proizvod.nacin === 'konsultacija' && proizvod.kategorija !== 'slusni-aparati'
 
   return (
     <article className="povrsina povrsina-hover group relative flex h-full flex-col overflow-hidden">
@@ -70,8 +72,14 @@ export function ProizvodKartica({ proizvod }: { proizvod: Proizvodi }) {
             )
           ) : (
             <>
-              {cijena && <p className="telefon text-[18px] text-neutral-800">{cijena}</p>}
-              <p className="text-small text-neutral-500">{napomena ?? 'Cijena na besplatnom savjetovanju'}</p>
+              {prikaziOpisNaKartici && opisKartice ? (
+                <p className="line-clamp-4 text-[15px] leading-relaxed text-neutral-600">{opisKartice}</p>
+              ) : (
+                <>
+                  {cijena && <p className="telefon text-[18px] text-neutral-800">{cijena}</p>}
+                  <p className="text-small text-neutral-500">{napomena ?? 'Cijena na besplatnom savjetovanju'}</p>
+                </>
+              )}
             </>
           )}
         </div>

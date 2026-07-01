@@ -19,7 +19,6 @@ import {
 } from 'lucide-react'
 import {
   dajAktivneAkcije,
-  dajPayload,
   dajPitanja,
   dajPocetnu,
   dajPodesavanja,
@@ -43,7 +42,9 @@ import { ZvucniTalasiOmot } from '@/components/motion/ZvucniTalasiOmot'
 import { MapaBiH } from '@/components/poslovnice/MapaBiH'
 import { SlikaMedija } from '@/components/ui/SlikaMedija'
 import { TIPOVI_APARATA } from '@/lib/catalog'
-import type { Mediji } from '@/payload-types'
+import kanalniAparatiSlika from '../../../assets-src/products/alpha-3-slusni-aparati/01.jpg'
+import zausniAparatiSlika from '../../../assets-src/products/alpha-3-slusni-aparati/02.jpg'
+import zausniSnazniAparatiSlika from '../../../assets-src/products/alpha-3-slusni-aparati/03.jpg'
 
 export async function generateMetadata(): Promise<Metadata> {
   const podesavanja = await dajPodesavanja()
@@ -62,6 +63,21 @@ const IKONE_USLUGA: Record<string, typeof Ear> = {
   shield: ShieldCheck,
 }
 
+const TIPOVI_APARATA_SLIKE = {
+  kanalni: {
+    src: kanalniAparatiSlika,
+    alt: 'Kanalni slušni aparati smješteni u ušni umetak',
+  },
+  zausni: {
+    src: zausniAparatiSlika,
+    alt: 'Zaušni slušni aparati sa tankom žicom i zvučnikom u uhu',
+  },
+  'zausni-snazni': {
+    src: zausniSnazniAparatiSlika,
+    alt: 'Snažni zaušni slušni aparati za teža oštećenja sluha',
+  },
+} as const satisfies Record<keyof typeof TIPOVI_APARATA, { src: typeof kanalniAparatiSlika; alt: string }>
+
 /** Naslov iz CMS-a: prva riječ u brend crvenoj — miran, samouvjeren akcenat. */
 function NaslovSaAkcentom({ tekst }: { tekst: string }) {
   const [prva, ...ostatak] = tekst.split(' ')
@@ -73,31 +89,21 @@ function NaslovSaAkcentom({ tekst }: { tekst: string }) {
 }
 
 export default async function Pocetna() {
-  const [pocetna, podesavanja, poslovnice, usluge, pitanja, recenzije, akcije, payload] =
-    await Promise.all([
-      dajPocetnu(),
-      dajPodesavanja(),
-      dajLokacije(),
-      dajUsluge(),
-      dajPitanja(),
-      dajRecenzije(),
-      dajAktivneAkcije(),
-      dajPayload(),
-    ])
+  const [pocetna, podesavanja, poslovnice, usluge, pitanja, recenzije, akcije] = await Promise.all([
+    dajPocetnu(),
+    dajPodesavanja(),
+    dajLokacije(),
+    dajUsluge(),
+    dajPitanja(),
+    dajRecenzije(),
+    dajAktivneAkcije(),
+  ])
 
-  // po jedan stvarni proizvod po tipu aparata (za uporedni prikaz tipova)
-  const tipovi = await Promise.all(
-    (Object.keys(TIPOVI_APARATA) as (keyof typeof TIPOVI_APARATA)[]).map(async (tip) => {
-      const { docs } = await payload.find({
-        collection: 'proizvodi',
-        where: { and: [{ tipAparata: { equals: tip } }, { aktivan: { equals: true } }] },
-        limit: 1,
-        depth: 1,
-        draft: false,
-      })
-      return { tip, info: TIPOVI_APARATA[tip], primjer: docs[0] ?? null }
-    }),
-  )
+  const tipovi = (Object.keys(TIPOVI_APARATA) as (keyof typeof TIPOVI_APARATA)[]).map((tip) => ({
+    tip,
+    info: TIPOVI_APARATA[tip],
+    slika: TIPOVI_APARATA_SLIKE[tip],
+  }))
 
   const pitanjaPocetna = pitanja.filter((p) => p.naPocetnoj).slice(0, 4)
   const istaknutaAkcija = akcije.find((a) => a.istaknutaNaPocetnoj) ?? akcije[0]
@@ -258,46 +264,37 @@ export default async function Pocetna() {
           />
           <Otkrij className="mt-14">
             <div className="povrsina grid overflow-hidden !rounded-[28px] divide-y divide-neutral-200/70 md:grid-cols-3 md:divide-x md:divide-y-0">
-              {tipovi.map(({ tip, info, primjer }, i) => {
-                const slika = (primjer?.slike as (Mediji | number)[] | undefined)?.[0]
-                return (
-                  <div
-                    key={tip}
-                    className="group relative flex flex-col p-7 transition-colors duration-250 hover:bg-neutral-50/70 lg:p-9"
-                  >
-                    <span className="text-[13px] font-extrabold tracking-[0.2em] text-neutral-300" aria-hidden>
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <div className="relative my-6 h-32 overflow-hidden sm:h-36 lg:h-40">
-                      {slika && typeof slika === 'object' ? (
-                        <SlikaMedija
-                          medij={slika}
-                          altRezerva={`${info.naziv} — slušni aparat`}
-                          fill
-                          sizes="(min-width: 768px) 260px, 70vw"
-                          className="object-contain p-2 drop-shadow-lg transition-transform duration-250 group-hover:scale-[1.04]"
-                        />
-                      ) : (
-                        <div className="grid h-full place-items-center">
-                          <Ear className="size-16 text-neutral-200" strokeWidth={1.25} aria-hidden />
-                        </div>
-                      )}
-                    </div>
-                    <h3 className="text-h3">
-                      <Link href={`/slusni-aparati/${tip}`} className="after:absolute after:inset-0">
-                        {info.naziv}
-                      </Link>
-                    </h3>
-                    <p className="mt-2 flex-1 text-neutral-600">{info.kratko}</p>
-                    <span className="mt-5 inline-flex items-center gap-2.5 font-semibold text-brand-700">
-                      <span className="grid size-8 place-items-center rounded-full bg-brand-50 transition-colors duration-150 group-hover:bg-brand-600 group-hover:text-white">
-                        <ArrowRight className="size-4" aria-hidden />
-                      </span>
-                      Saznajte više
-                    </span>
+              {tipovi.map(({ tip, info, slika }, i) => (
+                <div
+                  key={tip}
+                  className="group relative flex flex-col p-7 transition-colors duration-250 hover:bg-neutral-50/70 lg:p-9"
+                >
+                  <span className="text-[13px] font-extrabold tracking-[0.2em] text-neutral-300" aria-hidden>
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <div className="relative my-6 h-32 overflow-hidden sm:h-36 lg:h-40">
+                    <Image
+                      src={slika.src}
+                      alt={slika.alt}
+                      fill
+                      sizes="(min-width: 768px) 260px, 70vw"
+                      className="object-contain p-2 drop-shadow-lg transition-transform duration-250 group-hover:scale-[1.04]"
+                    />
                   </div>
-                )
-              })}
+                  <h3 className="text-h3">
+                    <Link href={`/slusni-aparati/${tip}`} className="after:absolute after:inset-0">
+                      {info.naziv}
+                    </Link>
+                  </h3>
+                  <p className="mt-2 flex-1 text-neutral-600">{info.kratko}</p>
+                  <span className="mt-5 inline-flex items-center gap-2.5 font-semibold text-brand-700">
+                    <span className="grid size-8 place-items-center rounded-full bg-brand-50 transition-colors duration-150 group-hover:bg-brand-600 group-hover:text-white">
+                      <ArrowRight className="size-4" aria-hidden />
+                    </span>
+                    Saznajte više
+                  </span>
+                </div>
+              ))}
             </div>
           </Otkrij>
           <Otkrij className="mt-8 text-center">
@@ -743,7 +740,7 @@ export default async function Pocetna() {
       <section className="border-b border-neutral-200/60 bg-white">
         <div className="kontejner py-9 md:py-11">
           <p className="mx-auto max-w-3xl text-center text-[17px] leading-relaxed text-neutral-600 md:text-[19px]">
-            U <strong className="font-semibold text-neutral-800">Svijet Sluha</strong> nudimo besplatnu
+            U <strong className="font-semibold text-neutral-800">Svijetu Sluha</strong> nudimo besplatnu
             provjeru sluha i vrhunske slušne aparate vodećih svjetskih brendova — uz više od 30 godina
             povjerenja i stručan tim u {poslovnice.length} poslovnica širom Bosne i Hercegovine. Provjera sluha je
             bezbolna, traje 30–45 minuta i ne obavezuje na kupovinu.

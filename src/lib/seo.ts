@@ -22,7 +22,7 @@ export function brendNaslov(cmsNaslov?: string | null) {
 export function brendOpis(cmsOpis?: string | null) {
   return cmsOpis && cmsOpis.includes(BREND.naziv) && cmsOpis.length >= 140
     ? cmsOpis
-    : 'Svijet Sluha — besplatna provjera sluha i slušni aparati vodećih svjetskih brendova, uz više od 30 godina povjerenja i fizičke poslovnice širom Bosne i Hercegovine.'
+    : 'Svijet Sluha — besplatna provjera sluha i slušni aparati vodećih svjetskih brendova, uz više od 30 godina povjerenja. Posjetite nas u 8 poslovnica širom BiH.'
 }
 
 /** Gradi Metadata za stranicu: jedinstven naslov ≤60, opis ≤155, OG/Twitter, canonical, hreflang. */

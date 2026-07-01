@@ -28,7 +28,7 @@ export const Podesavanja: GlobalConfig = {
               name: 'telefonGlavni',
               label: 'Glavni telefon (zaglavlje stranice)',
               type: 'text',
-              defaultValue: '051 218 781',
+              defaultValue: '033 977 966',
             },
             {
               name: 'emailGlavni',
@@ -56,7 +56,7 @@ export const Podesavanja: GlobalConfig = {
               maxLength: 220,
               admin: { description: 'Preporučeno 150–220 znakova (sa razmacima) za najbolji prikaz u pretrazi.' },
               defaultValue:
-                'Svijet Sluha — besplatna provjera sluha i slušni aparati vodećih svjetskih brendova, uz više od 30 godina povjerenja. Posjetite nas u Sarajevu, Banjoj Luci, Gradišci, Bijeljini, Doboju ili Brčkom.',
+                'Svijet Sluha — besplatna provjera sluha i slušni aparati vodećih svjetskih brendova, uz više od 30 godina povjerenja. Posjetite nas u 8 poslovnica širom BiH.',
             },
             { name: 'ogSlika', label: 'Podrazumijevana slika za dijeljenje', type: 'upload', relationTo: 'mediji' },
           ],

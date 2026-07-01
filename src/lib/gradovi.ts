@@ -6,6 +6,8 @@ const LOKATIV: Record<string, string> = {
   Bijeljina: 'Bijeljini',
   Doboj: 'Doboju',
   Brčko: 'Brčkom',
+  Tuzla: 'Tuzli',
+  Mostar: 'Mostaru',
 }
 
 export const uGradu = (grad: string): string => `u ${LOKATIV[grad] ?? grad}`

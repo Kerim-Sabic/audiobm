@@ -32,8 +32,8 @@ export default function Greska({ reset }: { error: Error; reset: () => void }) {
         </div>
         <p className="mt-8 flex items-center justify-center gap-2 text-neutral-600">
           <Phone className="size-5 text-brand-600" aria-hidden />
-          <a href="tel:+38751218781" className="telefon text-[22px] text-neutral-900 hover:text-brand-700">
-            051 218 781
+          <a href="tel:+38733977966" className="telefon text-[22px] text-neutral-900 hover:text-brand-700">
+            033 977 966
           </a>
         </p>
       </div>

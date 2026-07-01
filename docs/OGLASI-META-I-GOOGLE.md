@@ -99,8 +99,8 @@ za pse, polovno, iznajmljivanje, kako napraviti, youtube
 
 ### Ekstenzije (obavezno — dižu CTR)
 - **Sitelinks:** Poslovnice · Cijene i finansiranje · Online test sluha · Kontakt
-- **Callouts:** Besplatna provjera · Bez obaveze · 7 gradova · 30+ godina
-- **Call extension:** centralni telefon (051 218 781)
+- **Callouts:** Besplatna provjera · Bez obaveze · 8 poslovnica · 30+ godina
+- **Call extension:** centralni telefon (033 977 966)
 - **Location extension:** poveži Google Business profile (kad budu postavljeni)
 
 ---

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, MapPin } from 'lucide-react'
 import { dajNavigaciju, dajPodesavanja } from '@/lib/podaci'
-import { dajLokacije, opisGradova } from '@/data/locations'
+import { dajLokacije } from '@/data/locations'
 import { stvarno } from '@/lib/tekst'
 import { BREND } from '@/lib/brend'
 import { Logotip } from '@/components/ui/Logotip'
@@ -106,7 +106,7 @@ export async function Podnozje() {
             <Logotip varijanta="svijetlo" tagline />
             <p className="mt-5 max-w-xs text-[15px] leading-relaxed text-neutral-400">
               Više od 30 godina brinemo o sluhu — slušni aparati, besplatne provjere sluha i stručno
-              savjetovanje u {opisGradova(poslovnice)} Bosne i Hercegovine.
+              savjetovanje u {poslovnice.length} poslovnica širom Bosne i Hercegovine.
             </p>
             {telefon && (
               <p className="mt-6">
